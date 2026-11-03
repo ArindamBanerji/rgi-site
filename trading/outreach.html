@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RGI Trading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#FAF8F3;--ink:#1C2126;--soft:#44515C;--muted:#6B7883;--line:#E7E1D2;--card:#FFFFFF;--inset:#F3EFE5;
+  --accent:#1E6FB8;--accent-ink:#1A5C9A;--accent-wash:#1E6FB81a;--ochre:#9A5B16;--ochre-wash:#9A5B1618;--green:#0C8367;--green-wash:#0C836714;--red:#B23B2E;--red-wash:#B23B2E14;--slate:#5B6B7A;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;--head:"Archivo",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:light;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#13171B;--ink:#ECEFF2;--soft:#C3CBD2;--muted:#93A0AB;--line:#2A323A;--card:#1A2026;--inset:#12171C;
+  --accent:#5EA8E6;--accent-ink:#8CC3F0;--accent-wash:#5EA8E622;--ochre:#D79A4E;--ochre-wash:#D79A4E1f;--green:#36B394;--green-wash:#36B39422;--red:#E27A6E;--red-wash:#E27A6E1f;--slate:#9DB0BE;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#13171B;--ink:#ECEFF2;--soft:#C3CBD2;--muted:#93A0AB;--line:#2A323A;--card:#1A2026;--inset:#12171C;
+  --accent:#5EA8E6;--accent-ink:#8CC3F0;--accent-wash:#5EA8E622;--ochre:#D79A4E;--ochre-wash:#D79A4E1f;--green:#36B394;--green-wash:#36B39422;--red:#E27A6E;--red-wash:#E27A6E1f;--slate:#9DB0BE;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;margin:0;padding:24px 18px 60px;max-width:960px;margin-inline:auto}
+
+/* --- Hero --- */
+.pill{display:inline-block;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.25em .7em;border-radius:999px;background:var(--accent-wash);color:var(--accent-ink);border:1px solid #1E6FB84c;margin-bottom:10px}
+h1{font-family:var(--head);font-weight:800;font-size:1.8rem;letter-spacing:-.02em;margin:0}
+.tag{font-family:var(--head);font-weight:600;color:var(--accent-ink);font-size:1rem;margin-top:4px}
+.lede{font-size:.84rem;color:var(--soft);max-width:72ch;margin:8px 0 0;line-height:1.55}
+.lede b{color:var(--ink)}
+
+/* --- Nav --- */
+.nav-bar{position:sticky;top:0;z-index:10;background:var(--inset);border:1px solid var(--line);border-radius:12px;margin:14px 0 4px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:5px 6px}
+.nav-bar a{font-family:var(--mono);font-size:.64rem;letter-spacing:.02em;color:var(--soft);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:.4em .7em;white-space:nowrap;transition:all .2s}
+.nav-bar a:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-wash)}
+.nav-bar a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* --- Sections --- */
+section{margin-top:30px;padding-top:22px;border-top:2px solid var(--line);scroll-margin-top:80px}
+.eyebrow{font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:4px}
+h2{font-family:var(--head);font-weight:800;font-size:1.2rem;letter-spacing:-.01em;margin:2px 0 8px}
+h2 .sub{color:var(--soft);font-weight:600;font-size:.88rem}
+h3{font-family:var(--head);font-weight:700;font-size:.95rem;margin:20px 0 8px}
+
+/* --- Cards, grids --- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:10px 0}
+.card-t{font-family:var(--mono);font-size:.58rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+@media(max-width:640px){.g2{grid-template-columns:1fr}}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}
+@media(max-width:700px){.g3{grid-template-columns:1fr}}
+
+/* --- Pain sub-stories --- */
+.sub-story{margin:16px 0 0;padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.sub-story h3{margin:0 0 6px;font-size:.92rem}
+.sub-story p{margin:4px 0 0;font-size:.8rem;color:var(--soft);line-height:1.55}
+.sub-story p b{color:var(--ink)}
+.sub-story .source{font-family:var(--mono);font-size:.6rem;color:var(--muted);margin-top:6px}
+
+/* --- Walkthrough / before-after --- */
+.walk{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+.walk .step-label{font-family:var(--mono);font-size:.56rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.walk .step-label.old{color:var(--ochre)}
+.walk .step-label.rgi{color:var(--accent-ink)}
+.walk p{margin:4px 0 0;font-size:.8rem;color:var(--soft);line-height:1.55}
+.walk p b{color:var(--ink)}
+
+/* --- Factor / signal bars --- */
+.factor-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;margin:12px 0}
+@media(max-width:640px){.factor-grid{grid-template-columns:1fr}}
+.factor{display:flex;align-items:center;gap:8px;font-size:.76rem;color:var(--soft)}
+.factor .fname{flex:0 0 150px;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);text-align:right}
+.factor .bar-bg{flex:1;height:8px;background:var(--inset);border-radius:4px;overflow:hidden}
+.factor .bar-fill{height:100%;border-radius:4px;background:var(--accent)}
+.factor .fval{flex:0 0 34px;font-family:var(--mono);font-size:.68rem;font-weight:600;color:var(--accent-ink)}
+
+/* --- Timeline --- */
+.timeline{position:relative;margin:16px 0 16px 20px;padding-left:24px;border-left:2px solid var(--line)}
+.timeline .tick{position:relative;margin-bottom:16px}
+.timeline .tick::before{content:'';position:absolute;left:-29px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--paper)}
+.timeline .tick .when{font-family:var(--mono);font-size:.62rem;font-weight:600;color:var(--accent-ink);margin-bottom:2px}
+.timeline .tick p{margin:0;font-size:.8rem;color:var(--soft);line-height:1.5}
+.timeline .tick p b{color:var(--ink)}
+.timeline .tick.green::before{background:var(--green)}
+.timeline .tick.green .when{color:var(--green)}
+
+/* --- Pillar imprint --- */
+.pillar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+@media(max-width:700px){.pillar-grid{grid-template-columns:repeat(2,1fr)}}
+.pi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;position:relative;transition:border-color .2s}
+.pi:hover{border-color:#1E6FB87f}
+.pi .pn{font-family:var(--mono);font-size:.52rem;font-weight:600;letter-spacing:.06em;color:var(--accent-ink);text-transform:uppercase;margin-bottom:3px}
+.pi h4{font-family:var(--head);font-weight:700;font-size:.78rem;margin:0 0 4px;line-height:1.25}
+.pi .pw{font-size:.68rem;color:var(--soft);line-height:1.4;margin:0}
+.pi .pw b{color:var(--ink)}
+
+/* --- Pillar badge (inline tag) --- */
+.pb{display:inline-block;font-family:var(--mono);font-size:.5rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:.2em .5em;border-radius:5px;background:var(--accent-wash);color:var(--accent-ink);border:1px solid #1E6FB833;vertical-align:middle;margin:0 2px}
+
+/* --- Conservation status chips --- */
+.cs{display:inline-block;font-family:var(--mono);font-size:.52rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.2em .55em;border-radius:5px;vertical-align:middle}
+.cs.g{background:var(--green-wash);color:var(--green);border:1px solid #0C836759}
+.cs.a{background:var(--ochre-wash);color:var(--ochre);border:1px solid #9A5B1659}
+.cs.r{background:var(--red-wash);color:var(--red);border:1px solid #B23B2E59}
+.chip{display:inline-block;font-family:var(--mono);font-size:.5rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.22em .5em;border-radius:5px;background:var(--inset);color:var(--muted);border:1px solid var(--line);vertical-align:middle}
+.chip.live{background:var(--green-wash);color:var(--green);border-color:#0C836759}
+.chip.soon{background:var(--ochre-wash);color:var(--ochre);border-color:#9A5B1659}
+
+/* --- With/Without --- */
+.ww .row{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.ww .row .without{background:var(--inset);padding:14px 16px;border-right:1px solid var(--line)}
+.ww .row .with{background:#f5f9fc;padding:14px 16px}
+.ww .row h4{font-family:var(--mono);font-size:.56rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin:0 0 6px}
+.ww .row .without h4{color:var(--ochre)}
+.ww .row .with h4{color:var(--accent-ink)}
+.ww .row p{margin:0;font-size:.78rem;color:var(--soft);line-height:1.5}
+.ww .row p b{color:var(--ink)}
+.ww .row .impact{font-family:var(--mono);font-size:.68rem;font-weight:600;color:var(--accent-ink);margin-top:8px}
+@media(max-width:640px){.ww .row{grid-template-columns:1fr}.ww .row .without{border-right:0;border-bottom:1px solid var(--line)}}
+
+/* --- Callouts --- */
+.callout{margin:14px 0;padding:14px 16px;background:var(--accent-wash);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;font-size:.82rem;color:var(--ink);line-height:1.55}
+.callout b{color:var(--accent-ink)}
+.callout-green{background:var(--green-wash);border-left-color:var(--green)}
+.callout-green b{color:var(--green)}
+.callout-ochre{background:var(--ochre-wash);border-left-color:var(--ochre)}
+.callout-ochre b{color:var(--ochre)}
+
+/* --- Tables --- */
+table{width:100%;border-collapse:collapse;font-size:.76rem;margin:12px 0}
+th{font-family:var(--mono);font-size:.54rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:2px solid var(--line);background:var(--inset)}
+td{padding:8px 10px;border-bottom:1px solid var(--line);color:var(--soft);vertical-align:top}
+td b{color:var(--ink);font-weight:600}
+td.us{background:var(--accent-wash);color:var(--ink)}
+
+/* --- KPI row --- */
+.kpi-row{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;flex:1;min-width:120px}
+.kpi .v{font-family:var(--head);font-weight:800;font-size:1.2rem;color:var(--accent-ink)}
+.kpi .l{font-size:.58rem;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.03em;font-family:var(--mono)}
+
+/* --- Quick wins --- */
+.qw{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.qw h4{font-family:var(--head);font-weight:700;font-size:.84rem;margin:0 0 4px}
+.qw p{margin:0;font-size:.78rem;color:var(--soft);line-height:1.5}
+.qw p b{color:var(--ink)}
+.qw .metrics{font-family:var(--mono);font-size:.66rem;color:var(--accent-ink);margin-top:6px}
+
+/* --- Level cards --- */
+.level{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:8px;position:relative}
+.level .lnum{font-family:var(--mono);font-size:.72rem;font-weight:800;color:var(--accent-ink);position:absolute;top:14px;right:16px}
+.level h4{font-family:var(--head);font-weight:700;font-size:.84rem;margin:0 0 4px}
+.level p{margin:0;font-size:.78rem;color:var(--soft);line-height:1.5}
+.level p b{color:var(--ink)}
+.level.us{border-color:#1E6FB866;background:#f3f7fb}
+
+/* --- Connector pills --- */
+.conn-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.conn{font-family:var(--mono);font-size:.6rem;padding:.3em .6em;border-radius:7px;border:1px solid var(--line);background:var(--card);color:var(--soft)}
+.conn.live{border-color:#0C836766;color:var(--green);background:var(--green-wash)}
+
+/* --- Use-case / scenario cards (house format) --- */
+.ucgrid{display:flex;flex-direction:column;gap:14px;margin-top:4px}
+.uc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 17px;margin:12px 0}
+.uch{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 12px;margin-bottom:7px}
+.uct{font-family:var(--head);font-weight:800;font-size:1.0rem;letter-spacing:-.01em}
+.ucf{font-family:var(--mono);font-size:.62rem;color:var(--soft)}
+.ucs{font-size:.82rem;color:var(--soft);line-height:1.5;margin:0 0 9px}
+.ucs b{color:var(--ink);font-weight:600}
+.ucmech{border:1px solid var(--line);border-radius:10px;background:var(--paper);padding:9px 12px 5px;margin-bottom:9px}
+.ucmt{font-family:var(--mono);font-size:.56rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:3px}
+.ucbar{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;padding-top:9px;border-top:1px dashed var(--line)}
+.ucloop{font-family:var(--mono);font-size:.6rem;color:var(--muted)}
+.uck{font-size:.78rem;color:var(--soft)}
+.uck b{color:var(--accent-ink);font-weight:600}
+.ucmoved{font-family:var(--head);font-weight:800;color:var(--accent-ink);font-size:.9rem;margin-left:auto}
+
+/* --- Compounding loop connector --- */
+.loop-strip{margin:18px 0 6px;padding:14px 16px;background:var(--inset);border:1px solid var(--line);border-radius:12px;text-align:center}
+.loop-strip .loop-label{font-family:var(--mono);font-size:.54rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-ink);margin-bottom:6px}
+.loop-strip p{font-size:.76rem;color:var(--soft);margin:0;line-height:1.5}
+.loop-strip p b{color:var(--ink)}
+
+/* --- Footer --- */
+.disc{font-family:var(--mono);font-size:.54rem;color:var(--muted);text-align:center;margin-top:40px;text-transform:uppercase;letter-spacing:.04em}
+.footer{text-align:center;margin-top:20px;font-size:.78rem;color:var(--muted)}
+.footer a{color:var(--accent-ink);text-decoration:none}
+svg{max-width:100%;height:auto;display:block}
+
+/* --- Fragment bullet lists --- */
+ul.frags{margin:8px 0 0;padding:0;list-style:none}
+ul.frags li{position:relative;padding-left:16px;font-size:.82rem;color:var(--soft);line-height:1.5;margin:4px 0}
+ul.frags li::before{content:'';position:absolute;left:2px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.75}
+ul.frags li b{color:var(--ink);font-weight:600}
+ul.frags.tight li{font-size:.78rem;margin:3px 0}
+ul.frags li .cs,ul.frags li .pb{vertical-align:baseline}
+</style>
+</head>
+<body>
+
+<!-- ============================================================ HERO ============================================================ -->
+<span class="pill">RGI Trading · Compounding Intelligence</span>
+<h1>RGI Trading</h1>
+<div class="tag">The open-source, post-trade layer that learns your trading biases</div>
+<p class="lede">Every trading tool helps you <b>execute</b>. None measures <b>how you decide</b> — so the same mistakes repeat and the same edge goes unproven, trade after trade.</p>
+<ul class="frags">
+  <li>Learns which of <b>your</b> signals are real edge vs noise — your favorite setup is often your worst</li>
+  <li>Proves when a strategy is <b>safe to scale</b> — from your execution, not a backtest</li>
+  <li>Shows where your edge <b>grows in volatile markets</b> — and whether your bets on volatility carry an edge</li>
+  <li><b>Flags the regime break before the tail</b> — the blow-up that drains most accounts</li>
+  <li><b>Post-trade, observation-only · open-source, self-hosted</b> — it reviews your completed trades and never recommends one; the competence layer the agentic wave lacks, and your data never leaves your machine</li>
+</ul>
+
+<!-- ICP self-qualifier -->
+<div style="margin-top:13px;padding:11px 15px;border:1px dashed #1E6FB859;border-radius:10px;background:var(--accent-wash)">
+  <span style="font-family:var(--mono);font-size:.56rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink)">If this is you</span>
+  <p style="margin:5px 0 0;font-size:.8rem;color:var(--soft);line-height:1.5">You've been profitable but give it back in drawdowns. You suspect your <b>favorite setup isn't your best one</b>. You keep a journal — and it still can't tell you why Q4 erased Q3. <span style="color:var(--muted)">Fits if you're 2+ years in, $50K–$500K, on TradingView + Alpaca/IBKR. (Run a small desk? There's a section for you near the end.)</span></p>
+</div>
+
+<div style="margin-top:13px;padding:12px 16px;border-left:3px solid var(--accent);background:var(--accent-wash);border-radius:0 10px 10px 0">
+  <p style="margin:0;font-size:.85rem;color:var(--ink);line-height:1.6">You point it at 8 months of Alpaca fills. Three minutes later: your RSI+MACD setup — the one you take 3× more than anything — earns <b>12% trust</b>. The volume-breakout you rarely take? <b>94%</b>. The ranking inverts. That's minute three, on history you already have.</p>
+</div>
+<p style="margin:8px 0 0;font-family:var(--mono);font-size:.68rem;color:var(--muted)"><b style="color:var(--accent-ink)">Scope today:</b> equities &amp; ETFs are live · options (IV/RV regime, premium timing) is next (v1.1).</p>
+
+
+<!-- ============================================================ NAV ============================================================ -->
+<nav class="nav-bar" id="navBar">
+  <a href="#s1" data-nav="1">1. Problem</a>
+  <a href="#s8" data-nav="8">2. The product</a>
+  <a href="#s2" data-nav="2">3. One setup</a>
+  <a href="#s3" data-nav="3">4. Earned trust</a>
+  <a href="#s4" data-nav="4">5. Volatile week</a>
+  <a href="#s9" data-nav="9">6. Compounds</a>
+  <a href="#s10" data-nav="10">7. Volatility edge</a>
+  <a href="#s13" data-nav="13">8. Landscape</a>
+  <a href="#s5" data-nav="5">9. What it costs</a>
+  <a href="#s11" data-nav="11">10. Value</a>
+  <a href="#s12" data-nav="12">11. Pricing</a>
+  <a href="#s6" data-nav="6">12. Where it fits</a>
+  <a href="#s7" data-nav="7">13. Quick wins</a>
+  <a href="#s14" data-nav="14">14. Start</a>
+</nav>
+
+<!-- ============================================================ §1 THE PROBLEM ============================================================ -->
+<!-- ===== s1 ===== -->
+<section id="s1">
+<div class="eyebrow">The problem</div>
+<h2>You gave back Q3's gains in Q4 — and your journal can't tell you why</h2>
+<p class="lede">Every tool helps you <b>execute</b>; none computes over your verified outcomes to tell you how you actually trade.</p>
+<ul class="frags">
+  <li><b>Everything is static</b> — TradingView charts, Alpaca/IBKR fill, your journal records; trade #10,000 scored like trade #1</li>
+  <li><b>You can't prove what you suspect</b> — your most-traded setup underperforms your average, while a setup you rarely take quietly beats it</li>
+  <li>Size jumps 40% after three winners · Friday 2–4pm Sharpe 0.3 vs 1.8 overall — all buried in monthly P&L</li>
+  <li><b>The journal always has an insight</b> — so none can tell you when you're genuinely clean</li>
+</ul>
+
+<p class="lede" style="margin-top:14px">Four structural limits of the current stack — architecture gaps, not feature gaps:</p>
+<div class="g2">
+  <div class="card"><div class="card-t">1 · Record, don't compute</div><p style="font-size:.78rem;color:var(--soft);margin:0;line-height:1.55">Journals store P&L by setup. <span class="pb">signal truth</span> None compute per-signal, outcome-conditioned variance — which indicator is signal and which is noise <b>for you</b>.</p></div>
+  <div class="card"><div class="card-t">2 · Model the strategy, not the trader</div><p style="font-size:.78rem;color:var(--soft);margin:0;line-height:1.55">Backtests assume perfect execution. <span class="pb">proof to scale</span> They can't prove a strategy is safe to scale on <b>your</b> real fills and exits.</p></div>
+  <div class="card"><div class="card-t">3 · Static scoring</div><p style="font-size:.78rem;color:var(--soft);margin:0;line-height:1.55">No verified outcome feeds back. <span class="pb">fingerprint</span> Day 365 runs the same logic as Day 1 — your edge drifts and nothing notices.</p></div>
+  <div class="card"><div class="card-t">4 · Always an answer</div><p style="font-size:.78rem;color:var(--soft);margin:0;line-height:1.55">No abstention, no competence boundary. <span class="pb">proof gate</span> <span class="pb">steps back</span> Can't certify "clean," can't cut its own autonomy when the regime breaks.</p></div>
+</div>
+
+<div style="margin-top:14px;padding:13px 16px;border:1.5px solid #1E6FB872;border-radius:12px;background:var(--accent-wash)">
+  <div class="card-t" style="margin-bottom:5px">What RGI Trading will never do</div>
+  <p style="margin:0;font-size:.82rem;color:var(--ink);line-height:1.6"><b>Place a trade · recommend a position · send a signal · share your data · train on your record · issue a directive.</b> It measures your completed trades. You decide. That boundary is the product, not a setting we'll relax.</p>
+</div>
+</section>
+
+<!-- ===== s8 ===== -->
+<section id="s8">
+<div class="eyebrow">The product</div>
+<h2>The whole product — eight capabilities on one closed loop</h2>
+<p class="lede">You don't buy features — you buy self-knowledge you can act on. Each capability answers a question your current stack can't; together they compound with every verified trade.</p>
+
+<div class="pillar-grid">
+  <div class="pi"><div class="pn">Which of your signals actually work</div><h4>The real edge vs the noise</h4><p class="pw">Your most-trusted signal is often your noisiest — the gap is the bias. <span class="cs a" style="background:var(--inset);color:var(--muted);border:1px solid var(--line)">DiagonalKernel</span></p></div>
+  <div class="pi"><div class="pn">Proof before you size up</div><h4>Scale only what's proven</h4><p class="pw">A theorem, not a policy — and it pauses what's decaying. <span class="cs a" style="background:var(--inset);color:var(--muted);border:1px solid var(--line)">Conservation law</span></p></div>
+  <div class="pi"><div class="pn">Where your edge lives by regime</div><h4>Your edge isn't uniform</h4><p class="pw">Your weights at VIX 15 differ from VIX 32 — it learns both. <span class="cs a" style="background:var(--inset);color:var(--muted);border:1px solid var(--line)">Regime-conditioned trust</span></p></div>
+  <div class="pi"><div class="pn">The fingerprint of how you trade</div><h4>Your reality in numbers</h4><p class="pw">Biases, strengths, blind spots in ~200 learned values. It never forgets. <span class="cs a" style="background:var(--inset);color:var(--muted);border:1px solid var(--line)">Judgment memory</span></p></div>
+  <div class="pi"><div class="pn">Only the findings that hold up</div><h4>Proof, not stories</h4><p class="pw">FDR + deflated Sharpe + 70/30 out-of-sample. Abstains when the data isn't there. <span class="cs a" style="background:var(--inset);color:var(--muted);border:1px solid var(--line)">Claim gate</span></p></div>
+  <div class="pi"><div class="pn">Knows when to step back</div><h4>Flags where you were out of your depth</h4><p class="pw">On a regime break your record shows where to have cut back — the restraint a reward-maximizer's objective skips. <span class="cs a" style="background:var(--inset);color:var(--muted);border:1px solid var(--line)">Autonomy throttle</span></p></div>
+  <div class="pi"><div class="pn">Comes back faster after a break</div><h4>Not from zero</h4><p class="pw">Re-initializes from the nearest prior regime's geometry. <span class="cs a">roadmap</span></p></div>
+  <div class="pi" style="border-color:#1E6FB872"><div class="pn">Every trade enriches the rest</div><h4>The compounding engine</h4><p class="pw">Each trade sharpens the read on the others — and nothing resets. <span class="cs a" style="background:var(--inset);color:var(--muted);border:1px solid var(--line)">Cross-Graph Attention</span></p></div>
+</div>
+<p style="margin:2px 0 0;font-size:.72rem;color:var(--muted);line-height:1.55">Under the hood: <b>DiagonalKernel</b> decomposes your outcome variance per signal (online Welford σ) to separate edge from noise · <b>Conservation law</b> gates scaling on aggregate accuracy + per-factor drift + rate-of-change · <b>Cross-Graph Attention</b> links every trade so each sharpens the rest · the ~200 learned values are per-(setup × action) centroids in your factor space.</p>
+
+<div class="card">
+  <div class="card-t">The compounding loop — one verified trade, three improvements at once</div>
+  <svg viewBox="0 0 760 210" role="img" aria-label="A loop: one verified trade feeds three improvements — signal trust, data enrichment, and the safety floor — which together make the next trade sharper.">
+    <!-- source -->
+    <rect x="30" y="80" width="150" height="48" rx="8" fill="var(--accent-wash)" stroke="#1E6FB859"/>
+    <text x="105" y="100" text-anchor="middle" font-family="var(--head)" font-weight="700" font-size="12" fill="var(--accent-ink)">one verified</text>
+    <text x="105" y="116" text-anchor="middle" font-family="var(--head)" font-weight="700" font-size="12" fill="var(--accent-ink)">trade</text>
+    <!-- three channels -->
+    <g font-family="var(--mono)" font-size="10" fill="var(--ink)">
+      <rect x="300" y="20" width="230" height="40" rx="7" fill="var(--card)" stroke="var(--line)"/><text x="315" y="44" fill="var(--soft)">↑ <tspan font-weight="600" fill="var(--ink)">signal trust</tspan> — which to weight</text>
+      <rect x="300" y="84" width="230" height="40" rx="7" fill="var(--card)" stroke="#1E6FB859"/><text x="315" y="108" fill="var(--soft)">↑ <tspan font-weight="600" fill="var(--accent-ink)">enrichment</tspan> — each trade lifts the rest</text>
+      <rect x="300" y="148" width="230" height="40" rx="7" fill="var(--card)" stroke="var(--line)"/><text x="315" y="172" fill="var(--soft)">↑ <tspan font-weight="600" fill="var(--ink)">safety floor</tspan> — what's proven to scale</text>
+    </g>
+    <!-- arrows source -> channels -->
+    <g stroke="var(--muted)" fill="none" stroke-width="1.6">
+      <path d="M180 100 C 250 100, 240 40, 298 40"/><path d="M180 104 L 298 104"/><path d="M180 108 C 250 108, 240 168, 298 168"/>
+    </g>
+    <!-- return -->
+    <rect x="600" y="80" width="140" height="48" rx="8" fill="var(--green-wash)" stroke="#0C836759"/>
+    <text x="670" y="100" text-anchor="middle" font-family="var(--head)" font-weight="700" font-size="12" fill="var(--green)">sharper</text>
+    <text x="670" y="116" text-anchor="middle" font-family="var(--head)" font-weight="700" font-size="12" fill="var(--green)">next trade</text>
+    <g stroke="var(--green)" fill="none" stroke-width="1.6"><path d="M530 40 C 580 40, 600 90, 600 100"/><path d="M530 104 L 598 104"/><path d="M530 168 C 580 168, 600 118, 600 108"/></g>
+    <path d="M670 128 C 670 196, 105 196, 105 130" stroke="var(--muted)" fill="none" stroke-width="1.4" stroke-dasharray="4 4"/>
+    <text x="388" y="208" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--muted)">the gap against a static tool widens every month — it never narrows</text>
+  </svg>
+</div>
+
+<h3>What you actually see — the panels</h3>
+<div class="g2">
+  <div class="card"><div class="card-t">Trust Radar + proof badge</div><ul class="frags tight"><li>Your signals in your confidence order — then the radar inverts on verified outcomes</li><li>Badge shows FDR-cleared + held out-of-sample</li></ul></div>
+  <div class="card"><div class="card-t">Regime analytics + autonomy band</div><ul class="frags tight"><li>Accuracy &amp; Sharpe per strategy, by regime</li><li>GREEN/AMBER/RED band on the system's own competence</li></ul></div>
+  <div class="card"><div class="card-t">Fingerprint + certificate</div><ul class="frags tight"><li>Your reality in ~200 learned values — the judgment memory of your book</li><li>"Genuinely clean" certificate when nothing survives correction</li></ul></div>
+  <div class="card"><div class="card-t">Signal trust weights (illustrative)</div>
+    <div class="factor-grid" style="margin:4px 0 0">
+      <div class="factor"><span class="fname">volume + trend</span><span class="bar-bg"><span class="bar-fill" style="width:94%"></span></span><span class="fval">94%</span></div>
+      <div class="factor"><span class="fname">RSI + MACD</span><span class="bar-bg"><span class="bar-fill" style="width:12%;background:var(--red)"></span></span><span class="fval" style="color:var(--red)">12%</span></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== s2 ===== -->
+<section id="s2">
+<div class="eyebrow">How it reads you · one setup, this morning</div>
+<h2>How it reads one setup — judgment where a journal sees only P&L</h2>
+<ul class="frags">
+  <li>One decision, start to finish — your go-to setup, scored by whether it predicts <b>your</b> outcomes, not by last month's P&L</li>
+  <li><b>Observation only</b> — it reports what it measured; you decide</li>
+</ul>
+
+<div class="ww">
+  <div class="row">
+    <div class="without"><h4>Without · your favorite setup</h4><p>RSI+MACD is your go-to — taken 3× more than anything else. Win rate 48%, below your 54% average. Your boring volume-breakout runs 71%. Monthly P&L hides it.</p></div>
+    <div class="with"><h4>With · signal trust radar</h4><p>"RSI+MACD: σ=0.31 (noisy), trust weight <b>12%</b>. Volume+trend: σ=0.09, weight <b>94%</b>. You take the noisy one 3× more often." The gap between expected and actual importance <b>is</b> the bias.</p><div class="impact">Your true Sharpe is <b>1.2</b>, not the 2.1 you believed — the gap was unpriced noise**</div></div>
+  </div>
+</div>
+<p style="margin:6px 0 0;font-size:.72rem;color:var(--muted);line-height:1.5">** Modeled / illustrative. Trust weights are FDR-corrected and out-of-sample checked, not raw win-rates — see the proof gate below.</p>
+
+<div class="card">
+  <div class="card-t">The trust radar — expected importance vs what your outcomes prove</div>
+  <svg viewBox="0 0 760 300" role="img" aria-label="Radar chart contrasting the trader's expected signal importance with the importance earned from verified outcomes; the most-trusted signal resolves to the noisiest.">
+    <g transform="translate(200,150)">
+      <circle r="110" fill="none" stroke="var(--line)"/><circle r="73" fill="none" stroke="var(--line)"/><circle r="37" fill="none" stroke="var(--line)"/>
+      <g stroke="var(--line)">
+        <line x1="0" y1="0" x2="0" y2="-110"/><line x1="0" y1="0" x2="95" y2="-55"/><line x1="0" y1="0" x2="95" y2="55"/>
+        <line x1="0" y1="0" x2="0" y2="110"/><line x1="0" y1="0" x2="-95" y2="55"/><line x1="0" y1="0" x2="-95" y2="-55"/>
+      </g>
+      <polygon points="0,-104 90,-52 48,28 0,55 -62,36 -78,-45" fill="none" stroke="var(--ochre)" stroke-width="2" stroke-dasharray="5 4"/>
+      <polygon points="0,-30 40,-23 90,52 0,92 -48,28 -70,-40" fill="var(--accent-wash)" stroke="var(--accent)" stroke-width="2.4"/>
+      <text x="0" y="-120" text-anchor="middle" font-size="10" font-family="var(--mono)" fill="var(--ochre)" font-weight="600">RSI+MACD</text>
+      <text x="108" y="-58" font-size="10" font-family="var(--mono)" fill="var(--soft)">momentum</text>
+      <text x="108" y="66" font-size="10" font-family="var(--mono)" fill="var(--accent-ink)" font-weight="600">volume+trend</text>
+      <text x="0" y="128" text-anchor="middle" font-size="10" font-family="var(--mono)" fill="var(--soft)">mean-rev</text>
+      <text x="-108" y="66" text-anchor="end" font-size="10" font-family="var(--mono)" fill="var(--soft)">gap fill</text>
+      <text x="-108" y="-58" text-anchor="end" font-size="10" font-family="var(--mono)" fill="var(--soft)">breakout</text>
+    </g>
+    <g transform="translate(430,120)" font-family="var(--mono)" font-size="11">
+      <line x1="0" y1="0" x2="26" y2="0" stroke="var(--ochre)" stroke-width="2" stroke-dasharray="5 4"/><text x="34" y="4" fill="var(--soft)">what you believe you weight</text>
+      <line x1="0" y1="22" x2="26" y2="22" stroke="var(--accent)" stroke-width="2.4"/><text x="34" y="26" fill="var(--soft)">what your outcomes prove</text>
+      <text x="0" y="58" fill="var(--ink)" font-weight="600" style="font-family:var(--head)">The ranking inverts.</text>
+      <text x="0" y="76" fill="var(--muted)">Your #1 signal is your noisiest —</text>
+      <text x="0" y="92" fill="var(--muted)">highest σ, lowest earned trust.</text>
+    </g>
+  </svg>
+</div>
+<p class="lede" style="margin-top:2px">Nobody could tell you this — not a coach, not a dashboard. Only your own verified decisions could. A journal records; this reflects.</p>
+</section>
+
+<!-- ===== s3 ===== -->
+<section id="s3">
+<div class="eyebrow">Earned trust</div>
+<h2>It earns the right to be trusted — or it says nothing</h2>
+<p class="lede">It never issues a directive, so "trust" here is narrow and testable:</p>
+<ul class="frags">
+  <li><b>Proof to scale</b> — the conservation law shows what's safe to size up, from your execution</li>
+  <li><b>Claims that hold up</b> — the gate certifies only findings that survive correction</li>
+  <li><b>Abstention</b> — when the evidence isn't there, it says nothing</li>
+</ul>
+
+<h3>Which of your strategies belong in this situation <span class="pb">proof to scale</span></h3>
+<div class="card">
+  <div class="card-t">The gate reads your verified record, not a backtest — and matches strategy to situation</div>
+  <ul class="frags tight">
+    <li>There's no one winning strategy — there are many, each with its own regime</li>
+    <li>For the situation at hand, your record shows which carry verified edge <span class="cs g">GREEN</span> and which don't belong here <span class="cs r">RED</span></li>
+    <li>The conservation gate is a <b>competence-zone check</b> — which strategies fit, not how large to bet</li>
+  </ul>
+</div>
+
+<div class="g2">
+  <div class="walk">
+    <div class="step-label old">The strategy that quietly died</div>
+    <p>A swing-momentum strategy ran 18 months, went negative 6 weeks ago. You're still trading it — "it'll come back."</p>
+    <div class="step-label rgi" style="margin-top:8px">Conservation flags it</div>
+    <p>"Accuracy 68% → 49%, rolling quality below floor. Regime shifted trending → ranging — this strategy is out of its competence zone now." <span class="cs a">AMBER</span></p>
+  </div>
+  <div class="walk">
+    <div class="step-label old">A new strategy you're tempted to lean on</div>
+    <p>Backtest flatters it; your live sample is thin. Is the edge real for this situation yet?</p>
+    <div class="step-label rgi" style="margin-top:8px">The record says: not yet</div>
+    <p>"50 trades, σ=0.12 — hasn't cleared the gate for this regime. Your record shows it isn't earned confidence; it stays a watch." <span class="cs a">watch</span></p>
+  </div>
+</div>
+
+<div class="callout">
+  <b>The proof gate, in one line:</b> a finding becomes a claim only if it clears Benjamini-Hochberg FDR across all detectors, beats a deflated-Sharpe threshold, and holds on a 30% confirm set it never saw. Below the bar: "insufficient data (N=4). No score issued." It would rather say nothing than sell you noise.
+</div>
+</section>
+
+<!-- ===== s4 ===== -->
+<section id="s4">
+<div class="eyebrow">End to end · one volatile week</div>
+<h2>One volatile week — read back from your record, where the band flips and why</h2>
+<ul class="frags">
+  <li>The single incident that separates this from everything else</li>
+  <li>A calm tape turns violent mid-week — exactly when a reward-maximizer, trained on the calm, sizes into the break</li>
+  <li>Illustrative, modeled from trading-engine fixtures; no production customers</li>
+</ul>
+
+<div class="timeline">
+  <div class="tick"><div class="when">Mon–Tue · calm</div><p>Health band <b>GREEN</b>. Leveraged long the momentum names that ran all spring — full size, "this is easy."</p></div>
+  <div class="tick"><div class="when">Wed · the break</div><p>VIX gaps 16 → 31. Local-Hurst + tail-dependence mark a regime break. The band flips <span class="cs a">AMBER</span> — <b>the point your record shows to step back until the regime re-converges.</b> It's the flag before the tail that drains a leveraged momentum book.</p></div>
+  <div class="tick"><div class="when">Thu · rotate, don't flee</div><p>Not "reduce everything." Your <b>mean-reversion book runs 71% at VIX 25–35</b> (GREEN); your <b>breakout/momentum book 38%</b> (RED). Lean into what works in the regime.</p></div>
+  <div class="tick green"><div class="when">Fri · re-converged</div><p>Band back toward GREEN. A cold-start learner relearns from zero; this kept the prior vol-regime's geometry and came back faster.</p></div>
+</div>
+
+<div class="card">
+  <div class="card-t">The health band through the break — where it flips to AMBER, and recovers</div>
+  <svg viewBox="0 0 760 180" role="img" aria-label="A health band green while the regime is stable, amber at a detected regime break as the system lowers its own autonomy, then returning toward green as it re-converges.">
+    <line x1="60" y1="140" x2="710" y2="140" stroke="var(--line)"/>
+    <line x1="60" y1="30" x2="60" y2="140" stroke="var(--line)"/>
+    <g font-family="var(--mono)" font-size="9" fill="var(--muted)">
+      <text x="54" y="40" text-anchor="end">full</text><text x="54" y="143" text-anchor="end">0</text>
+      <text x="90" y="156" text-anchor="middle">calm</text><text x="360" y="156" text-anchor="middle" fill="var(--ochre)">regime break</text><text x="660" y="156" text-anchor="middle">re-converged</text>
+    </g>
+    <rect x="330" y="30" width="120" height="110" fill="var(--ochre-wash)"/>
+    <polyline points="60,55 300,55 330,60 360,112 420,118 470,108 560,88 660,66 710,62" fill="none" stroke="var(--accent)" stroke-width="2.6"/>
+    <circle cx="180" cy="55" r="4" fill="var(--green)"/><circle cx="390" cy="115" r="4" fill="var(--ochre)"/><circle cx="660" cy="66" r="4" fill="var(--green)"/>
+    <text x="180" y="46" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--green)" font-weight="600">GREEN</text>
+    <text x="392" y="106" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--ochre)" font-weight="600">AMBER</text>
+  </svg>
+</div>
+
+<div class="ww">
+  <div class="row">
+    <div class="without"><h4>Leveraged momentum book · at the break</h4><p>You're leveraged long the momentum names that worked all spring (QQQ/TQQQ or your two hottest tickers). VIX gaps 16→31, they gap down together — a <b>$30–80K drawdown</b> — and the breach takes the account.</p></div>
+    <div class="with"><h4>RGI Trading · reading that week</h4><p>Your record shows where the band flips AMBER — where to have cut back and leaned to the regime-GREEN book. A reward-maximizer optimizes for return; that restraint isn't in its objective, and the agents shipping today skip it.</p></div>
+  </div>
+</div>
+</section>
+
+<!-- ===== s9 ===== -->
+<section id="s9">
+<div class="eyebrow">Every trade enriches the rest · why it compounds</div>
+<h2>Data enrichment — each trade sharpens the others, and nothing resets</h2>
+<p class="lede">The capability behind the compounding: every trade you've ever made, unified into one graph where each sharpens the read on the rest.</p>
+
+<div class="g3">
+  <div class="qw"><h4>One record, every broker</h4><ul class="frags tight"><li>Alpaca + IBKR + CSV + the spreadsheet → one graph</li><li>Switch brokers or tools — <b>you never start over</b></li><li>The fingerprint is yours, not locked to a SaaS</li></ul></div>
+  <div class="qw"><h4>Sharper from day one</h4><ul class="frags tight"><li>A new setup reads off your whole enriched history, not from scratch</li><li>Each trade lifts the priors on related setups and regimes</li><li>Day-1 accuracy well above a cold start</li></ul></div>
+  <div class="qw"><h4>It carries when you don't</h4><ul class="frags tight"><li>Step away for a quarter — the judgment persists</li><li>Hand a book on — ~200 values transfer to the next trader</li><li>No knowledge walks out the door</li></ul></div>
+</div>
+
+<div class="card">
+  <div class="card-t">Day-one accuracy over the first months — the enriched graph pulls away, the cold start stays flat</div>
+  <svg viewBox="0 0 760 210" role="img" aria-label="Two lines over six months: the cold-start line stays flat near 50 percent while the graph-enriched line rises from about 50 to about 72 percent. The widening gap is the compounding.">
+    <line x1="80" y1="24" x2="80" y2="170" stroke="var(--line)"/><line x1="80" y1="170" x2="720" y2="170" stroke="var(--line)"/>
+    <g font-family="var(--mono)" font-size="9.5" fill="var(--muted)">
+      <line x1="80" y1="128" x2="720" y2="128" stroke="var(--line)" stroke-dasharray="2 3"/><text x="74" y="131" text-anchor="end">50%</text>
+      <line x1="80" y1="66" x2="720" y2="66" stroke="var(--line)" stroke-dasharray="2 3"/><text x="74" y="69" text-anchor="end">70%</text>
+      <text x="82" y="186" text-anchor="start">day 1</text><text x="400" y="186" text-anchor="middle">month 3</text><text x="718" y="186" text-anchor="end">month 6</text>
+    </g>
+    <polyline points="80,128 720,126" fill="none" stroke="var(--slate)" stroke-width="2.4" stroke-dasharray="7 4"/>
+    <circle cx="720" cy="126" r="3.5" fill="var(--slate)"/><text x="712" y="140" text-anchor="end" font-family="var(--mono)" font-size="10" fill="var(--slate)">cold start · a fork</text>
+    <polyline points="80,127 230,106 400,84 560,66 720,54" fill="none" stroke="var(--accent)" stroke-width="2.8"/>
+    <circle cx="80" cy="127" r="3.5" fill="var(--accent)"/><circle cx="720" cy="54" r="4.5" fill="var(--accent)"/>
+    <text x="712" y="46" text-anchor="end" font-family="var(--mono)" font-size="10" font-weight="600" fill="var(--accent-ink)">your enriched graph</text>
+    <text x="300" y="60" text-anchor="middle" font-family="var(--mono)" font-size="10" font-weight="600" fill="var(--accent-ink)">the widening gap is the compounding · +~20pp by month 6</text>
+  </svg>
+  <p class="source">Illustrative; magnitude modeled. Both start near a cold 50%; only the enriched graph climbs — which is why a copycat forking the code starts far behind. See the moat.</p>
+</div>
+</section>
+
+<!-- ===== s10 ===== -->
+<section id="s10">
+<div class="eyebrow">See it · the scenarios</div>
+<h2>The call a journal makes vs the call RGI makes</h2>
+<ul class="frags">
+  <li>Five scenarios from your own record — what caught it, what it costs, what moves</li>
+  <li>Weighted to volatility — the key differentiator; the options / short-vol cases are the <b>v1.1 extension</b>, tagged below</li>
+  <li>Every "with" is observation only; illustrative, modeled from fixtures; no production customers</li>
+</ul>
+
+<div class="ucgrid">
+
+  <div class="uc">
+    <div class="uch"><div class="uct">Your favorite setup is your worst</div><div class="ucf">Can't prove your edge → Which Signals Actually Work · <span class="chip live">live</span></div></div>
+    <p class="ucs"><b>Without:</b> you take RSI+MACD 3× more than anything — it wins 48% vs your 54% average; the boring volume-breakout runs 71%, and monthly P&L hides it. <b>With:</b> the trust radar resolves on your verified trades and inverts — your #1 signal is your noisiest.</p>
+    <div class="ucmech"><div class="ucmt">earned trust weight · your outcomes, not your gut</div>
+      <svg viewBox="0 0 560 96" role="img" aria-label="Two bars: RSI+MACD earns a 12% trust weight while volume+trend earns 94%.">
+        <text x="150" y="32" text-anchor="end" font-family="var(--mono)" font-size="11" fill="var(--soft)">RSI+MACD (go-to)</text>
+        <rect x="158" y="20" width="48" height="16" rx="3" fill="var(--red)"/><text x="212" y="33" font-family="var(--mono)" font-size="10" font-weight="600" fill="var(--red)">12%</text>
+        <text x="150" y="68" text-anchor="end" font-family="var(--mono)" font-size="11" fill="var(--soft)">volume+trend</text>
+        <rect x="158" y="56" width="372" height="16" rx="3" fill="var(--accent)"/><text x="524" y="69" text-anchor="end" font-family="var(--mono)" font-size="10" font-weight="600" fill="#fff">94%</text>
+      </svg>
+    </div>
+    <div class="ucbar"><span class="ucloop">verified outcomes → signal trust → de-weight the noise</span><span class="uck">take the 48% setup <b>3× less</b></span><span class="ucmoved">+$2–3K/yr</span></div>
+  </div>
+
+  <div class="uc">
+    <div class="uch"><div class="uct">The regime break — on a premium-selling book</div><div class="ucf">RL blows up in crisis → Knows When to Step Back · <span class="chip soon">v1.1</span></div></div>
+    <p class="ucs"><b>Without:</b> your premium-selling book stays on through a VIX gap 16→31; the tail turns $1,000 of premium into a $30–80K loss and the account dies on the drawdown breach. <b>With:</b> your record shows where the band flips AMBER — the point to have cut back — before the regime re-converges. <i>The equities version runs live today; this options / short-vol read is the v1.1 extension.</i></p>
+    <div class="ucmech"><div class="ucmt">the autonomy band through the shock</div>
+      <svg viewBox="0 0 560 96" role="img" aria-label="The autonomy band is high in calm, drops to amber at the regime break, then recovers.">
+        <line x1="20" y1="80" x2="540" y2="80" stroke="var(--line)"/>
+        <rect x="230" y="12" width="90" height="68" fill="var(--ochre-wash)"/>
+        <polyline points="20,28 215,28 240,34 265,66 320,70 400,52 480,36 540,32" fill="none" stroke="var(--accent)" stroke-width="2.4"/>
+        <circle cx="120" cy="28" r="3.5" fill="var(--green)"/><circle cx="268" cy="67" r="3.5" fill="var(--ochre)"/><circle cx="500" cy="35" r="3.5" fill="var(--green)"/>
+        <text x="120" y="20" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--green)">GREEN</text><text x="275" y="90" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--ochre)">break</text>
+      </svg>
+    </div>
+    <div class="ucbar"><span class="ucloop">break marked → band AMBER → step back</span><span class="uck">the flag before the tail</span><span class="ucmoved">$30–80K tail · flagged</span></div>
+  </div>
+
+  <div class="uc">
+    <div class="uch"><div class="uct">Sell premium only when it's rich</div><div class="ucf">Short-vol tail → Where Your Edge Lives by Regime · <span class="chip soon">v1.1</span></div></div>
+    <p class="ucs"><b>Without:</b> you sell premium at the same size in calm and rich markets — 49% when IV/RV is thin, bleeding when a strike gaps. <b>With:</b> the "income" trade is flagged GREEN only when volatility is genuinely expensive, where your accuracy is 78%.</p>
+    <div class="ucmech"><div class="ucmt">your short-premium accuracy by IV/RV</div>
+      <svg viewBox="0 0 560 96" role="img" aria-label="Short-premium accuracy is 49% at low IV over RV and 78% at high IV over RV.">
+        <text x="150" y="32" text-anchor="end" font-family="var(--mono)" font-size="11" fill="var(--soft)">IV/RV &lt; 1.2</text>
+        <rect x="158" y="20" width="192" height="16" rx="3" fill="var(--slate)"/><text x="356" y="33" font-family="var(--mono)" font-size="10" font-weight="600" fill="var(--slate)">49%</text>
+        <text x="150" y="68" text-anchor="end" font-family="var(--mono)" font-size="11" fill="var(--soft)">IV/RV &gt; 1.5</text>
+        <rect x="158" y="56" width="306" height="16" rx="3" fill="var(--accent)"/><text x="470" y="69" font-family="var(--mono)" font-size="10" font-weight="600" fill="var(--accent-ink)">78%</text>
+      </svg>
+    </div>
+    <div class="ucbar"><span class="ucloop">IV/RV read → premium GREEN only when rich</span><span class="uck"><b>78%</b> vs 49%</span><span class="ucmoved">6× in vol</span></div>
+  </div>
+
+  <div class="uc">
+    <div class="uch"><div class="uct">The strategy that quietly died</div><div class="ucf">Silent decay → Proof Before You Size Up · <span class="chip live">live</span></div></div>
+    <p class="ucs"><b>Without:</b> your swing-momentum strategy ran 18 months, then went negative 6 weeks ago — you're still trading it, "it'll come back." <b>With:</b> rolling quality drops below floor, the strategy is flagged out of its competence zone, and the cause is named: regime shifted trending → ranging.</p>
+    <div class="ucmech"><div class="ucmt">accuracy over the last weeks — caught at the floor</div>
+      <svg viewBox="0 0 560 96" role="img" aria-label="Strategy accuracy declines from 68% to 49% over six weeks, with an amber flag where it is out of its competence zone.">
+        <line x1="40" y1="18" x2="40" y2="80" stroke="var(--line)"/><line x1="40" y1="80" x2="540" y2="80" stroke="var(--line)"/>
+        <polyline points="60,26 160,30 260,40 360,54 440,66 500,72" fill="none" stroke="var(--accent)" stroke-width="2.2"/>
+        <text x="58" y="22" font-family="var(--mono)" font-size="9" fill="var(--soft)">68%</text>
+        <circle cx="440" cy="66" r="4" fill="var(--ochre)"/><text x="432" y="58" text-anchor="end" font-family="var(--mono)" font-size="9" fill="var(--ochre)">49% · AMBER · out of zone</text>
+      </svg>
+    </div>
+    <div class="ucbar"><span class="ucloop">rolling quality &lt; floor → flagged out of its zone</span><span class="uck">caught now, not at month-end</span><span class="ucmoved">AMBER</span></div>
+  </div>
+
+  <div class="uc">
+    <div class="uch"><div class="uct">Bet on volatility itself</div><div class="ucf">Betting on vol blind → Which Signals Actually Work · <span class="chip soon">v1.1</span></div></div>
+    <p class="ucs"><b>Without:</b> in earnings season you take directional calls/puts 4× more than straddles — directional wins 39%, straddles 68%; you're a volatility trader who trades direction. <b>With:</b> the subtype split is scored from your own trades — you're shown where your vol-edge actually is.</p>
+    <div class="ucmech"><div class="ucmt">earnings accuracy by subtype</div>
+      <svg viewBox="0 0 560 96" role="img" aria-label="Earnings directional trades win 39% while straddles win 68%.">
+        <text x="150" y="32" text-anchor="end" font-family="var(--mono)" font-size="11" fill="var(--soft)">directional</text>
+        <rect x="158" y="20" width="152" height="16" rx="3" fill="var(--slate)"/><text x="316" y="33" font-family="var(--mono)" font-size="10" font-weight="600" fill="var(--slate)">39%</text>
+        <text x="150" y="68" text-anchor="end" font-family="var(--mono)" font-size="11" fill="var(--soft)">straddles (vol)</text>
+        <rect x="158" y="56" width="266" height="16" rx="3" fill="var(--accent)"/><text x="430" y="69" font-family="var(--mono)" font-size="10" font-weight="600" fill="var(--accent-ink)">68%</text>
+      </svg>
+    </div>
+    <div class="ucbar"><span class="ucloop">earnings subtype → verified edge</span><span class="uck">straddles <b>68%</b> vs 39%</span><span class="ucmoved">+$4,200/yr</span></div>
+  </div>
+
+</div>
+
+<h3>The value multiplier — worth more as volatility rises</h3>
+<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+<table style="min-width:520px">
+  <tr><th>Capability</th><th>Calm · VIX 15</th><th>Volatile · VIX 32</th><th>×</th></tr>
+  <tr><td><b>Signal trust</b></td><td>Nice to know</td><td>Edge vs bias = survival</td><td><b>3×</b></td></tr>
+  <tr><td><b>Conservation read</b></td><td>Flags oversize</td><td>Flags blow-up risk</td><td><b>5×</b></td></tr>
+  <tr><td><b>Regime rotation</b></td><td>Minor optimization</td><td>~$4,800 kept + edge captured</td><td><b>4×</b></td></tr>
+  <tr><td><b>Premium-selling timing</b> <span class="chip soon">v1.1</span></td><td>Low edge</td><td>Rich premium, your edge on</td><td><b>6×</b></td></tr>
+  <tr><td><b>Correlation detection</b></td><td>Low risk</td><td>Portfolio-collapse risk</td><td><b>10×</b></td></tr>
+  <tr><td class="us"><b>Platform value</b></td><td class="us"><b>$16–26K/yr</b></td><td class="us"><b>$64–130K/yr</b></td><td class="us"><b>4–5×</b></td></tr>
+</table>
+</div>
+
+<div class="callout">
+  <b>The differentiator, in one line:</b> every tool says <i>reduce exposure</i>; the pros' own prescription is <i>size by regime</i>; RGI Trading is the only layer that <b>proves your per-regime edge from your own trades and cuts its own autonomy before the tail</b>. No journal, chart, backtester — or trading agent — has verified-outcome data cut by regime.
+</div>
+</section>
+
+<!-- ===== s13 ===== -->
+<section id="s13">
+<div class="eyebrow">The landscape</div>
+<h2>Agentic trading is here — and it's missing the layer that knows when to stop</h2>
+<ul class="frags">
+  <li><b>Retail:</b> Robinhood lets third-party AI agents trade your account <b>autonomously</b> (via MCP); Public.com and SoFi / Composer ship AI investing agents too</li>
+  <li><b>Institutions:</b> the Bank of England says <b>52% of finance firms</b> already run agentic AI — and is weighing a market-wide <b>"kill switch"</b></li>
+  <li><b>Crypto:</b> on-chain agents (Virtuals, ElizaOS) proliferate — agent tokens fell <b>~93%</b> from highs; <b>62% of participants lost money</b></li>
+  <li>The wave has arrived. What every part of it lacks is a <b>competence boundary</b>.</li>
+</ul>
+
+<div class="g2">
+  <div class="card"><div class="card-t">What they all do — act</div><ul class="frags tight"><li>An LLM or RL model decides and <b>places trades</b></li><li>Generic models · investor personas · backtested rules</li><li>Robinhood "does not control, supervise or audit the agents"; your data leaves its environment</li><li>Reward-maximizers — they always act, and <b>herd</b> on shared foundation models</li></ul></div>
+  <div class="card" style="border-color:#1E6FB872"><div class="card-t">What none of them do — measure</div><ul class="frags tight"><li>Learn which of <b>your</b> signals have verified edge, from <b>your</b> outcomes</li><li><b>Abstain</b> when nothing survives correction</li><li>Cut their own autonomy when the regime breaks — independent of the model</li><li>Run on your machine, data never leaving</li></ul></div>
+</div>
+
+<div class="callout callout-ochre">
+  <b>The verdict on the wave, from its own researchers:</b> these agents make money "sometimes in backtesting, rarely in live" — "none are money printers," and the TradingAgents team recommends against real money. A 2026 systematization finds <b>80% of LLM trading-agent designs fail robustness</b>, none enforce a loss limit outside the model, and the named gap is a <b>missing competence boundary</b>. Fed bad data, agents concentrate positions and take severe drawdowns.
+</div>
+
+<p class="lede" style="margin-top:4px"><b>RGI Trading is not another agent that trades.</b> It's observation-only — the layer that <b>measures whether the trade had verified edge</b>, and tells you (or your agent) when to stand down. You can run it <i>underneath</i> any of them; none of them can become it.</p>
+
+<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+<table style="min-width:660px">
+  <tr><th>Can it…</th><th>Journals<br>Tradervue · TradeZella</th><th>Algo / strategy<br>QuantConnect · Composer</th><th>Autonomous agents<br>Robinhood · TradingAgents</th><th>RGI Trading</th></tr>
+  <tr><td><b>Learn which of MY signals have edge, from MY outcomes</b></td><td>Can't</td><td>Backtest only</td><td>Generic model</td><td class="us">Per-signal trust, verified</td></tr>
+  <tr><td><b>Abstain when nothing survives correction</b></td><td>—</td><td>—</td><td>Always acts</td><td class="us">Yes — claim gate</td></tr>
+  <tr><td><b>Cut its own autonomy when the regime breaks</b></td><td>—</td><td>—</td><td>No competence boundary</td><td class="us">Yes — autonomy throttle</td></tr>
+  <tr><td><b>Prove safe-to-scale from MY execution</b></td><td>Can't</td><td>Backtest "yes"</td><td>No</td><td class="us">Conservation law</td></tr>
+  <tr><td><b>Run on my machine, data never leaving</b></td><td>No · cloud</td><td>Partly</td><td>No · data leaves</td><td class="us">Apache 2.0 · self-hosted</td></tr>
+  <tr><td><b>Does it place trades?</b></td><td>No</td><td>Yes</td><td>Yes</td><td class="us">No — observation only</td></tr>
+</table>
+</div>
+
+<h3>What you're probably thinking</h3>
+<div class="ucgrid">
+  <div class="uc"><div class="uct">"Doesn't Robinhood / Composer / TradingAgents already do this?"</div><p class="ucs">They're <b>agents that act</b> — an LLM or rule set decides and places trades, on a generic model, and (Robinhood's own words) unsupervised. RGI is the <b>layer that measures</b> whether the action had verified edge, learned from <i>your</i> outcomes, and abstains when it didn't. Different job. You bolt RGI under an agent; the agent can't become RGI — it has no verified outcomes feeding per-signal trust, and it can't say "nothing here survives correction."</p></div>
+  <div class="uc"><div class="uct">"If agents are the future, why observation-only?"</div><p class="ucs">Because the thing the wave is missing — and the thing the Bank of England is trying to legislate with a kill switch — is exactly a <b>competence boundary</b>: knowing when to stop. An actor that always acts can't be that; the measurement layer that knows when the edge isn't there is. On the roadmap, that's the check an agent calls before it trades.</p></div>
+  <div class="uc"><div class="uct">"If it's open source, what's defensible?"</div><p class="ucs">The code is Apache 2.0 — fork it. Your ~200 learned values are <b>your own portable record</b>, not a lock-in. What's defensible sits elsewhere: the <b>community factor library</b> (network effect), the <b>engine and its published math</b> (the hard part), and the real answer — <b>the moat is the five-copilot platform; Trading-in-the-open is its hardest-domain proof.</b></p></div>
+</div>
+
+<div class="callout callout-green">
+  <b>The question that sorts the field:</b> "After 1,000 of my trades — which of MY signals have verified edge; does it ABSTAIN when nothing survives correction; does it cut its own autonomy when the regime breaks; from MY execution, on MY machine?" Every agent, journal and backtester answers no. That's the gap none of them fill.
+</div>
+</section>
+
+<!-- ===== platform ===== -->
+<section id="platform" style="border-top:2px solid var(--line)">
+<div class="eyebrow">The platform advantage</div>
+<h2>It doesn't start from zero — one engine, five copilots</h2>
+<ul class="frags"><li>Runs on a shared substrate — the <b>Graph Attention Engine</b></li><li>The same loop that earns trust and gates autonomy in four other domains</li><li>Trading is deliberately the <b>open-source reference copilot</b> — fork the whole machine tonight</li></ul>
+<div class="g3">
+  <div class="qw"><h4>RGI Trading</h4><p>Decision quality for traders — signal trust, conservation, the volatility edge. <span class="cs g">open · this doc</span></p></div>
+  <div class="qw"><h4>RGI DataOps</h4><p>The reasoning layer under a data estate — source trust, self-healing, dark-data discovery.</p></div>
+  <div class="qw"><h4>RGI SOC</h4><p>Security operations — triage and self-healing response on the same loop.</p></div>
+  <div class="qw"><h4>RGI S2P</h4><p>Source-to-pay — supplier trust, invoice reasoning, autonomy earned by category.</p></div>
+  <div class="qw"><h4>RGI Purchasing</h4><p>Margin copilot for operators — ordering, usage truth, price shocks vs verified outcomes.</p></div>
+  <div class="qw"><h4>Shared · Graph Attention Engine</h4><p>Judgment memory, conservation law, claim gate — a mechanism proven in one domain carries to the rest.</p></div>
+</div>
+</section>
+
+<!-- ===== s5 ===== -->
+<section id="s5">
+<div class="eyebrow">What it costs today</div>
+<h2>The quiet leaks dwarf the one blow-up you remember</h2>
+<ul class="frags">
+  <li>The blow-up is the story you tell; the damage is the <b>drip</b></li>
+  <li>Priced out, the leaks are bigger than the crash — and they're the field's own top-ten mistakes, unmeasured</li>
+</ul>
+
+<div class="g2" style="margin-top:12px">
+  <div class="sub-story" style="margin:0">
+    <h3>The numbers behind it</h3>
+    <ul class="frags tight">
+      <li><b>~72%</b> of day traders end the year with losses</li>
+      <li><b>~1%</b> profitable over five years · <b>40%</b> quit within a month</li>
+      <li>Barber &amp; Odean: <b>the most active traders underperform the most</b></li>
+      <li>Weak setup ~$200–800/mo · revenge trades win ~25% vs ~62% planned</li>
+    </ul>
+    <p class="source">FINRA / academic syntheses; Barber &amp; Odean (2000); TradeZella &amp; DayTrading.com top-mistakes compilations (illustrative)</p>
+  </div>
+  <div class="sub-story" style="margin:0">
+    <h3>The new way retail blows up: short volatility</h3>
+    <ul class="frags tight">
+      <li><b>0DTE &gt; 75%</b> of retail SPX volume — traded like lottery tickets</li>
+      <li>Retail <b>lost ~$125M (~$350K/day)</b> on 0DTE</li>
+      <li>Premium selling: <b>steady small gains, rare deep losses</b></li>
+      <li><b>60–70%</b> of funded-trader blow-ups are drawdown breaches — dies when vol arrives</li>
+    </ul>
+    <p class="source">Neudata 0DTE review (2024); Track360 2026 (estimate); "Volmageddon," Feb 2018</p>
+  </div>
+</div>
+
+<table>
+  <tr><th>The leak</th><th>Annual cost today</th><th>Surfaced</th></tr>
+  <tr><td><b>Wrong setup preference</b> — overtrading your worst setup</td><td>~$3,600</td><td>$2,000–3,000</td></tr>
+  <tr><td><b>Post-win overtrading</b> — size creep after streaks</td><td>~$2,800</td><td>$1,500–2,500</td></tr>
+  <tr><td><b>Time-of-day weakness</b> — the window you shouldn't trade</td><td>~$14,400/yr</td><td>$8,000–12,000</td></tr>
+  <tr><td><b>Revenge trades</b> — re-entry within 30 min of a loss</td><td>~$4,200</td><td>$2,500–3,500</td></tr>
+  <tr><td><b>Execution gap</b> — your fills vs the strategy's</td><td>variable</td><td>$2,000–5,000</td></tr>
+  <tr><td class="us"><b>Total · individual, $250–500K book</b></td><td class="us"></td><td class="us"><b>$16,000–26,000/yr</b></td></tr>
+</table>
+<p class="lede" style="margin-top:2px">Modeled / illustrative from sample. In a volatile year these run <b>4–5× higher</b> — the capability is worth most exactly when the market is hardest.</p>
+</section>
+
+<!-- ===== s11 ===== -->
+<section id="s11">
+<div class="eyebrow">The economics</div>
+<h2>Self-funding from the first leak you close — then it compounds</h2>
+<ul class="frags">
+  <li>Not a return promise — it never tells you what to trade</li>
+  <li>The value is the recurring <b>leakage it makes visible</b>, and it grows as it learns your record</li>
+  <li>The first bias you close typically covers the cost many times over</li>
+</ul>
+<div class="kpi-row">
+  <div class="kpi"><div class="v">$16–26K</div><div class="l">leakage surfaced /yr · individual</div></div>
+  <div class="kpi"><div class="v">4–5×</div><div class="l">value multiple in volatile markets</div></div>
+  <div class="kpi"><div class="v">compounds</div><div class="l">gap vs a static tool widens monthly</div></div>
+  <div class="kpi"><div class="v">real data</div><div class="l">runs on public market data + your log</div></div>
+</div>
+
+<div class="card">
+  <div class="card-t">Why "compounds" is the word that matters — RGI vs a static tool</div>
+  <svg viewBox="0 0 760 240" role="img" aria-label="Two curves over months of verified trades: RGI's cumulative value rises and accelerates while a static tool stays flat and drifts down, so the gap widens and never narrows.">
+    <line x1="60" y1="20" x2="60" y2="195" stroke="var(--line)"/><line x1="60" y1="195" x2="720" y2="195" stroke="var(--line)"/>
+    <g font-family="var(--mono)" font-size="9" fill="var(--muted)">
+      <text x="90" y="212">month 0</text><text x="370" y="212" text-anchor="middle">month 6</text><text x="700" y="212" text-anchor="end">month 12</text>
+      <text x="52" y="30" text-anchor="end">value</text>
+    </g>
+    <!-- static tool: flat, slight decay -->
+    <polyline points="60,150 180,150 320,153 460,158 600,163 710,167" fill="none" stroke="var(--slate)" stroke-width="2" stroke-dasharray="6 4"/>
+    <text x="700" y="181" text-anchor="end" font-family="var(--mono)" font-size="9" fill="var(--slate)">static tool</text>
+    <!-- RGI: rising, convex -->
+    <polyline points="60,150 180,138 320,116 460,88 600,56 710,32" fill="none" stroke="var(--accent)" stroke-width="2.6"/>
+    <text x="712" y="30" font-family="var(--mono)" font-size="9" font-weight="600" fill="var(--accent-ink)">RGI</text>
+    <!-- gap bracket -->
+    <line x1="675" y1="34" x2="675" y2="165" stroke="var(--accent-ink)" stroke-width="1" stroke-dasharray="3 3"/>
+    <text x="668" y="105" text-anchor="end" font-family="var(--mono)" font-size="9" fill="var(--accent-ink)">gap widens,</text>
+    <text x="668" y="117" text-anchor="end" font-family="var(--mono)" font-size="9" fill="var(--accent-ink)">never narrows</text>
+  </svg>
+  <p class="source">Illustrative / modeled. A journal's value is fixed at setup; RGI's rises because it keeps absorbing your verified record.</p>
+</div>
+
+<h3>Each capability, the outcome it buys</h3>
+<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+<table style="min-width:480px">
+  <tr><th>Capability</th><th>The outcome</th></tr>
+  <tr><td><b>Which signals actually work</b></td><td>Stop feeding the 48% setup → ~$2–3K/yr back</td></tr>
+  <tr><td><b>Proof before you size up</b></td><td>Scale only what's proven → no unforced blow-up</td></tr>
+  <tr><td><b>Where your edge lives by regime</b></td><td>Trade the regime you're good at → ~$4,800 + edge</td></tr>
+  <tr><td><b>Knows when to step back</b></td><td>Flags the regime break → the $30–80K tail, seen coming</td></tr>
+  <tr><td class="us"><b>Every trade enriches the rest</b></td><td class="us">Sharper Day-1, widening gap → the compounding itself</td></tr>
+</table>
+</div>
+<p class="lede" style="margin-top:2px">Figures modeled / illustrative from sample.</p>
+</section>
+
+<!-- ===== s12 ===== -->
+<section id="s12">
+<div class="eyebrow">What it costs</div>
+<h2>Free and open — with a hand for desks that want one</h2>
+<div class="g2">
+  <div class="level us"><div class="lnum">$0</div><h4>Open source · the whole tool</h4><ul class="frags tight"><li>Apache 2.0, self-hosted — the full engine: signal trust, conservation, claim gate, regime analytics</li><li>Runs on your machine · your data never leaves · <b>fork it tonight</b></li><li>No tier gates capability — the post-trade advisor is the open build, in full</li></ul></div>
+  <div class="level"><div class="lnum">Desk pilots</div><h4>Hands-on help for a desk / PM</h4><ul class="frags tight"><li>"Which of your traders is running a decayed strategy <b>right now</b>?" — across the whole book</li><li>Book-level correlation risk — the portfolio-collapse signal before it lands</li><li>A trader leaves — their ~200 learned values transfer to the seat (judgment that took ~8,000 trades)</li><li>A paid engagement for setup and support — not a licence on the tool</li></ul></div>
+</div>
+<p class="lede" style="margin-top:2px">The tool is open source and complete on its own. A desk that wants help standing it up across a book can run a pilot with us — that's a service, not a paywall. All figures modeled / illustrative.</p>
+</section>
+
+<!-- ===== s6 ===== -->
+<section id="s6">
+<div class="eyebrow">Where it plugs in</div>
+<h2>Where it fits — on top of your stack, on your own machine, nothing replaced</h2>
+<p class="lede">The reasoning layer on top of your stack — charts, execution and data stay exactly where they are.</p>
+
+<div class="card" style="text-align:center">
+  <div class="card-t" style="text-align:left">Your stack — unchanged</div>
+  <div class="conn-row" style="justify-content:center">
+    <span class="conn">TradingView · charts</span><span class="conn">Alpaca · execution</span><span class="conn">IBKR · execution</span><span class="conn">yfinance · data</span><span class="conn">CSV · any broker</span>
+  </div>
+  <div style="font-family:var(--mono);font-size:1rem;color:var(--muted);margin:4px 0">↓</div>
+  <div class="card-t" style="text-align:left">RGI Trading — the new layer, running locally</div>
+  <div class="conn-row" style="justify-content:center">
+    <span class="conn live">import trades</span><span class="conn live">score decisions</span><span class="conn live">learn signal trust</span><span class="conn live">prove scaling</span><span class="conn live">detect decay</span><span class="conn">options / IV-RV · v1.1</span>
+  </div>
+  <div style="font-family:var(--mono);font-size:.82rem;color:var(--muted);margin:6px 0 2px;opacity:.7">↓ on the roadmap</div>
+  <div class="card-t" style="text-align:left;opacity:.8">Your agent, if you run one — RGI is the check it calls before it acts</div>
+  <div class="conn-row" style="justify-content:center;align-items:center">
+    <span class="conn" style="border-style:dashed">Robinhood MCP / custom agent</span><span style="font-family:var(--mono);font-size:.74rem;color:var(--muted)">→ asks RGI: "verified edge in this regime?" →</span><span class="conn" style="border-style:dashed">RGI answers · or abstains</span>
+  </div>
+</div>
+<p class="source" style="margin-top:6px"><b>Scope today:</b> equities &amp; ETFs are live — signal trust, scaling proof, decay detection. Options (IV/RV regime, premium-selling timing) is <b>v1.1, on the roadmap</b> — the premium &amp; short-vol scenarios show where that capability lands.</p>
+
+<h3>How it's delivered — the part your security and your privacy care about</h3>
+<div class="g2">
+  <div class="card">
+    <div class="card-t">Your data, your machine</div>
+    <ul class="frags tight">
+      <li><b>Apache 2.0, self-hosted by default</b> — runs on your laptop or your box</li>
+      <li>Your trade history <b>never leaves your machine</b> — no cloud account required</li>
+      <li>No training on your data, no shared corpus — your fingerprint is yours alone</li>
+      <li>Deterministic — bias detection is math, not an LLM guessing</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-t">What it will and won't do</div>
+    <ul class="frags tight">
+      <li><b>Observation only</b> — it reports; never "buy / sell / size X"</li>
+      <li><b>No broker execution path</b>, by design — it can't place a trade</li>
+      <li>Every output is your own measured record, not a signal or a tip</li>
+      <li>You stay the decision-maker; the system stays the mirror</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout">
+  <b>The invariant, stated plainly:</b> every screen ends in data you read, not a directive the system issues. A product and a scope boundary, not a feature we'll relax — a tool that tells retail traders what to trade is a different, regulated thing.
+</div>
+</section>
+
+<!-- ===== s7 ===== -->
+<section id="s7">
+<div class="eyebrow">Quick wins — your fingerprint's first reads</div>
+<h2>What you see in the first session — before you trust it with anything</h2>
+<p class="lede">Point it at your trade log — logged only fills? It <b>reconstructs the signal and regime context from public market data, point-in-time</b>, so the first panels resolve on history you already have. No authority granted to anything.</p>
+<div class="timeline" style="margin:10px 0 14px">
+  <div class="tick"><div class="when">Minute three</div><p>Your signal-trust radar resolves on the log you already have — and usually inverts.</p></div>
+  <div class="tick"><div class="when">First weeks</div><p>Regime split and execution-gap reads fill in as more trades clear correction.</p></div>
+  <div class="tick green"><div class="when">~3 months</div><p>The certificate — or a clear "not yet." A quarter of verified trades and the fingerprint is stable; the gate waits rather than overfit.</p></div>
+</div>
+<p class="source" style="margin-top:6px"><b>Lower-frequency trader?</b> It reads whatever history you have — a few hundred trades is plenty to start. If your record is thinner it <b>abstains rather than guess</b>: the certificate waits until your own data can support it, however long that takes for your cadence.</p>
+<div class="g2">
+  <div class="qw">
+    <h4>Your signal trust radar — day one</h4>
+    <ul class="frags tight"><li>Resolves on the trades you already have</li><li>The inversion — most-used signal sitting lowest — usually lands in the first session</li></ul>
+    <div class="metrics">from your existing log · minutes to first read</div>
+  </div>
+  <div class="qw">
+    <h4>Your bias flags</h4>
+    <ul class="frags tight"><li>Post-streak size creep · revenge re-entries · time-of-day weakness</li><li>Each with its historical cost + a conservation status</li></ul>
+    <div class="metrics">GREEN / AMBER / RED · with the dollar cost</div>
+  </div>
+  <div class="qw">
+    <h4>Your regime split</h4>
+    <ul class="frags tight"><li>Where your edge concentrates — trending vs ranging vs high-vol</li><li>Stop running one playbook across regimes it was never fit for</li></ul>
+    <div class="metrics">accuracy &amp; Sharpe per regime</div>
+  </div>
+  <div class="qw">
+    <h4>The certificate — or a clear "not yet"</h4>
+    <ul class="frags tight"><li>A certified claim when a pattern clears correction</li><li>"Genuinely clean" or "insufficient data" otherwise — never a manufactured insight</li></ul>
+    <div class="metrics">FDR + out-of-sample · abstains by default</div>
+  </div>
+</div>
+</section>
+
+<!-- ===== s14 ===== -->
+<section id="s14">
+<div class="eyebrow">Where to start</div>
+<h2>Fork it tonight — clone, run the gate, watch your fingerprint fill</h2>
+<ul class="frags"><li>No sales call, no cloud account, no authority granted to anything</li><li>Clone the repo, point it at your trade log, read your own record back</li><li><b>Verify it on real data</b> — market prices and indicators are public, and it reconstructs your signal context from them, so you can run the engine on real public history and your own fills, not a fixture</li></ul>
+<div class="timeline">
+  <div class="tick"><div class="when">Tonight</div><p>Clone GAE + SDK + the trading copilot. Point it at Alpaca / IBKR / CSV. Signal trust radar + bias flags resolve on what you already have — in minutes.</p></div>
+  <div class="tick green"><div class="when">First weeks</div><p>Regime split and execution-gap read fill in. The gate certifies what survives correction and stays silent on what doesn't. (Full convergence timeline is in Quick wins, above.)</p></div>
+</div>
+</section>
+
+<!-- ===== s-close ===== -->
+<section id="s-close" style="border-top:3px solid var(--accent)">
+<div class="eyebrow">The one page</div>
+<h2>A mirror, not an advisor</h2>
+<p class="lede">The one tool that learns which of your signals predict your outcomes, proves when a strategy is safe to scale, knows when it's out of its depth, and gets better with every verified trade — on your machine, in your hands.</p>
+<div class="kpi-row">
+  <div class="kpi"><div class="v">proof-gated</div><div class="l">every claim: FDR + out-of-sample</div></div>
+  <div class="kpi"><div class="v">4–5×</div><div class="l">value when volatility arrives</div></div>
+  <div class="kpi"><div class="v">~200</div><div class="l">learned values · your portable record</div></div>
+  <div class="kpi"><div class="v">Apache 2.0</div><div class="l">open · self-hosted · observation-only</div></div>
+</div>
+<div class="callout callout-green" style="margin-top:6px">
+  <b>The question that sorts the field:</b> after 1,000 of your trades — which of <b>your</b> signals have verified edge; does it <b>abstain</b> when nothing survives correction; does it cut its own autonomy when the regime breaks; from <b>your</b> execution, on <b>your</b> machine? Every agent, journal and backtester answers no.
+</div>
+<div class="footer">
+  <p style="margin:0 0 2px"><a href="https://dakshineshwari.net">dakshineshwari.net</a> · Arindam Banerji · banerji.arindam@gmail.com</p>
+  <p style="margin:0;font-size:.72rem;color:var(--muted)">The material earns the next conversation.</p>
+</div>
+</section>
+
+
+<div class="disc">RGI Trading · Outreach Dashboard v13 · October 2026 · Observation-only (no trade directives) · Figures modeled / illustrative from sample · Industry data cited by source · Re-convergence magnitude simulation-only, pilot-pending · No production customers · Apache 2.0</div>
+
+<script>
+const navLinks=document.querySelectorAll('.nav-bar a[data-nav]');
+const sections=[...document.querySelectorAll('section[id^="s"]')];
+let raf=0;
+function updateNav(){
+  const y=window.scrollY+80;let active=sections[0]?sections[0].id:'';
+  for(let i=sections.length-1;i>=0;i--){ if(sections[i].offsetTop<=y){active=sections[i].id;break;} }
+  navLinks.forEach(a=>{a.classList.toggle('active','s'+a.dataset.nav===active);});
+}
+window.addEventListener('scroll',()=>{if(!raf){raf=requestAnimationFrame(()=>{updateNav();raf=0;});}},{passive:true});
+navLinks.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const sec=document.getElementById('s'+a.dataset.nav);if(sec)sec.scrollIntoView({behavior:'smooth',block:'start'});}));
+updateNav();
+</script>
+</body>
+</html>

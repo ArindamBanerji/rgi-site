@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RGI for LLM Evals</title>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --surface-alt: #f0f1f3;
+    --text: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+    --accent: #4f46e5;
+    --accent-soft: #eef2ff;
+    --accent-mid: #a5b4fc;
+    --green: #059669;
+    --green-soft: #d1fae5;
+    --red: #dc2626;
+    --red-soft: #fee2e2;
+    --amber: #d97706;
+    --amber-soft: #fef3c7;
+    --border: #e5e7eb;
+    --border-light: #f3f4f6;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03);
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --code-kw: #cba6f7;
+    --code-fn: #89b4fa;
+    --code-str: #a6e3a1;
+    --code-cm: #6c7086;
+    --code-num: #fab387;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  /* ─── Hero ─── */
+  .hero {
+    padding: 56px 0 40px;
+    text-align: center;
+  }
+  .hero-chip {
+    display: inline-block;
+    font-size: 12px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--accent);
+    background: var(--accent-soft); border-radius: 20px;
+    padding: 4px 14px; margin-bottom: 20px;
+  }
+  .hero h1 { font-size: 36px; font-weight: 800; line-height: 1.15; margin-bottom: 12px; }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub { font-size: 17px; color: var(--text-secondary); max-width: 620px; margin: 0 auto 24px; }
+  .hero-pip {
+    display: inline-block; background: var(--code-bg); color: var(--code-text);
+    font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 14px;
+    padding: 8px 20px; border-radius: 8px;
+  }
+  .hero-pip .cm { color: var(--code-cm); }
+
+  /* ─── Section ─── */
+  section { margin-bottom: 56px; }
+  .section-label {
+    font-size: 12px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+  section h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  section .sub { font-size: 15px; color: var(--text-secondary); margin-bottom: 24px; }
+  section h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  p { font-size: 15px; margin-bottom: 14px; }
+
+  .divider { height: 1px; background: var(--border); margin: 48px 0; }
+
+  /* ─── Compare ─── */
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-radius: 14px; overflow: hidden; border: 1px solid var(--border);
+    box-shadow: var(--shadow-md); margin: 28px 0;
+  }
+  @media(max-width:700px){ .compare{grid-template-columns:1fr;} }
+  .cmp-side { padding: 28px; }
+  .cmp-side.left { background: var(--surface-alt); border-right: 1px solid var(--border); }
+  .cmp-side.right { background: var(--surface); }
+  .cmp-tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; margin-bottom: 14px;
+  }
+  .cmp-tag.dim { color: var(--text-muted); }
+  .cmp-tag.hi  { color: var(--accent); }
+
+  /* ─── Code ─── */
+  .code {
+    background: var(--code-bg); color: var(--code-text);
+    font-family: 'SF Mono','Fira Code','Consolas',monospace;
+    font-size: 13px; line-height: 1.55; border-radius: 10px;
+    padding: 18px 22px; overflow-x: auto; margin: 14px 0;
+  }
+  .code .kw{color:var(--code-kw)} .code .fn{color:var(--code-fn)}
+  .code .s{color:var(--code-str)} .code .c{color:var(--code-cm)}
+  .code .n{color:var(--code-num)}
+
+  /* ─── Tabs ─── */
+  .tabs { margin: 28px 0; }
+  .tab-bar {
+    display: flex; gap: 0; border-bottom: 2px solid var(--border);
+    margin-bottom: 0;
+  }
+  .tab-btn {
+    padding: 10px 22px; font-size: 14px; font-weight: 600;
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted); border-bottom: 2px solid transparent;
+    margin-bottom: -2px; transition: all 0.2s;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn:hover { color: var(--text); }
+  .tab-panel { display: none; padding-top: 4px; }
+  .tab-panel.active { display: block; }
+
+  /* ─── Gaps list ─── */
+  .gap-list { list-style: none; padding: 0; margin: 20px 0; }
+  .gap-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px 0; border-bottom: 1px solid var(--border-light); font-size: 14px;
+  }
+  .gap-list li:last-child { border-bottom: none; }
+  .gap-tag {
+    flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 3px 8px;
+    border-radius: 4px; background: var(--red-soft); color: var(--red);
+    letter-spacing: 0.5px; margin-top: 1px;
+  }
+
+  /* ─── Charts ─── */
+  .chart-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px; box-shadow: var(--shadow);
+    margin: 24px 0;
+  }
+  .chart-wrap h4 {
+    font-size: 14px; font-weight: 600; color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  svg text { font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif; }
+
+  /* ─── Bar chart rows ─── */
+  .hbar { margin: 20px 0; }
+  .hbar-row {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 10px;
+  }
+  .hbar-name {
+    font-size: 13px; font-weight: 600; width: 110px;
+    text-align: right; flex-shrink: 0; color: var(--text);
+  }
+  .hbar-track {
+    flex: 1; height: 28px; background: var(--border-light);
+    border-radius: 6px; overflow: hidden;
+  }
+  .hbar-fill {
+    height: 100%; border-radius: 6px;
+    display: flex; align-items: center; padding-left: 10px;
+    font-size: 12px; font-weight: 700; color: #fff;
+    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .hbar-val {
+    font-size: 14px; font-weight: 700; width: 65px; flex-shrink: 0;
+  }
+
+  /* ─── Stat row ─── */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px; margin: 24px 0;
+  }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; box-shadow: var(--shadow);
+  }
+  .stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .stat-val { font-size: 32px; font-weight: 800; line-height: 1; }
+  .stat-note { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+  .stat-val.green { color: var(--green); }
+  .stat-val.red { color: var(--red); }
+  .stat-val.accent { color: var(--accent); }
+  .stat-val.amber { color: var(--amber); }
+
+  /* ─── Gate ─── */
+  .gate-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0;
+  }
+  @media(max-width:500px){ .gate-row{grid-template-columns:1fr;} }
+  .gate {
+    border-radius: 12px; padding: 20px; text-align: center;
+  }
+  .gate.ok { background: var(--green-soft); border: 2px solid var(--green); }
+  .gate.no { background: var(--red-soft); border: 2px solid var(--red); }
+  .gate-big { font-size: 26px; font-weight: 800; margin-bottom: 2px; }
+  .gate.ok .gate-big { color: var(--green); }
+  .gate.no .gate-big { color: var(--red); }
+  .gate-sub { font-size: 12px; color: var(--text-secondary); }
+
+  /* ─── Callout ─── */
+  .callout {
+    border-radius: 10px; padding: 18px 22px; margin: 20px 0;
+    font-size: 14px; line-height: 1.6;
+  }
+  .callout.blue { background: var(--accent-soft); border-left: 4px solid var(--accent); }
+  .callout.green { background: var(--green-soft); border-left: 4px solid var(--green); }
+  .callout.amber { background: var(--amber-soft); border-left: 4px solid var(--amber); }
+  .callout strong { font-weight: 700; }
+  .callout.blue strong { color: var(--accent); }
+  .callout.green strong { color: var(--green); }
+  .callout.amber strong { color: var(--amber); }
+
+  /* ─── Convergence ─── */
+  .conv-box {
+    background: var(--surface-alt); border-radius: 14px; padding: 24px;
+    margin: 24px 0;
+  }
+  .conv-box h4 {
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px;
+  }
+  .conv-row {
+    padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px;
+  }
+  .conv-row:last-child { border-bottom: none; }
+  .conv-name { font-weight: 700; color: var(--text); }
+
+  /* ─── Footer ─── */
+  .footer {
+    border-top: 1px solid var(--border); padding: 36px 0; margin-top: 56px;
+    text-align: center;
+  }
+  .footer-quote { font-size: 18px; font-weight: 600; font-style: italic; margin-bottom: 16px; color: var(--text); }
+  .footer-meta { font-size: 13px; color: var(--text-muted); }
+  .footer-meta a { color: var(--accent); text-decoration: none; }
+  .footer-fine { font-size: 11px; color: var(--text-muted); margin-top: 10px; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-chip">Graph Attention Engine</div>
+  <h1>RGI <span>for LLM Evals</span></h1>
+  <p class="hero-sub">LLM-as-Judge scores. GAE learns from them. Same eval rubric &mdash; only one discovers which criteria actually predict quality.</p>
+  <div class="hero-pip">pip install graph-attention-engine <span class="cm">&nbsp;# ~844 params, Apache 2.0</span></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ COMPARE: LANGSMITH vs GAE ═══ -->
+<section>
+  <div class="section-label">Side by Side</div>
+  <h2>Score &amp; Archive vs. Score &amp; Learn</h2>
+  <p class="sub">LangSmith runs your LLM-as-judge rubric and logs the scores. GAE takes the same scores, learns which criteria matter, and rewrites the rubric from verified outcomes.</p>
+
+  <div class="compare">
+    <div class="cmp-side left">
+      <div class="cmp-tag dim">LangSmith &middot; Score &amp; Archive</div>
+      <div class="code">
+<span class="c"># LangSmith — LLM-as-judge pipeline</span>
+<span class="kw">from</span> langsmith <span class="kw">import</span> Client
+<span class="kw">from</span> openevals.llm <span class="kw">import</span> create_llm_as_judge
+
+client = Client()
+evals = [
+  create_llm_as_judge(
+    prompt=CORRECTNESS_PROMPT,
+    model=<span class="s">"openai:o3-mini"</span>
+  ),
+  create_llm_as_judge(
+    prompt=CONCISENESS_PROMPT,
+    model=<span class="s">"openai:o3-mini"</span>
+  ),
+]
+
+results = client.evaluate(
+  my_agent,
+  data=<span class="s">"summary_eval_dataset"</span>,
+  evaluators=evals,
+  experiment_prefix=<span class="s">"summary-q3"</span>
+)
+
+<span class="c"># Scores logged. Dashboard updated.</span>
+<span class="c"># Which criteria predict satisfaction?</span>
+<span class="c"># No feedback loop. No way to know.</span>
+      </div>
+    </div>
+    <div class="cmp-side right">
+      <div class="cmp-tag hi">GAE &middot; Score &amp; Learn</div>
+      <div class="code">
+<span class="c"># GAE — ~844 inspectable parameters</span>
+<span class="kw">from</span> gae <span class="kw">import</span> (
+  ProfileScorer, run_ablation,
+  run_evaluation, check_conservation,
+  compute_theta_min
+)
+
+scorer = ProfileScorer(mu=mu, actions=ACTIONS)
+
+<span class="c"># Learn from verified outcomes</span>
+<span class="kw">for</span> task, scores, verified <span class="kw">in</span> eval_data:
+  result = scorer.score(scores, cat_idx[task])
+  scorer.update(
+    f=scores, category_index=cat_idx[task],
+    action_index=result.action_index,
+    correct=(result.action_name == verified),
+    gt_action_index=act_idx[verified],
+  ) <span class="c"># c += &eta;&middot;(outcome &minus; c)</span>
+
+<span class="c"># Which criteria predict quality?</span>
+abl = run_ablation(scorer, scenarios, FACTORS)
+<span class="c"># &rarr; #1 correctness  drop=+33%</span>
+<span class="c"># &rarr; #5 conciseness  drop=+8%</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>What Score-and-Archive Can Never Do</h3>
+  <ul class="gap-list">
+    <li><span class="gap-tag">NO TRAJECTORY</span> 4.2/5 for six months, complaints rising. No curve &mdash; rubric can't see drift.</li>
+    <li><span class="gap-tag">NO VERIFICATION</span> Two agents, same score. One improving, one gaming the rubric. No way to tell.</li>
+    <li><span class="gap-tag">NO TRANSFER</span> Year tuning summarization evals. Now need RAG retrieval. Start from zero.</li>
+    <li><span class="gap-tag">NO DISCOVERY</span> Five criteria. Which predict satisfaction? No outcome feedback &mdash; you'll never know.</li>
+    <li><span class="gap-tag">NO DEFENSE</span> "Conciseness" gets 4.8. Users prefer the longer version. Rubric can't self-correct.</li>
+  </ul>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ EVIDENCE ═══ -->
+<section>
+  <div class="section-label">Running Results</div>
+  <h2>The Evidence</h2>
+  <p class="sub">Same rubric. Five criteria: correctness, grounding, conciseness, fluency, relevance. 12 evals for training, 8 held-out for testing. All code below runs with <code>pip install graph-attention-engine</code>.</p>
+
+  <!-- Learning Curve -->
+  <div class="chart-wrap">
+    <h4>Learning Curve &mdash; 5 Rounds of Training</h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">After each round, accuracy measured on 8 held-out evals the scorer has never trained on.</p>
+    <svg viewBox="0 0 600 220" width="100%" style="max-width:600px">
+      <!-- Grid -->
+      <line x1="70" y1="20" x2="70" y2="180" stroke="#e5e7eb" stroke-width="1"/>
+      <line x1="70" y1="180" x2="560" y2="180" stroke="#e5e7eb" stroke-width="1"/>
+      <line x1="70" y1="130" x2="560" y2="130" stroke="#f3f4f6" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="70" y1="80" x2="560" y2="80" stroke="#f3f4f6" stroke-width="1" stroke-dasharray="4,4"/>
+      <!-- Y labels -->
+      <text x="62" y="184" text-anchor="end" fill="#9ca3af" font-size="11">0%</text>
+      <text x="62" y="134" text-anchor="end" fill="#9ca3af" font-size="11">25%</text>
+      <text x="62" y="84" text-anchor="end" fill="#9ca3af" font-size="11">50%</text>
+      <text x="62" y="25" text-anchor="end" fill="#9ca3af" font-size="11" font-weight="600">Accuracy</text>
+      <!-- X labels -->
+      <text x="168" y="200" text-anchor="middle" fill="#9ca3af" font-size="11">R1</text>
+      <text x="266" y="200" text-anchor="middle" fill="#9ca3af" font-size="11">R2</text>
+      <text x="364" y="200" text-anchor="middle" fill="#9ca3af" font-size="11">R3</text>
+      <text x="462" y="200" text-anchor="middle" fill="#9ca3af" font-size="11">R4</text>
+      <text x="560" y="200" text-anchor="middle" fill="#9ca3af" font-size="11">R5</text>
+      <!-- Line -->
+      <polyline points="168,130 266,89 364,89 462,89 560,89" fill="none" stroke="#4f46e5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Dots -->
+      <circle cx="168" cy="130" r="5" fill="#4f46e5"/>
+      <circle cx="266" cy="89" r="5" fill="#4f46e5"/>
+      <circle cx="364" cy="89" r="5" fill="#4f46e5"/>
+      <circle cx="462" cy="89" r="5" fill="#4f46e5"/>
+      <circle cx="560" cy="89" r="5" fill="#4f46e5"/>
+      <!-- Value labels -->
+      <text x="168" y="122" text-anchor="middle" fill="#4f46e5" font-size="12" font-weight="700">25%</text>
+      <text x="266" y="81" text-anchor="middle" fill="#4f46e5" font-size="12" font-weight="700">38%</text>
+      <text x="560" y="81" text-anchor="middle" fill="#4f46e5" font-size="12" font-weight="700">38%</text>
+      <!-- Annotation -->
+      <text x="380" y="70" text-anchor="middle" fill="#6b7280" font-size="11" font-style="italic">Centroids stabilize &#8212; the eval sharpens, not just the agent</text>
+    </svg>
+  </div>
+
+  <!-- Ablation -->
+  <div class="chart-wrap">
+    <h4>Ablation &mdash; Which Criteria Predict Quality?</h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Remove each criterion. Measure accuracy drop. Bigger drop = actually matters.</p>
+    <div class="hbar">
+      <div class="hbar-row">
+        <div class="hbar-name">correctness</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:100%;background:var(--accent)">+33.3%</div></div>
+        <div class="hbar-val" style="color:var(--accent)">#1</div>
+      </div>
+      <div class="hbar-row">
+        <div class="hbar-name">grounding</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:100%;background:#7c3aed">+33.3%</div></div>
+        <div class="hbar-val" style="color:#7c3aed">#2</div>
+      </div>
+      <div class="hbar-row">
+        <div class="hbar-name">relevance</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:75%;background:var(--green)">+25.0%</div></div>
+        <div class="hbar-val" style="color:var(--green)">#3</div>
+      </div>
+      <div class="hbar-row">
+        <div class="hbar-name">fluency</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:50%;background:#6b7280">+16.7%</div></div>
+        <div class="hbar-val">#4</div>
+      </div>
+      <div class="hbar-row">
+        <div class="hbar-name">conciseness</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:25%;background:#d1d5db"></div></div>
+        <div class="hbar-val" style="color:var(--text-muted)">+8.3%</div>
+      </div>
+    </div>
+    <div class="callout blue">
+      <p><strong>Your rubric weights all five equally.</strong> GAE shows correctness matters 4x more than conciseness. The rubric rewrites itself from outcomes.</p>
+    </div>
+  </div>
+
+  <!-- Transfer -->
+  <div class="chart-wrap">
+    <h4>Transfer &mdash; Learned Geometry vs. Blank Slate</h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">New task: RAG retrieval. Transfer scorer seeds from trained summarization geometry. Cold scorer starts flat. Both train on 2 RAG evals, test on 4 held-out.</p>
+    <svg viewBox="0 0 500 140" width="100%" style="max-width:500px">
+      <!-- Bars -->
+      <rect x="100" y="20" width="80" height="44" rx="6" fill="var(--red)"/>
+      <rect x="100" y="80" width="300" height="44" rx="6" fill="var(--green)"/>
+      <!-- Labels -->
+      <text x="92" y="47" text-anchor="end" fill="var(--text)" font-size="13" font-weight="600">Cold start</text>
+      <text x="92" y="107" text-anchor="end" fill="var(--text)" font-size="13" font-weight="600">Transfer</text>
+      <!-- Values -->
+      <text x="190" y="47" fill="#fff" font-size="15" font-weight="800">25%</text>
+      <text x="260" y="107" fill="#fff" font-size="15" font-weight="800">75%</text>
+      <!-- Annotation -->
+      <text x="410" y="107" fill="var(--green)" font-size="13" font-weight="700">3x</text>
+    </svg>
+    <div class="callout green">
+      <p><strong>3x accuracy from 2 examples.</strong> Structure learned from summarization transfers to RAG retrieval. Static rubrics start cold every time.</p>
+    </div>
+  </div>
+
+  <!-- Gaming -->
+  <div class="chart-wrap">
+    <h4>Gaming Detection</h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">6 evals injected: agent scores high on correctness, verified outcomes all "poor." A gaming attack.</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Predictions Wrong</div>
+        <div class="stat-val red">6 / 6</div>
+        <div class="stat-note">All gaming evals caught</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Centroid Drift</div>
+        <div class="stat-val amber">0.056</div>
+        <div class="stat-note">Trajectory increasing &mdash; attack</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Accuracy Impact</div>
+        <div class="stat-val red">58%&rarr;39%</div>
+        <div class="stat-note">Override rate: 100%</div>
+      </div>
+    </div>
+    <div class="callout amber">
+      <p><strong>Conservation gate: AMBER.</strong> A static rubric sees 6 more data points. GAE sees an attack &mdash; centroid drift increasing, the gate holds. Static rubrics have no defense against this.</p>
+    </div>
+  </div>
+
+  <!-- Conservation Gate -->
+  <div class="chart-wrap">
+    <h4>Conservation Gate &mdash; &alpha;&middot;q&middot;V &ge; &theta;<sub>min</sub></h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Coverage &times; accuracy &times; volume must clear a floor before any weight changes. Thin feedback can't corrupt a production rubric.</p>
+    <div class="gate-row">
+      <div class="gate ok">
+        <div class="gate-big">GREEN</div>
+        <div class="gate-sub">V=120 evals &middot; signal=8.16 &middot; &theta;=2.45</div>
+        <div class="gate-sub" style="font-weight:700;color:var(--green);margin-top:4px">Safe to update</div>
+      </div>
+      <div class="gate no">
+        <div class="gate-big">RED</div>
+        <div class="gate-sub">V=3 evals &middot; signal=0.20 &middot; &theta;=98.0</div>
+        <div class="gate-sub" style="font-weight:700;color:var(--red);margin-top:4px">Weights frozen</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scale -->
+  <div class="chart-wrap">
+    <h4>At Scale &mdash; 2,000 Decisions</h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Judgment Memory (centroid learning) vs. k-NN retrieval (the mechanism behind agentic memory). 4 categories, 6 factors, 4 actions.</p>
+    <svg viewBox="0 0 600 240" width="100%" style="max-width:600px">
+      <!-- Grid -->
+      <line x1="70" y1="20" x2="70" y2="200" stroke="#e5e7eb" stroke-width="1"/>
+      <line x1="70" y1="200" x2="570" y2="200" stroke="#e5e7eb" stroke-width="1"/>
+      <line x1="70" y1="140" x2="570" y2="140" stroke="#f3f4f6" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="70" y1="80" x2="570" y2="80" stroke="#f3f4f6" stroke-width="1" stroke-dasharray="4,4"/>
+      <!-- Y axis -->
+      <text x="62" y="204" text-anchor="end" fill="#9ca3af" font-size="11">50%</text>
+      <text x="62" y="144" text-anchor="end" fill="#9ca3af" font-size="11">60%</text>
+      <text x="62" y="84" text-anchor="end" fill="#9ca3af" font-size="11">70%</text>
+      <text x="62" y="24" text-anchor="end" fill="#9ca3af" font-size="11">80%</text>
+      <!-- X axis -->
+      <text x="70" y="220" fill="#9ca3af" font-size="11">0</text>
+      <text x="230" y="220" text-anchor="middle" fill="#9ca3af" font-size="11">500</text>
+      <text x="390" y="220" text-anchor="middle" fill="#9ca3af" font-size="11">1000</text>
+      <text x="550" y="220" text-anchor="middle" fill="#9ca3af" font-size="11">2000</text>
+      <text x="310" y="236" text-anchor="middle" fill="#9ca3af" font-size="11">Decisions</text>
+      <!-- k-NN line (starts higher, plateaus lower) -->
+      <polyline points="70,170 150,135 230,120 310,115 390,112 470,110 550,108" fill="none" stroke="#d1d5db" stroke-width="2.5" stroke-dasharray="6,4"/>
+      <!-- JM line (starts lower, crosses over, ends higher) -->
+      <polyline points="70,190 150,155 230,125 310,105 390,82 470,68 550,56" fill="none" stroke="var(--accent)" stroke-width="3"/>
+      <!-- Crossover marker -->
+      <line x1="270" y1="118" x2="270" y2="200" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <circle cx="270" cy="118" r="5" fill="var(--amber)"/>
+      <text x="278" y="198" fill="var(--amber)" font-size="11" font-weight="700">N=639</text>
+      <!-- Legend -->
+      <line x1="380" y1="28" x2="410" y2="28" stroke="var(--accent)" stroke-width="3"/>
+      <text x="414" y="32" fill="var(--text)" font-size="11" font-weight="600">Judgment Memory</text>
+      <line x1="380" y1="46" x2="410" y2="46" stroke="#d1d5db" stroke-width="2.5" stroke-dasharray="6,4"/>
+      <text x="414" y="50" fill="#9ca3af" font-size="11">k-NN (agentic memory)</text>
+      <!-- Final gap annotation -->
+      <text x="558" y="56" fill="var(--accent)" font-size="12" font-weight="700">72.5%</text>
+      <text x="558" y="108" fill="#9ca3af" font-size="12">66.3%</text>
+    </svg>
+    <div class="stats" style="margin-top:20px">
+      <div class="stat">
+        <div class="stat-label">Crossover</div>
+        <div class="stat-val accent">N=639</div>
+        <div class="stat-note">JM overtakes k-NN</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Final Gap</div>
+        <div class="stat-val green">+6.2 pp</div>
+        <div class="stat-note">95% CI: [+3.7, +8.4]</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Ablation</div>
+        <div class="stat-val accent">+9.2 pp</div>
+        <div class="stat-note">CI excludes zero at N=500</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Test Suite</div>
+        <div class="stat-val">5,702</div>
+        <div class="stat-note">pytest &middot; passing &middot; 34.5s</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ FULL CODE ═══ -->
+<section>
+  <div class="section-label">Working Code</div>
+  <h2>The Full Script</h2>
+  <p class="sub">Everything above runs from one file. <code>pip install graph-attention-engine</code>, copy, run.</p>
+
+  <div class="tabs">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="showTab(event, 'tab-setup')">Setup &amp; Data</button>
+      <button class="tab-btn" onclick="showTab(event, 'tab-train')">Train &amp; Ablate</button>
+      <button class="tab-btn" onclick="showTab(event, 'tab-gate')">Gate &amp; Transfer</button>
+      <button class="tab-btn" onclick="showTab(event, 'tab-scale')">Gaming &amp; Scale</button>
+    </div>
+
+    <div id="tab-setup" class="tab-panel active">
+      <div class="code">
+<span class="c">"""GAE for LLM Evals — running example (v6)."""</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> gae <span class="kw">import</span> (
+    ProfileScorer, EvaluationScenario,
+    run_evaluation, run_ablation,
+    compute_judgment, check_conservation,
+    compute_theta_min,
+)
+
+<span class="c"># Domain: LLM eval rubric</span>
+CATEGORIES = [<span class="s">"summarization"</span>, <span class="s">"qa"</span>, <span class="s">"code_review"</span>, <span class="s">"rag_retrieval"</span>]
+ACTIONS    = [<span class="s">"poor"</span>, <span class="s">"fair"</span>, <span class="s">"good"</span>, <span class="s">"excellent"</span>]
+FACTORS    = [<span class="s">"correctness"</span>, <span class="s">"grounding"</span>, <span class="s">"conciseness"</span>,
+              <span class="s">"fluency"</span>, <span class="s">"relevance"</span>]
+
+<span class="c"># Training data — 12 evals across 3 task types</span>
+CORE_EVALS = [
+    <span class="c"># Summarization: users prefer grounded, even verbose</span>
+    (<span class="s">"summarization"</span>, [<span class="n">0.8</span>,<span class="n">0.9</span>,<span class="n">0.3</span>,<span class="n">0.8</span>,<span class="n">0.9</span>], <span class="s">"excellent"</span>),
+    (<span class="s">"summarization"</span>, [<span class="n">0.7</span>,<span class="n">0.2</span>,<span class="n">0.9</span>,<span class="n">0.9</span>,<span class="n">0.6</span>], <span class="s">"fair"</span>),
+    (<span class="s">"summarization"</span>, [<span class="n">0.9</span>,<span class="n">0.8</span>,<span class="n">0.4</span>,<span class="n">0.7</span>,<span class="n">0.8</span>], <span class="s">"good"</span>),
+    (<span class="s">"summarization"</span>, [<span class="n">0.3</span>,<span class="n">0.1</span>,<span class="n">0.8</span>,<span class="n">0.6</span>,<span class="n">0.3</span>], <span class="s">"poor"</span>),
+    <span class="c"># QA: correctness + relevance dominate</span>
+    (<span class="s">"qa"</span>, [<span class="n">0.9</span>,<span class="n">0.7</span>,<span class="n">0.5</span>,<span class="n">0.4</span>,<span class="n">0.9</span>], <span class="s">"excellent"</span>),
+    (<span class="s">"qa"</span>, [<span class="n">0.3</span>,<span class="n">0.5</span>,<span class="n">0.8</span>,<span class="n">0.9</span>,<span class="n">0.3</span>], <span class="s">"poor"</span>),
+    (<span class="s">"qa"</span>, [<span class="n">0.7</span>,<span class="n">0.6</span>,<span class="n">0.6</span>,<span class="n">0.7</span>,<span class="n">0.8</span>], <span class="s">"good"</span>),
+    (<span class="s">"qa"</span>, [<span class="n">0.5</span>,<span class="n">0.3</span>,<span class="n">0.7</span>,<span class="n">0.8</span>,<span class="n">0.4</span>], <span class="s">"fair"</span>),
+    <span class="c"># Code review: correctness is everything</span>
+    (<span class="s">"code_review"</span>, [<span class="n">0.9</span>,<span class="n">0.6</span>,<span class="n">0.8</span>,<span class="n">0.5</span>,<span class="n">0.7</span>], <span class="s">"excellent"</span>),
+    (<span class="s">"code_review"</span>, [<span class="n">0.2</span>,<span class="n">0.3</span>,<span class="n">0.9</span>,<span class="n">0.9</span>,<span class="n">0.4</span>], <span class="s">"poor"</span>),
+    (<span class="s">"code_review"</span>, [<span class="n">0.7</span>,<span class="n">0.5</span>,<span class="n">0.7</span>,<span class="n">0.6</span>,<span class="n">0.6</span>], <span class="s">"good"</span>),
+    (<span class="s">"code_review"</span>, [<span class="n">0.4</span>,<span class="n">0.2</span>,<span class="n">0.5</span>,<span class="n">0.7</span>,<span class="n">0.3</span>], <span class="s">"fair"</span>),
+]
+      </div>
+    </div>
+
+    <div id="tab-train" class="tab-panel">
+      <div class="code">
+<span class="c"># PART 1: Multi-round learning</span>
+scorer = build_scorer()
+<span class="kw">for</span> round_num, batch <span class="kw">in</span> enumerate(ROUND_BATCHES, <span class="n">1</span>):
+    train_batch(scorer, batch)
+    report = run_evaluation(scorer, test_scenarios)
+    <span class="c"># &rarr; accuracy climbs as centroids refine</span>
+    <span class="c"># Round 1: 25% &rarr; Round 5: 38%</span>
+
+<span class="c"># PART 2: Ablation — which criteria matter?</span>
+ablation = run_ablation(scorer, all_scenarios, FACTORS)
+<span class="kw">for</span> name, drop <span class="kw">in</span> ablation.items():
+    print(f<span class="s">"{name}: drop={drop:+.1%}"</span>)
+
+<span class="c"># &rarr; #1 correctness  drop=+33.3%</span>
+<span class="c"># &rarr; #2 grounding    drop=+33.3%</span>
+<span class="c"># &rarr; #3 relevance    drop=+25.0%</span>
+<span class="c"># &rarr; #4 fluency      drop=+16.7%</span>
+<span class="c"># &rarr; #5 conciseness  drop=+8.3%</span>
+
+<span class="c"># PART 7: Calibration report</span>
+report = run_evaluation(scorer, final_scenarios)
+<span class="c"># &rarr; Accuracy: 58% (7/12)</span>
+<span class="c"># &rarr; ECE: 0.1358</span>
+<span class="c"># &rarr; summarization: 75%  qa: 50%  code_review: 50%</span>
+      </div>
+    </div>
+
+    <div id="tab-gate" class="tab-panel">
+      <div class="code">
+<span class="c"># PART 3: Conservation gate</span>
+theta = compute_theta_min(alpha=<span class="n">0.08</span>, V=<span class="n">120</span>)
+check = check_conservation(
+    alpha=<span class="n">0.08</span>, q=<span class="n">0.85</span>, V=<span class="n">120</span>, theta_min=theta
+)
+<span class="c"># V=120 &rarr; GREEN (safe to update)</span>
+<span class="c"># V=3   &rarr; RED   (weights frozen)</span>
+
+<span class="c"># PART 4: Transfer — learned geometry vs blank slate</span>
+transfer_mu = scorer.centroids.copy()
+transfer_mu[cat_idx[<span class="s">"rag_retrieval"</span>]] = \
+    transfer_mu[cat_idx[<span class="s">"summarization"</span>]]
+transfer_scorer = build_scorer(mu_override=transfer_mu)
+
+cold_mu = build_scorer().centroids.copy()
+cold_mu[cat_idx[<span class="s">"rag_retrieval"</span>]] = <span class="n">0.5</span>
+cold_scorer = build_scorer(mu_override=cold_mu)
+
+<span class="c"># Both train on 2 RAG evals, test on 4 held-out</span>
+train_batch(cold_scorer, RAG_TRAIN)
+train_batch(transfer_scorer, RAG_TRAIN)
+<span class="c"># &rarr; Cold: 25% (1/4)  Transfer: 75% (3/4)</span>
+
+<span class="c"># PART 6: Score a new eval with judgment</span>
+judgment = compute_judgment(
+    scoring_result=result, f=new_scores,
+    mu=scorer.centroids,
+    category_index=cat_idx[<span class="s">"summarization"</span>],
+    factor_names=FACTORS, actions=ACTIONS,
+)
+<span class="c"># &rarr; good (60% confidence)</span>
+<span class="c"># &rarr; key factors: fluency, relevance, grounding</span>
+<span class="c"># &rarr; Not a label: a distribution over all verdicts</span>
+      </div>
+    </div>
+
+    <div id="tab-scale" class="tab-panel">
+      <div class="code">
+<span class="c"># PART 5: Gaming detection</span>
+GAMING_EVALS = [
+    <span class="c"># High correctness scores, verified outcomes all "poor"</span>
+    (<span class="s">"summarization"</span>, [<span class="n">0.9</span>,<span class="n">0.8</span>,<span class="n">0.7</span>,<span class="n">0.8</span>,<span class="n">0.9</span>], <span class="s">"poor"</span>),
+    (<span class="s">"qa"</span>,            [<span class="n">0.85</span>,<span class="n">0.7</span>,<span class="n">0.6</span>,<span class="n">0.75</span>,<span class="n">0.8</span>], <span class="s">"poor"</span>),
+    <span class="c"># ... 4 more gaming evals</span>
+]
+pre_gaming = scorer.centroids.copy()
+<span class="kw">for</span> task, scores, verified <span class="kw">in</span> GAMING_EVALS:
+    result = scorer.score(scores, cat_idx[task])
+    scorer.update(...)
+drift = np.linalg.norm(scorer.centroids - pre_gaming)
+<span class="c"># &rarr; drift=0.0563, override_rate=100%</span>
+<span class="c"># &rarr; accuracy: 58% &rarr; 39%</span>
+<span class="c"># &rarr; conservation: AMBER</span>
+
+<span class="c"># PART 8: Scale — 2,000 decisions</span>
+<span class="c"># JM (centroid learning) vs k-NN (agentic memory)</span>
+<span class="c"># 4 categories &times; 6 factors &times; 4 actions</span>
+<span class="c">#</span>
+<span class="c"># Crossover at N=639</span>
+<span class="c"># Final gap: +6.2 pp [95% CI: +3.7, +8.4]</span>
+<span class="c"># JM accuracy: 72.5% vs k-NN: 66.3%</span>
+<span class="c">#</span>
+<span class="c"># Ablation (drop 2 of 6 factors):</span>
+<span class="c"># Effect: +9.2 pp [+7.2, +11.3]</span>
+<span class="c"># CI excludes zero at N=500</span>
+<span class="c"># CI width tracks 1/&radic;N reference</span>
+<span class="c">#</span>
+<span class="c"># Production: 5,702 pytest cases &middot; all passing &middot; 34.5s</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ CONVERGENCE ═══ -->
+<section>
+  <div class="section-label">Market Context</div>
+  <h2>The Category Is Forming</h2>
+  <p class="sub">Three independent results bracket the same mechanism. Different teams, different domains.</p>
+
+  <div class="conv-box">
+    <h4>External convergence (not our numbers)</h4>
+    <div class="conv-row"><span class="conv-name">jev</span> (Hugging Face) &mdash; Typed machine decisions: action + probability + confidence. RGI adds a provenance tier.</div>
+    <div class="conv-row"><span class="conv-name">rrsi</span> (Google Research) &mdash; Governed recursive self-improvement. Noise-adjusted floor blocking gains inside measurement variance.</div>
+    <div class="conv-row"><span class="conv-name">GEPA</span> (arXiv, ICLR 2026 oral) &mdash; Reflective prompt evolution outperforms RL at ~90x lower cost.</div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="footer">
+  <p class="footer-quote">"LangSmith tracked the experiments. GAE learned from them."</p>
+  <p class="footer-meta">
+    Arindam Banerji &middot;
+    <a href="https://www.dakshineshwari.net">dakshineshwari.net</a> &middot;
+    <a href="https://github.com/ArindamBanerji">GitHub</a> (Apache-2.0)
+  </p>
+  <p class="footer-fine">~844 parameters. No LLM in the loop. Fully inspectable. Scale experiment: 2,000 decisions, controlled. Convergence: external references. Numbers from controlled experiments.</p>
+</div>
+
+</div>
+
+<script>
+function showTab(e, id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  e.currentTarget.classList.add('active');
+}
+</script>
+</body>
+</html>

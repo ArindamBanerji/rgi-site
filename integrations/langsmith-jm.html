@@ -1,0 +1,429 @@
+<title>LangSmith + Judgment Memory</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: single column narrative with code panels and result cards */
+:root {
+  --bg: #FAFAF7; --surface: #FFFFFF; --inset: #F3F1EB;
+  --fg: #1A1F26; --fg-soft: #3D4854; --fg-muted: #6B7580;
+  --line: #E4E0D6; --line-strong: #D0CBBD;
+  --accent: #0C8367; --accent-ink: #0A6B54; --accent-wash: #0C836712;
+  --langsmith: #1A56DB; --langsmith-wash: #1A56DB10;
+  --jm: #0C8367; --jm-wash: #0C836712;
+  --red: #C43C4E; --red-wash: #C43C4E12;
+  --amber: #9A6B16; --amber-wash: #9A6B1612;
+  --sans: "IBM Plex Sans", system-ui, sans-serif;
+  --head: "Archivo", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0F1318; --surface: #171D24; --inset: #1E252E;
+  --fg: #ECF0F4; --fg-soft: #B8C2CC; --fg-muted: #7E8C99;
+  --line: #2A333D; --line-strong: #374350;
+  --accent: #36C6A6; --accent-ink: #5AD3B8; --accent-wash: #36C6A618;
+  --langsmith: #6B9BF0; --langsmith-wash: #6B9BF018;
+  --jm: #36C6A6; --jm-wash: #36C6A618;
+  --red: #E86B7A; --red-wash: #E86B7A18;
+  --amber: #D4A04E; --amber-wash: #D4A04E18;
+  color-scheme: dark;
+}}
+:root[data-theme="dark"] {
+  --bg: #0F1318; --surface: #171D24; --inset: #1E252E;
+  --fg: #ECF0F4; --fg-soft: #B8C2CC; --fg-muted: #7E8C99;
+  --line: #2A333D; --line-strong: #374350;
+  --accent: #36C6A6; --accent-ink: #5AD3B8; --accent-wash: #36C6A618;
+  --langsmith: #6B9BF0; --langsmith-wash: #6B9BF018;
+  --jm: #36C6A6; --jm-wash: #36C6A618;
+  --red: #E86B7A; --red-wash: #E86B7A18;
+  --amber: #D4A04E; --amber-wash: #D4A04E18;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--sans);
+  line-height: 1.6; -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0; max-width: 780px; margin: 0 auto;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+
+h1 { font-family: var(--head); font-weight: 800; font-size: clamp(28px, 5vw, 42px); letter-spacing: -.02em; line-height: 1.05; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--head); font-weight: 700; font-size: clamp(18px, 3vw, 24px); letter-spacing: -.01em; margin: 0 0 12px; text-wrap: balance; }
+h3 { font-family: var(--head); font-weight: 700; font-size: 16px; margin: 0 0 8px; }
+p { margin: 0 0 12px; font-size: 15px; color: var(--fg-soft); }
+.lede { font-size: clamp(16px, 2vw, 18px); max-width: 58ch; }
+.ey { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 4px; }
+
+section { padding: clamp(32px, 5vw, 56px) 0; border-top: 1px solid var(--line); }
+section:first-of-type { border-top: none; padding-top: clamp(40px, 6vw, 64px); }
+
+/* Badges */
+.badge { display: inline-block; font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+.badge-ls { background: var(--langsmith-wash); color: var(--langsmith); border: 1px solid color-mix(in srgb, var(--langsmith) 20%, transparent); }
+.badge-jm { background: var(--jm-wash); color: var(--jm); border: 1px solid color-mix(in srgb, var(--jm) 20%, transparent); }
+
+/* Code blocks */
+.code-panel { background: var(--inset); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin: 14px 0; overflow-x: auto; }
+.code-panel pre { margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--fg); white-space: pre; }
+.code-panel .cm { color: var(--fg-muted); }
+.code-panel .kw { color: var(--langsmith); font-weight: 600; }
+.code-panel .fn { color: var(--accent-ink); }
+.code-panel .st { color: var(--amber); }
+.code-panel .hl { background: var(--jm-wash); display: inline; padding: 1px 4px; border-radius: 3px; }
+
+/* Result panels */
+.result { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin: 14px 0; }
+.result .r-head { font-family: var(--head); font-weight: 700; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.result .r-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.result .r-row:last-child { border-bottom: none; }
+.result .r-label { color: var(--fg-muted); font-family: var(--mono); font-size: 12px; }
+.result .r-val { font-family: var(--head); font-weight: 700; }
+.result .r-val.good { color: var(--accent-ink); }
+.result .r-val.warn { color: var(--amber); }
+.result .r-val.bad { color: var(--red); }
+
+/* Comparison grid */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+@media (max-width: 560px) { .compare { grid-template-columns: 1fr; } }
+.compare .col { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+.compare .col h3 { font-size: 14px; display: flex; align-items: center; gap: 6px; }
+.compare .col ul { margin: 8px 0 0; padding: 0 0 0 16px; font-size: 13px; color: var(--fg-soft); }
+.compare .col li { margin-bottom: 4px; }
+.col-ls { border-top: 3px solid var(--langsmith); }
+.col-jm { border-top: 3px solid var(--jm); }
+
+/* Stat row */
+.stats { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+.stat { flex: 1; min-width: 120px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; text-align: center; }
+.stat .sv { font-family: var(--head); font-weight: 800; font-size: 20px; line-height: 1.1; }
+.stat .sl { font-size: 11px; color: var(--fg-muted); margin-top: 3px; }
+
+/* Pattern cards */
+.pattern { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin: 16px 0; }
+.pattern .p-num { font-family: var(--head); font-weight: 800; font-size: 13px; color: var(--accent-ink); margin-bottom: 2px; }
+.pattern h3 { font-size: 17px; margin-bottom: 6px; }
+.pattern .p-problem { font-size: 13px; color: var(--fg-muted); margin-bottom: 10px; padding: 8px 12px; background: var(--red-wash); border-radius: 6px; border-left: 3px solid var(--red); }
+.pattern .p-result { font-size: 13px; padding: 8px 12px; background: var(--jm-wash); border-radius: 6px; border-left: 3px solid var(--jm); }
+
+/* Callout */
+.callout { background: var(--jm-wash); border: 1px solid color-mix(in srgb, var(--jm) 25%, transparent); border-radius: 10px; padding: 18px 20px; margin: 20px 0; text-align: center; }
+.callout .big { font-family: var(--head); font-weight: 700; font-size: clamp(16px, 2.5vw, 20px); line-height: 1.3; color: var(--fg); }
+.callout .sub { font-size: 14px; color: var(--fg-muted); margin-top: 6px; }
+
+/* Install block */
+.install { background: var(--inset); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; margin: 16px 0; font-family: var(--mono); font-size: 13px; color: var(--accent-ink); text-align: center; }
+
+/* Footer */
+.foot { text-align: center; padding: 24px 0; font-size: 12px; color: var(--fg-muted); }
+.foot a { color: var(--accent-ink); text-decoration: none; }
+.disc { font-family: var(--mono); font-size: 9px; color: var(--fg-muted); text-align: center; text-transform: uppercase; letter-spacing: .06em; margin-top: 8px; }
+</style>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- HERO -->
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <div class="ey">Open Source · Apache 2.0</div>
+  <h1>LangSmith + Judgment Memory</h1>
+  <p class="lede" style="margin-top:10px">LangSmith traces what your agent did. Judgment Memory learns what it should do next — and proves it's safe to let it. Three lines of code. One <code style="font-family:var(--mono);font-size:.9em;background:var(--inset);padding:2px 6px;border-radius:4px">pip install</code>.</p>
+
+  <div class="install">pip install graph-attention-engine[langchain]</div>
+
+  <div class="compare">
+    <div class="col col-ls">
+      <h3><span class="badge badge-ls">LangSmith</span> Observability</h3>
+      <ul>
+        <li>Trace every tool call, chain, retrieval</li>
+        <li>Latency, token count, error rate</li>
+        <li>Debug and replay runs</li>
+        <li>Evaluate with scoring functions</li>
+      </ul>
+    </div>
+    <div class="col col-jm">
+      <h3><span class="badge badge-jm">Judgment Memory</span> Compounding</h3>
+      <ul>
+        <li>Score decisions against learned centroids</li>
+        <li>Learn from verified outcomes (not just traces)</li>
+        <li>Conservation law gates automation expansion</li>
+        <li>Decision #1,000 is measurably better than #1</li>
+      </ul>
+    </div>
+  </div>
+
+  <p style="font-size:13px;color:var(--fg-muted);text-align:center">LangSmith's traces are the <b style="color:var(--langsmith)">input</b>. JM's learned centroids are the <b style="color:var(--jm)">output</b> that improves.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- THE 3-LINE INTEGRATION -->
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <div class="ey">Integration</div>
+  <h2>Add to any LangChain agent — three lines</h2>
+
+  <div class="code-panel"><pre><span class="cm"># Your existing LangSmith setup (unchanged)</span>
+<span class="kw">import</span> os
+os.environ[<span class="st">"LANGSMITH_TRACING"</span>] = <span class="st">"true"</span>
+os.environ[<span class="st">"LANGSMITH_PROJECT"</span>] = <span class="st">"my-rag-pipeline"</span>
+
+<span class="kw">from</span> langchain.agents <span class="kw">import</span> AgentExecutor
+
+<span class="hl"><span class="cm"># ← Add Judgment Memory (3 lines)</span>
+<span class="kw">from</span> gae.integrations.langchain <span class="kw">import</span> <span class="fn">JudgmentMemoryCallback</span>
+
+jm = <span class="fn">JudgmentMemoryCallback</span>(
+    categories=[<span class="st">"retrieval"</span>, <span class="st">"generation"</span>, <span class="st">"routing"</span>],
+    actions=[<span class="st">"use"</span>, <span class="st">"skip"</span>, <span class="st">"escalate"</span>],
+    factors=[<span class="st">"relevance"</span>, <span class="st">"confidence"</span>, <span class="st">"recency"</span>,
+             <span class="st">"source_trust"</span>, <span class="st">"complexity"</span>],
+    state_path=<span class="st">"./jm_state.json"</span>,
+)</span>
+
+<span class="cm"># Both callbacks run together</span>
+result = executor.<span class="fn">invoke</span>(
+    {<span class="st">"input"</span>: <span class="st">"What's our Q3 compliance status?"</span>},
+    config={<span class="st">"callbacks"</span>: [jm]},
+)
+
+<span class="cm"># After verification</span>
+jm.<span class="fn">verify</span>(correct=<span class="kw">True</span>)
+
+<span class="cm"># Check status</span>
+jm.<span class="fn">status</span>()
+<span class="cm"># → {"decisions": 247, "accuracy": 0.84, "conservation": "GREEN"}</span></pre></div>
+
+  <p style="font-size:13px;color:var(--fg-muted)">LangSmith traces automatically via env vars. JM scores via the callback. Both run on the same agent invocation. State persists to <code style="font-family:var(--mono);font-size:.9em">jm_state.json</code> — pick up where you left off across restarts.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- THREE PATTERNS -->
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <div class="ey">Production patterns</div>
+  <h2>Three scenarios where JM compounds on LangSmith traces</h2>
+
+  <!-- Pattern 1: RAG -->
+  <div class="pattern">
+    <div class="p-num">Pattern 1</div>
+    <h3>RAG Pipeline — which retrieval strategy works for YOUR queries?</h3>
+    <div class="p-problem">LangSmith traces 1,000 retrievals. You see latency and token counts. But after 1,000 queries, which strategy (dense, sparse, hybrid, rerank) actually produces correct answers for which query types? LangSmith can't tell you — it doesn't learn from outcomes.</div>
+
+    <div class="code-panel"><pre>categories = [<span class="st">"compliance"</span>, <span class="st">"product"</span>, <span class="st">"financial"</span>, <span class="st">"technical"</span>]
+actions    = [<span class="st">"dense_only"</span>, <span class="st">"sparse_only"</span>, <span class="st">"hybrid"</span>, <span class="st">"hybrid_rerank"</span>]
+factors    = [<span class="st">"query_complexity"</span>, <span class="st">"corpus_coverage"</span>,
+              <span class="st">"recency_requirement"</span>, <span class="st">"precision_requirement"</span>,
+              <span class="st">"query_length"</span>, <span class="st">"entity_density"</span>]</pre></div>
+
+    <div class="result">
+      <div class="r-head"><span class="badge badge-jm">After 1,000 queries</span></div>
+      <div class="r-row"><span class="r-label">compliance</span><span class="r-val good">→ hybrid_rerank (p=0.273)</span></div>
+      <div class="r-row"><span class="r-label">product</span><span class="r-val good">→ dense_only (p=0.274)</span></div>
+      <div class="r-row"><span class="r-label">financial</span><span class="r-val good">→ hybrid (p=0.272)</span></div>
+      <div class="r-row"><span class="r-label">technical</span><span class="r-val good">→ sparse_only (p=0.270)</span></div>
+      <div class="r-row"><span class="r-label">dominant factors</span><span class="r-val">recency, complexity, entity_density</span></div>
+    </div>
+
+    <div class="p-result">JM learned: compliance needs reranking. Product lookups are faster AND more accurate with dense-only. Stop reranking product queries — save latency, gain accuracy.</div>
+  </div>
+
+  <!-- Pattern 2: Router -->
+  <div class="pattern">
+    <div class="p-num">Pattern 2</div>
+    <h3>Multi-Agent Router — which agent should handle this?</h3>
+    <div class="p-problem">You have 4 agents (research, code, data, writing). A router picks one per request. LangSmith traces all 1,500 routing decisions. But the router still uses Day 1 rules.</div>
+
+    <div class="code-panel"><pre>categories = [<span class="st">"code_question"</span>, <span class="st">"research"</span>, <span class="st">"data_analysis"</span>,
+              <span class="st">"content_creation"</span>, <span class="st">"ambiguous"</span>]
+actions    = [<span class="st">"research_agent"</span>, <span class="st">"code_agent"</span>,
+              <span class="st">"data_agent"</span>, <span class="st">"writing_agent"</span>]
+factors    = [<span class="st">"has_code_keywords"</span>, <span class="st">"needs_web_search"</span>,
+              <span class="st">"has_data_reference"</span>, <span class="st">"creative_intent"</span>,
+              <span class="st">"technical_depth"</span>, <span class="st">"user_history_code"</span>,
+              <span class="st">"user_history_research"</span>, <span class="st">"request_length"</span>]</pre></div>
+
+    <div class="result">
+      <div class="r-head"><span class="badge badge-jm">After 1,500 decisions</span></div>
+      <div class="r-row"><span class="r-label">Day 1 accuracy</span><span class="r-val warn">66%</span></div>
+      <div class="r-row"><span class="r-label">Day 1500 accuracy</span><span class="r-val good">80%</span></div>
+      <div class="r-row"><span class="r-label">improvement</span><span class="r-val good">+14pp</span></div>
+      <div class="r-row"><span class="r-label">research_agent</span><span class="r-val">86.3% (387 routed)</span></div>
+      <div class="r-row"><span class="r-label">code_agent</span><span class="r-val">78.4% (380 routed)</span></div>
+      <div class="r-row"><span class="r-label">data_agent</span><span class="r-val">78.0% (378 routed)</span></div>
+      <div class="r-row"><span class="r-label">writing_agent</span><span class="r-val">75.8% (355 routed)</span></div>
+    </div>
+
+    <div class="p-result">The router learned YOUR users' request patterns. Routing accuracy improved 14pp without changing a single routing rule — centroids absorbed the pattern from verified feedback.</div>
+  </div>
+
+  <!-- Pattern 3: Triage -->
+  <div class="pattern">
+    <div class="p-num">Pattern 3</div>
+    <h3>Alert Triage — should this auto-resolve?</h3>
+    <div class="p-problem">Your agent triages production alerts. LangSmith traces 2,000 triage decisions. But the auto-resolve threshold is static. After 500 correct auto-resolves for disk_space alerts, the system still asks a human every time.</div>
+
+    <div class="code-panel"><pre>categories = [<span class="st">"disk_space"</span>, <span class="st">"memory_leak"</span>, <span class="st">"api_latency"</span>,
+              <span class="st">"cert_expiry"</span>, <span class="st">"deploy_failure"</span>, <span class="st">"security_scan"</span>]
+actions    = [<span class="st">"auto_resolve"</span>, <span class="st">"escalate_l1"</span>,
+              <span class="st">"escalate_l2"</span>, <span class="st">"page_oncall"</span>]
+factors    = [<span class="st">"severity"</span>, <span class="st">"recurrence_count"</span>, <span class="st">"blast_radius"</span>,
+              <span class="st">"time_of_day"</span>, <span class="st">"similar_resolution"</span>,
+              <span class="st">"source_reliability"</span>, <span class="st">"sla_remaining_pct"</span>]</pre></div>
+
+    <div class="result">
+      <div class="r-head"><span class="badge badge-jm">After 2,000 alerts</span></div>
+      <div class="r-row"><span class="r-label">disk_space auto-resolve</span><span class="r-val good">92% accurate (294/321)</span></div>
+      <div class="r-row"><span class="r-label">cert_expiry auto-resolve</span><span class="r-val good">95% accurate (196/207)</span></div>
+      <div class="r-row"><span class="r-label">api_latency auto-resolve</span><span class="r-val warn">59% accurate (60/101)</span></div>
+      <div class="r-row"><span class="r-label">security_scan auto-resolve</span><span class="r-val bad">40% accurate (2/5)</span></div>
+      <div class="r-row"><span class="r-label">memory_leak auto-resolve</span><span class="r-val warn">56% accurate (45/81)</span></div>
+    </div>
+
+    <div class="p-result">JM learned the difference. disk_space and cert_expiry earned autonomy (92%, 95%). security_scan did not (40%). Each expansion step bounded by the conservation law — θ<sub>min</sub> = 23.53/(α×V). The system can improve. It cannot silently degrade.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- THE KEY INSIGHT -->
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <div class="ey">The difference</div>
+  <h2>What each system gives you after 1,000 decisions</h2>
+
+  <div class="compare">
+    <div class="col col-ls">
+      <h3><span class="badge badge-ls">LangSmith</span></h3>
+      <ul>
+        <li>1,000 traces with full metadata</li>
+        <li>P95 latency: 2.1s → 1.8s (cache hit)</li>
+        <li>Token usage trending down 12%</li>
+        <li>Error rate: 3.2% (up from 2.8%)</li>
+        <li>Three root causes identified in trace</li>
+      </ul>
+      <p style="font-size:12px;color:var(--fg-muted);margin:8px 0 0">Observability. What happened.</p>
+    </div>
+    <div class="col col-jm">
+      <h3><span class="badge badge-jm">Judgment Memory</span></h3>
+      <ul>
+        <li>Compliance → always rerank (91% vs 55%)</li>
+        <li>Product → skip reranking (94%, 3× faster)</li>
+        <li>Routing accuracy: 66% → 80% (+14pp)</li>
+        <li>disk_space auto-resolve: safe (92%)</li>
+        <li>security_scan: NOT safe (40%) — gate held</li>
+      </ul>
+      <p style="font-size:12px;color:var(--fg-muted);margin:8px 0 0">Judgment. What to do differently, and why.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="big">LangSmith tells you what happened.<br>Judgment Memory tells you what to do next — and proves it's safe.</div>
+    <div class="sub">They're complementary. LangSmith's traces are the raw signal. JM's centroids are the compounding output.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- HOW IT WORKS -->
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <div class="ey">Under the hood</div>
+  <h2>What happens on each decision</h2>
+
+  <div class="stats">
+    <div class="stat"><div class="sv" style="color:var(--langsmith)">①</div><div class="sl">Agent calls tool<br>LangSmith traces it</div></div>
+    <div class="stat"><div class="sv" style="color:var(--jm)">②</div><div class="sl">JM scores against<br>learned centroids</div></div>
+    <div class="stat"><div class="sv" style="color:var(--amber)">③</div><div class="sl">Human or check<br>verifies outcome</div></div>
+    <div class="stat"><div class="sv" style="color:var(--jm)">④</div><div class="sl">Centroids update<br>Conservation recalculates</div></div>
+  </div>
+
+  <div class="code-panel"><pre><span class="cm"># What compounds in the state file:</span>
+
+<span class="cm"># Centroid geometry — 4 categories × 4 actions × 6 factors = 96 values</span>
+<span class="cm"># Each value learned from YOUR verified outcomes</span>
+<span class="cm"># Day 1: uniform [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]</span>
+<span class="cm"># Day 1000: shaped [0.82, 0.31, 0.74, 0.91, 0.45, 0.67]</span>
+<span class="cm">#                   ↑ this shape IS the judgment</span>
+
+<span class="cm"># Conservation gate</span>
+<span class="cm"># θ_min = 23.53 / (α × V)</span>
+<span class="cm"># The system can improve. It cannot silently degrade.</span>
+<span class="cm"># 3 independent math reviewers · adversarial: 100% rejected</span>
+
+<span class="cm"># DK weights — per-factor trust</span>
+<span class="cm"># "source_trust" has weight 0.91 (your data confirms it matters)</span>
+<span class="cm"># "query_length" has weight 0.14 (noise for your domain)</span></pre></div>
+
+  <p style="font-size:13px;color:var(--fg-muted)">The state file is portable. Save it from a LangChain callback, load it in the MCP server, or move it between environments. The judgment carries.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ALSO: MCP -->
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <div class="ey">Also available</div>
+  <h2>MCP Server — for Claude, Cursor, Windsurf</h2>
+  <p>Same engine, different integration surface. Six tools over Model Context Protocol:</p>
+
+  <div class="code-panel"><pre><span class="cm"># Claude Desktop / Cursor config:</span>
+{
+  <span class="st">"mcpServers"</span>: {
+    <span class="st">"rgi-judgment-memory"</span>: {
+      <span class="st">"command"</span>: <span class="st">"rgi-mcp-server"</span>,
+      <span class="st">"args"</span>: [
+        <span class="st">"--categories"</span>, <span class="st">"retrieval,generation,routing"</span>,
+        <span class="st">"--actions"</span>, <span class="st">"use,skip,escalate"</span>,
+        <span class="st">"--factors"</span>, <span class="st">"relevance,confidence,recency,source_trust,complexity"</span>,
+        <span class="st">"--state"</span>, <span class="st">"./jm_state.json"</span>
+      ]
+    }
+  }
+}</pre></div>
+
+  <div class="result">
+    <div class="r-head">6 MCP tools</div>
+    <div class="r-row"><span class="r-label">rgi_score</span><span class="r-val">Score a decision → action + probabilities</span></div>
+    <div class="r-row"><span class="r-label">rgi_verify</span><span class="r-val">Learn from outcome → centroids update</span></div>
+    <div class="r-row"><span class="r-label">rgi_conservation</span><span class="r-val">Safety gate → RED / AMBER / GREEN</span></div>
+    <div class="r-row"><span class="r-label">rgi_decisions</span><span class="r-val">Decision history with outcomes</span></div>
+    <div class="r-row"><span class="r-label">rgi_accuracy</span><span class="r-val">Per-category accuracy + IKS</span></div>
+    <div class="r-row"><span class="r-label">rgi_explain</span><span class="r-val">Factor contributions + reasoning trace</span></div>
+  </div>
+
+  <div class="install">pip install graph-attention-engine[mcp]</div>
+  <p style="font-size:12px;color:var(--fg-muted);text-align:center">State files are interchangeable between LangChain and MCP integrations.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TRY IT -->
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <div class="ey">Try it</div>
+  <h2>Run the examples — no API key needed</h2>
+
+  <div class="code-panel"><pre><span class="cm"># Install</span>
+pip install graph-attention-engine
+
+<span class="cm"># Run all three patterns (uses only GAE, no LLM)</span>
+python examples/langsmith_jm_examples.py
+
+<span class="cm"># Run the MCP quickstart</span>
+python examples/mcp_quickstart.py
+
+<span class="cm"># Check system status</span>
+python examples/status_dashboard.py</pre></div>
+
+  <div class="stats">
+    <div class="stat"><div class="sv" style="color:var(--fg)">1,280</div><div class="sl">tests · 0 failures</div></div>
+    <div class="stat"><div class="sv" style="color:var(--fg)">v0.7.26</div><div class="sl">on PyPI</div></div>
+    <div class="stat"><div class="sv" style="color:var(--fg)">Apache 2.0</div><div class="sl">your data · your machine</div></div>
+  </div>
+
+  <p style="text-align:center;margin-top:12px">
+    <a href="https://github.com/ArindamBanerji/graph-attention-engine" style="font-family:var(--mono);font-size:13px;color:var(--accent-ink);text-decoration:none;padding:8px 16px;border:1px solid var(--line);border-radius:8px;display:inline-block">GitHub → ArindamBanerji/graph-attention-engine</a>
+  </p>
+</section>
+
+<!-- FOOTER -->
+<div class="foot">
+  <div>Arindam Banerji · <a href="https://www.dakshineshwari.net">dakshineshwari.net</a></div>
+</div>
+<div class="disc">RGI · Dakshineshwari LLC · October 2026 · Pre-revenue · All results from simulation runs on synthetic data</div>

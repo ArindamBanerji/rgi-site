@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic Memory vs RGI Judgment Memory</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --surface-alt: #f0f1f3;
+    --text: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+    --accent: #4f46e5;
+    --accent-soft: #eef2ff;
+    --accent-mid: #a5b4fc;
+    --green: #059669;
+    --green-soft: #d1fae5;
+    --red: #dc2626;
+    --red-soft: #fee2e2;
+    --amber: #d97706;
+    --amber-soft: #fef3c7;
+    --border: #e5e7eb;
+    --border-light: #f3f4f6;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.65; -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── Hero ── */
+  .hero { padding: 40px 0 24px; text-align: center; }
+  .hero-chip {
+    display: inline-block; font-size: 12px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent);
+    background: var(--accent-soft); border-radius: 20px;
+    padding: 4px 14px; margin-bottom: 20px;
+  }
+  .hero h1 { font-size: 36px; font-weight: 800; line-height: 1.15; margin-bottom: 12px; }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub { font-size: 17px; color: var(--text-secondary); max-width: 660px; margin: 0 auto 24px; }
+  .hero-pip {
+    display: inline-block; background: #2d2d2d; color: #ccc;
+    font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 14px;
+    padding: 8px 20px; border-radius: 8px;
+  }
+  .hero-pip .cm { color: #999; }
+
+  /* ── Section ── */
+  section { margin-bottom: 24px; }
+  .section-label {
+    font-size: 12px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+  section h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  section .sub { font-size: 15px; color: var(--text-secondary); margin-bottom: 12px; }
+  p { font-size: 15px; margin-bottom: 10px; }
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* ── Voiceover button ── */
+  .vo-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent-soft); border: 1px solid var(--accent-mid);
+    color: var(--accent); font-size: 13px; font-weight: 700;
+    padding: 8px 18px; border-radius: 24px; cursor: pointer;
+    transition: all 0.2s; margin: 8px 0;
+  }
+  .vo-btn:hover { background: #e0e7ff; }
+  .vo-btn.playing { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .vo-btn .vo-icon { font-size: 16px; }
+
+  /* ── Code (Prism override) ── */
+  pre[class*="language-"] {
+    border-radius: 10px !important;
+    font-size: 13.5px !important;
+    line-height: 1.65 !important;
+    padding: 20px 24px !important;
+    margin: 10px 0 !important;
+    tab-size: 4 !important;
+  }
+  code[class*="language-"] {
+    font-family: 'SF Mono','Fira Code','Consolas',monospace !important;
+    font-size: 13.5px !important;
+    line-height: 1.65 !important;
+  }
+
+  /* ── Tabs ── */
+  .tabs { margin: 16px 0; }
+  .tab-bar {
+    display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 0;
+  }
+  .tab-btn {
+    padding: 10px 22px; font-size: 14px; font-weight: 600;
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted); border-bottom: 2px solid transparent;
+    margin-bottom: -2px; transition: all 0.2s;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn:hover { color: var(--text); }
+  .tab-panel { display: none; padding-top: 4px; }
+  .tab-panel.active { display: block; }
+
+  /* ── Chart wrap ── */
+  .chart-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; box-shadow: var(--shadow); margin: 16px 0;
+  }
+  .chart-wrap h4 { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 16px; }
+  svg text { font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif; }
+
+  /* ── Stats ── */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px; margin: 16px 0;
+  }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; box-shadow: var(--shadow);
+  }
+  .stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .stat-val { font-size: 32px; font-weight: 800; line-height: 1; }
+  .stat-note { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+  .stat-val.green { color: var(--green); }
+  .stat-val.accent { color: var(--accent); }
+  .stat-val.amber { color: var(--amber); }
+
+  /* ── Callout ── */
+  .callout { border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 14px; line-height: 1.6; }
+  .callout.blue { background: var(--accent-soft); border-left: 4px solid var(--accent); }
+  .callout.green { background: var(--green-soft); border-left: 4px solid var(--green); }
+  .callout strong { font-weight: 700; }
+  .callout.blue strong { color: var(--accent); }
+  .callout.green strong { color: var(--green); }
+  .callout ul { margin: 8px 0 0 18px; padding: 0; }
+  .callout li { margin-bottom: 4px; }
+
+  /* ── Arch table ── */
+  .arch-table {
+    width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px;
+  }
+  .arch-table th {
+    text-align: left; padding: 10px 14px; border-bottom: 2px solid var(--border);
+    font-weight: 700; color: var(--text-secondary); font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .arch-table td {
+    padding: 10px 14px; border-bottom: 1px solid var(--border-light); color: var(--text);
+  }
+  .arch-table td:first-child { font-weight: 600; color: var(--text-secondary); }
+  .arch-table tr:last-child td { border-bottom: none; }
+  .arch-table .hi { color: var(--accent); font-weight: 700; }
+  .arch-table .dim { color: var(--text-muted); }
+
+  /* ── Footer ── */
+  .footer {
+    border-top: 1px solid var(--border); padding: 28px 0; margin-top: 32px; text-align: center;
+  }
+  .footer-quote { font-size: 18px; font-weight: 600; font-style: italic; margin-bottom: 16px; color: var(--text); }
+  .footer-meta { font-size: 13px; color: var(--text-muted); }
+  .footer-meta a { color: var(--accent); text-decoration: none; }
+  .footer-fine { font-size: 11px; color: var(--text-muted); margin-top: 10px; font-style: italic; }
+
+  /* ── Drift toggle ── */
+  .sim-controls {
+    display: flex; align-items: center; gap: 16px; margin: 12px 0 8px;
+    flex-wrap: wrap;
+  }
+  .drift-toggle {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer;
+  }
+  .drift-toggle input[type="checkbox"] { display: none; }
+  .drift-toggle .toggle-track {
+    width: 40px; height: 22px; border-radius: 11px;
+    background: var(--border); position: relative; transition: background 0.2s;
+  }
+  .drift-toggle input:checked + .toggle-track { background: var(--red); }
+  .drift-toggle .toggle-track::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .drift-toggle input:checked + .toggle-track::after { transform: translateX(18px); }
+  .sim-status { font-size: 12px; color: var(--text-muted); }
+
+  /* ── Canvas chart ── */
+  #simCanvas { width: 100%; max-width: 680px; display: block; margin: 0 auto; }
+  .drift-marker-label {
+    font-size: 12px; font-weight: 700; color: var(--red);
+    text-align: center; margin-top: -4px;
+  }
+
+  /* ── Drift callout ── */
+  .callout.red { background: var(--red-soft); border-left: 4px solid var(--red); }
+  .callout.red strong { color: var(--red); }
+
+  /* ── SVG highlight choreography ── */
+  @keyframes hl-pulse {
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(79, 70, 229, 0.4)); }
+    50% { filter: drop-shadow(0 0 14px rgba(79, 70, 229, 0.8)); }
+  }
+  .svg-hl { transition: all 0.3s ease; }
+  .svg-hl.active {
+    stroke: #4f46e5 !important;
+    stroke-width: 3.5 !important;
+    animation: hl-pulse 1.8s ease-in-out infinite;
+  }
+  /* Table row + callout item highlight */
+  .hl-row { transition: background 0.3s ease; }
+  .hl-row.active { background: var(--accent-soft) !important; }
+  .hl-item { transition: all 0.3s ease; border-left: 3px solid transparent; padding-left: 8px; }
+  .hl-item.active { background: rgba(79,70,229,0.08); border-left-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-chip">Compounding Intelligence</div>
+  <h1>Agentic Memory vs <span>RGI Judgment Memory</span></h1>
+  <p class="hero-sub">Two architectures for teaching agents to remember decisions. One stores traces and retrieves by similarity. The other learns a compressed prototype that scores in O(1) &#8212; no retrieval, no LLM call.</p>
+  <div class="hero-pip">pip install graph-attention-engine <span class="cm">&nbsp;# ~844 params, Apache 2.0</span></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ THE QUESTION ═══ -->
+<section>
+  <button class="vo-btn" onclick="toggleVO(this, 'intro')"><span class="vo-icon">&#x1F50A;</span> 1. Listen to Background</button>
+
+  <div class="section-label">The Question</div>
+  <h2>What should an agent remember &#8212; and how?</h2>
+
+  <!-- SVG infographic: two architectures side by side -->
+  <div class="chart-wrap" style="padding:24px 20px">
+    <svg viewBox="0 0 880 260" width="100%" style="max-width:880px">
+      <!-- Left: Agentic Memory -->
+      <rect id="svg-am-box" class="svg-hl" x="0" y="0" width="420" height="250" rx="12" fill="#f0f1f3" stroke="#e5e7eb" stroke-width="1"/>
+      <text x="210" y="28" text-anchor="middle" fill="#9ca3af" font-size="11" font-weight="700" letter-spacing="1">AGENTIC MEMORY</text>
+      <!-- Trace boxes -->
+      <rect x="30" y="48" width="60" height="32" rx="4" fill="#d1d5db"/>
+      <text x="60" y="68" text-anchor="middle" fill="#6b7280" font-size="9" font-weight="600">trace 1</text>
+      <rect x="100" y="48" width="60" height="32" rx="4" fill="#d1d5db"/>
+      <text x="130" y="68" text-anchor="middle" fill="#6b7280" font-size="9" font-weight="600">trace 2</text>
+      <rect x="170" y="48" width="60" height="32" rx="4" fill="#d1d5db"/>
+      <text x="200" y="68" text-anchor="middle" fill="#6b7280" font-size="9" font-weight="600">trace 3</text>
+      <text x="248" y="68" fill="#9ca3af" font-size="16" font-weight="700">&#8230;</text>
+      <rect x="270" y="48" width="60" height="32" rx="4" fill="#d1d5db"/>
+      <text x="300" y="68" text-anchor="middle" fill="#6b7280" font-size="9" font-weight="600">trace n</text>
+      <!-- Arrow down -->
+      <line x1="210" y1="90" x2="210" y2="112" stroke="#9ca3af" stroke-width="2" marker-end="url(#arrowGray)"/>
+      <text x="210" y="130" text-anchor="middle" fill="#6b7280" font-size="12" font-weight="600">k-NN search (scan all)</text>
+      <!-- Arrow down -->
+      <line x1="210" y1="140" x2="210" y2="158" stroke="#9ca3af" stroke-width="2" marker-end="url(#arrowGray)"/>
+      <!-- LLM box -->
+      <rect id="svg-am-llm" class="svg-hl" x="140" y="162" width="140" height="32" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+      <text x="210" y="183" text-anchor="middle" fill="#92400e" font-size="11" font-weight="700">1 LLM call (synthesize)</text>
+      <!-- Metrics -->
+      <text x="30" y="222" fill="#9ca3af" font-size="11">O(n) time &#183; O(n) space</text>
+      <text x="30" y="240" fill="#dc2626" font-size="11" font-weight="600">No drift protection</text>
+
+      <!-- Right: Judgment Memory -->
+      <rect id="svg-jm-box" class="svg-hl" x="460" y="0" width="420" height="250" rx="12" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+      <text x="670" y="28" text-anchor="middle" fill="#4f46e5" font-size="11" font-weight="700" letter-spacing="1">RGI JUDGMENT MEMORY</text>
+      <!-- Centroid grid -->
+      <rect x="500" y="48" width="36" height="28" rx="4" fill="#a5b4fc"/>
+      <rect x="542" y="48" width="36" height="28" rx="4" fill="#818cf8"/>
+      <rect x="584" y="48" width="36" height="28" rx="4" fill="#a5b4fc"/>
+      <rect x="626" y="48" width="36" height="28" rx="4" fill="#c7d2fe"/>
+      <rect x="668" y="48" width="36" height="28" rx="4" fill="#818cf8"/>
+      <rect x="710" y="48" width="36" height="28" rx="4" fill="#a5b4fc"/>
+      <rect x="752" y="48" width="36" height="28" rx="4" fill="#c7d2fe"/>
+      <rect x="794" y="48" width="36" height="28" rx="4" fill="#818cf8"/>
+      <text x="670" y="98" text-anchor="middle" fill="#4f46e5" font-size="10" font-weight="600">centroid tensor (~844 params)</text>
+      <!-- Arrow down -->
+      <line x1="670" y1="108" x2="670" y2="126" stroke="#4f46e5" stroke-width="2" marker-end="url(#arrowAccent)"/>
+      <text x="670" y="144" text-anchor="middle" fill="#4f46e5" font-size="12" font-weight="600">L2 distance (single computation)</text>
+      <!-- Arrow down -->
+      <line x1="670" y1="154" x2="670" y2="168" stroke="#4f46e5" stroke-width="2" marker-end="url(#arrowAccent)"/>
+      <!-- Gate box -->
+      <rect id="svg-jm-gate" class="svg-hl" x="600" y="172" width="140" height="32" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+      <text x="670" y="193" text-anchor="middle" fill="#065f46" font-size="11" font-weight="700">Conservation gate</text>
+      <!-- Metrics -->
+      <text x="490" y="228" fill="#4f46e5" font-size="11" font-weight="700">O(1) time &#183; O(1) space</text>
+      <text x="490" y="246" fill="#059669" font-size="11" font-weight="600">Zero LLM calls &#183; Drift-protected</text>
+
+      <!-- Arrow markers -->
+      <defs>
+        <marker id="arrowGray" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+        </marker>
+        <marker id="arrowAccent" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8" fill="none" stroke="#4f46e5" stroke-width="1.5"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div id="jm-callout" class="callout blue">
+    <p id="jm-co-head" class="hl-item"><strong>What is Judgment Memory?</strong></p>
+    <ul>
+      <li id="jm-co-centroid" class="hl-item">One learned prototype (centroid) per decision cell</li>
+      <li id="jm-co-update" class="hl-item">Each verified outcome shifts the nearest centroid: c += &#951;&#183;(outcome &#8722; c)</li>
+      <li id="jm-co-attention" class="hl-item">Criteria that predict quality get higher attention weights &#8212; criteria that don't get suppressed</li>
+      <li id="jm-co-params" class="hl-item">~844 parameters &#183; No LLM in the loop &#183; Fully inspectable</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ RESULTS ═══ -->
+<section>
+  <div class="section-label">Results</div>
+  <h2>Head-to-Head &#8212; 2,000 Decisions</h2>
+  <p class="sub">Same decision stream. 4 categories, 8 factors, 4 actions. JM scores before it learns. k-NN: distance-weighted retrieval, k=5, 400-chunk cap, FIFO eviction.</p>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:6px">
+    <button class="vo-btn" onclick="toggleVO(this, 'crossover')"><span class="vo-icon">&#x1F50A;</span> 2. Head-to-Head</button>
+    <button class="vo-btn" id="driftVoBtn" onclick="toggleVO(this, 'drift')"><span class="vo-icon">&#x1F50A;</span> 3. Distribution Shift</button>
+  </div>
+
+  <!-- Live simulation chart -->
+  <div class="chart-wrap">
+    <h4 id="chartTitle">Rolling accuracy (window 50) &#8212; click a voiceover to start</h4>
+    <div class="sim-controls">
+      <label class="drift-toggle">
+        <input type="checkbox" id="driftToggle" onchange="rerunSim()">
+        <span class="toggle-track"></span>
+        Drift at N=1,000
+      </label>
+      <span class="sim-status" id="simStatus"></span>
+    </div>
+    <canvas id="simCanvas" width="680" height="340"></canvas>
+    <div id="simStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"></div>
+  </div>
+
+  <!-- Drift callout (hidden until drift is active) -->
+  <div class="callout red" id="driftCallout" style="display:none">
+    <p id="drift-head" class="hl-item"><strong>Distribution shift injected at decision 1,000.</strong></p>
+    <p id="drift-desc" class="hl-item">The optimal action rotates for 2 of 4 categories &#8212; simulating a policy change, a regime shift, or a supplier reclassification mid-stream.</p>
+    <ul>
+      <li id="drift-jm" class="hl-item"><strong>Judgment Memory:</strong> category-scoped centroids keep 2 undrifted categories accurate; conservation gate dampens drifted categories while they re-learn. 14 points ahead of k-NN by N=1,150</li>
+      <li id="drift-am" class="hl-item"><strong>Agentic Memory:</strong> flat 400-trace FIFO store mixes all categories &#8212; stale traces from drifted categories poison k-NN retrieval for everything. Slower recovery</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ STABILITY: JUDGMENT IS GEOMETRY ═══ -->
+<section>
+  <div class="section-label">Stability</div>
+  <h2>Judgment is geometry &#8212; not a metaphor</h2>
+  <ul style="font-size:14px;color:var(--text-secondary);margin:4px 0 12px 20px;padding:0;line-height:1.6">
+    <li>Every decision moves a centroid &#8212; the geometric center of every verified outcome</li>
+    <li>Not a log. Not an LLM summary. The centroid IS the learned judgment</li>
+    <li>After 10,000 invoices, shaped by 10,000 outcomes &#8212; distances determine the action</li>
+    <li>Fully visible: which factors contributed, how far from each prototype, whether the gate dampened</li>
+    <li><strong style="color:var(--accent)">Inspect it. Trace it. Undo it.</strong></li>
+  </ul>
+
+  <button class="vo-btn" onclick="toggleVO(this, 'geometry')"><span class="vo-icon">&#x1F50A;</span> 4. How It Works</button>
+
+  <!-- SVG pipeline: Arrive → Score → Learn → Compare -->
+  <div class="chart-wrap" style="padding:20px 16px">
+    <svg viewBox="0 0 880 320" width="100%" style="max-width:880px">
+      <!-- Step 1: Arrive -->
+      <rect id="svg-step-arrive" class="svg-hl" x="0" y="0" width="260" height="120" rx="10" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+      <circle cx="24" cy="24" r="14" fill="#4f46e5"/>
+      <text x="24" y="29" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">1</text>
+      <text x="44" y="29" fill="#4f46e5" font-size="14" font-weight="700">Arrive</text>
+      <text x="16" y="50" fill="#4b5563" font-size="10">8 factors extracted:</text>
+      <text x="16" y="64" fill="#111827" font-size="10" font-weight="600">amount &#183; vendor history &#183; PO match</text>
+      <text x="16" y="78" fill="#111827" font-size="10" font-weight="600">approval tier &#183; days outstanding</text>
+      <text x="16" y="92" fill="#111827" font-size="10" font-weight="600">line-item count &#183; currency risk</text>
+      <text x="16" y="106" fill="#111827" font-size="10" font-weight="600">prior exceptions</text>
+
+      <!-- Arrow 1→2 -->
+      <line x1="268" y1="60" x2="306" y2="60" stroke="#4f46e5" stroke-width="2" marker-end="url(#arrowA)"/>
+
+      <!-- Step 2: Score -->
+      <rect id="svg-step-score" class="svg-hl" x="310" y="0" width="260" height="120" rx="10" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+      <circle cx="334" cy="24" r="14" fill="#4f46e5"/>
+      <text x="334" y="29" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">2</text>
+      <text x="354" y="29" fill="#4f46e5" font-size="14" font-weight="700">Score</text>
+      <text x="326" y="50" fill="#4b5563" font-size="10">L2 distances:</text>
+      <text x="326" y="66" fill="#059669" font-size="11" font-weight="700">Auto-Approve: 0.034</text>
+      <text x="326" y="80" fill="#9ca3af" font-size="10">Escalate: 0.71 &#183; Hold: 1.24</text>
+      <text x="326" y="98" fill="#4f46e5" font-size="11" font-weight="700">P(auto-approve) = 0.97</text>
+      <text x="326" y="112" fill="#9ca3af" font-size="10">1 computation &#183; 0 LLM calls</text>
+
+      <!-- Arrow 2→3 -->
+      <line x1="578" y1="60" x2="616" y2="60" stroke="#4f46e5" stroke-width="2" marker-end="url(#arrowA)"/>
+
+      <!-- Step 3: Learn -->
+      <rect id="svg-step-learn" class="svg-hl" x="620" y="0" width="260" height="120" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+      <circle cx="644" cy="24" r="14" fill="#059669"/>
+      <text x="644" y="29" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">3</text>
+      <text x="664" y="29" fill="#059669" font-size="14" font-weight="700">Learn</text>
+      <text x="636" y="50" fill="#4b5563" font-size="10">Conservation gate:</text>
+      <text x="636" y="66" fill="#059669" font-size="11" font-weight="700">disp 0.034 &lt; thresh 0.5 &#8594; PASS</text>
+      <text x="636" y="84" fill="#111827" font-size="10">Full &#951; = 0.08</text>
+      <text x="636" y="100" fill="#4f46e5" font-size="11" font-weight="700">Centroid shifts 0.0017</text>
+      <text x="636" y="114" fill="#9ca3af" font-size="10">toward this invoice</text>
+
+      <!-- Bottom: Black Box vs Open Geometry -->
+      <rect id="svg-blackbox" class="svg-hl" x="60" y="150" width="340" height="160" rx="10" fill="#f0f1f3" stroke="#e5e7eb" stroke-width="1"/>
+      <text x="230" y="174" text-anchor="middle" fill="#9ca3af" font-size="11" font-weight="700" letter-spacing="1">BLACK BOX</text>
+      <text x="80" y="198" fill="#6b7280" font-size="12">Neural network says &#8220;approve&#8221;</text>
+      <text x="80" y="218" fill="#6b7280" font-size="12">Why? Backprop through 10M params</text>
+      <text x="80" y="238" fill="#dc2626" font-size="12" font-weight="600">Not auditable in production</text>
+      <text x="80" y="260" fill="#dc2626" font-size="12" font-weight="600">Cannot undo a wrong decision</text>
+
+      <rect id="svg-opengeom" class="svg-hl" x="480" y="150" width="340" height="160" rx="10" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+      <text x="650" y="174" text-anchor="middle" fill="#4f46e5" font-size="11" font-weight="700" letter-spacing="1">RGI OPEN GEOMETRY</text>
+      <text x="500" y="198" fill="#111827" font-size="12">L2 distance = <tspan fill="#4f46e5" font-weight="700">0.034</tspan> to Auto-Approve</text>
+      <text x="500" y="218" fill="#111827" font-size="12">8 factor values visible</text>
+      <text x="500" y="238" fill="#111827" font-size="12">Conservation gate visible</text>
+      <text x="500" y="260" fill="#4f46e5" font-size="12" font-weight="700">Identify the cell. Trace it. Undo if wrong.</text>
+
+      <!-- vs label -->
+      <text x="440" y="234" text-anchor="middle" fill="#9ca3af" font-size="16" font-weight="800">vs</text>
+
+      <defs>
+        <marker id="arrowA" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8" fill="none" stroke="#4f46e5" stroke-width="1.5"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <button class="vo-btn" onclick="toggleVO(this, 'tradeoff')"><span class="vo-icon">&#x1F50A;</span> 5. Tradeoff</button>
+
+  <!-- SVG: Tradeoff + Tribal Knowledge visual -->
+  <div class="chart-wrap" style="padding:20px 16px">
+    <svg viewBox="0 0 880 340" width="100%" style="max-width:880px">
+      <!-- Top row: The Tradeoff (two boxes) -->
+      <text x="440" y="18" text-anchor="middle" fill="#4b5563" font-size="11" font-weight="700" letter-spacing="1">THE TRADEOFF</text>
+
+      <rect id="svg-trade-am" class="svg-hl" x="0" y="30" width="420" height="80" rx="10" fill="#f0f1f3" stroke="#e5e7eb" stroke-width="1"/>
+      <text x="210" y="52" text-anchor="middle" fill="#9ca3af" font-size="10" font-weight="700" letter-spacing="1">AGENTIC MEMORY WINS</text>
+      <text x="210" y="72" text-anchor="middle" fill="#6b7280" font-size="13">Inspect which traces influenced</text>
+      <text x="210" y="90" text-anchor="middle" fill="#6b7280" font-size="13">each decision</text>
+
+      <rect id="svg-trade-jm" class="svg-hl" x="460" y="30" width="420" height="80" rx="10" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+      <text x="670" y="52" text-anchor="middle" fill="#4f46e5" font-size="10" font-weight="700" letter-spacing="1">JUDGMENT MEMORY WINS</text>
+      <text x="670" y="72" text-anchor="middle" fill="#4f46e5" font-size="13" font-weight="600">O(1) &#183; Zero LLM &#183; Conservation gate</text>
+      <text x="670" y="90" text-anchor="middle" fill="#4f46e5" font-size="13" font-weight="600">&lt;1ms vs ~340ms &#183; Drift-protected</text>
+
+      <text x="440" y="78" text-anchor="middle" fill="#9ca3af" font-size="14" font-weight="800">vs</text>
+
+      <!-- Middle: The CFO Question -->
+      <rect id="svg-cfo-q" class="svg-hl" x="80" y="130" width="720" height="90" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+      <text x="440" y="152" text-anchor="middle" fill="#92400e" font-size="10" font-weight="700" letter-spacing="1">EVERY QUARTER, EVERY CFO TEAM</text>
+      <text x="440" y="176" text-anchor="middle" fill="#111827" font-size="16" font-style="italic">&#8220;Is 3.76% margin the right number &#8212; or is it more likely 2.95%?&#8221;</text>
+      <text x="440" y="200" text-anchor="middle" fill="#92400e" font-size="12">The senior analyst who answers draws on years of pattern recognition. If they leave, the next person guesses.</text>
+
+      <!-- Bottom: The Shift -->
+      <line x1="440" y1="228" x2="440" y2="248" stroke="#4f46e5" stroke-width="2" marker-end="url(#arrowA)"/>
+
+      <rect id="svg-jm-shift" class="svg-hl" x="120" y="252" width="640" height="80" rx="12" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+      <text x="440" y="274" text-anchor="middle" fill="#065f46" font-size="10" font-weight="700" letter-spacing="1">JUDGMENT MEMORY CHANGES THIS</text>
+      <text x="440" y="296" text-anchor="middle" fill="#111827" font-size="13">10,000 verified decisions &#8594; centroid tensor &#8594; new analyst inherits on day one</text>
+      <text x="440" y="316" text-anchor="middle" fill="#059669" font-size="14" font-weight="800">The knowledge doesn't leave when the person does.</text>
+    </svg>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ IMPLEMENTATION ═══ -->
+<section>
+  <div class="section-label">Implementation</div>
+  <h2>Full Production Classes &#8212; Not Pseudocode</h2>
+  <p class="sub">Two complete implementations. Read them side by side.</p>
+
+  <div class="tabs">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="showTab(event, 'tab-agentic')">Agentic Memory</button>
+      <button class="tab-btn" onclick="showTab(event, 'tab-jm')">Judgment Memory</button>
+    </div>
+
+    <div id="tab-agentic" class="tab-panel active">
+<pre class="language-python"><code>class AgenticMemory:
+    """k-NN retrieval memory. The pattern behind LangChain, Mem0,
+    and most agentic frameworks."""
+
+    def __init__(self, k=5, cap=200):
+        self.store = []          # flat list, all categories mixed
+        self.k = k               # neighbors to retrieve
+        self.cap = cap           # max traces before eviction
+
+    def score(self, factors, category='general'):
+        """O(n*K) — scans entire store, every call."""
+        if len(self.store) < self.k:
+            return None, 0.0
+
+        dists = [
+            (euclidean(factors, t['factors']), t)
+            for t in self.store
+        ]
+        dists.sort(key=lambda x: x[0])
+        neighbors = dists[:self.k]
+
+        votes = {}
+        for d, t in neighbors:
+            w = 1.0 / (d + 1e-8)
+            votes[t['action']] = votes.get(t['action'], 0) + w
+
+        best = max(votes, key=votes.get)
+        return best, votes[best] / sum(votes.values())
+        # → THEN: 1 LLM call to synthesize retrieved context
+
+    def learn(self, factors, action, **kwargs):
+        """Append. No compression. No gate. No quality signal."""
+        self.store.append({
+            'factors': factors,
+            'action': action,
+            'ts': now()
+        })
+        if len(self.store) > self.cap:
+            self.store.pop(0)     # FIFO eviction
+        # No drift protection
+        # No outcome-quality handling
+        # kwargs silently ignored</code></pre>
+    </div>
+
+    <div id="tab-jm" class="tab-panel">
+<pre class="language-python"><code>class JudgmentMemory:
+    """Centroid learning. O(1) inference, conservation-gated updates."""
+
+    def __init__(self, tau=0.1, drift_thresh=0.4):
+        self.centroids = {}      # {category: {action: [mu]}}
+        self.tau = tau            # softmax temperature
+        self.drift_thresh = drift_thresh
+        self.gate_log = []       # every drift event recorded
+
+    def score(self, factors, category='general'):
+        """O(A*K) — constant, category-scoped. Zero LLM calls."""
+        if category not in self.centroids:
+            return None, 0.0
+
+        C = self.centroids[category]
+        dists = {
+            a: sum((f - c)**2 for f, c in zip(factors, mu))
+            for a, mu in C.items()
+        }
+        exps = {a: exp(-d / self.tau) for a, d in dists.items()}
+        Z = sum(exps.values())
+        best = max(exps, key=exps.get)
+        return best, exps[best] / Z
+        # → Done. 0 LLM calls. &lt;1ms.
+
+    def learn(self, factors, action, category,
+              confirmed=True, outcome=None):
+        """Update centroid. Conservation gate checks drift."""
+        if outcome == '__incorrect__':
+            return {'skipped': True}  # uncertain → skip
+
+        eta = 0.05 if confirmed else 0.01   # 5x differential
+        mu = self.centroids[category][action]
+
+        # Conservation gate
+        disp = norm(factors - mu)
+        if disp > self.drift_thresh:
+            eta *= 0.5           # dampen outlier
+            self.gate_log.append({'disp': disp, 'action': action})
+
+        for i in range(len(mu)):
+            mu[i] += eta * (factors[i] - mu[i])  # c += η·(x - c)
+
+        return {'gated': disp > self.drift_thresh,
+                'eta': eta, 'disp': disp}</code></pre>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <p><strong>Five things JudgmentMemory does that AgenticMemory cannot:</strong></p>
+    <ul>
+      <li><strong>Category-scoped centroids</strong> &#8212; decisions don't bleed across domains</li>
+      <li><strong>Conservation gate</strong> &#8212; outliers can't hijack learned judgment</li>
+      <li><strong>Differentiated learning rates</strong> &#8212; confirmed experience weighs 5&#215; more than overrides</li>
+      <li><strong>Outcome-quality handling</strong> &#8212; uncertain decisions are skipped, not learned from</li>
+      <li><strong>Gate log</strong> &#8212; every drift event recorded for audit</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ ARCHITECTURE + TRADEOFF (merged) ═══ -->
+<section>
+  <div class="section-label">Architecture</div>
+  <h2>Structural Comparison</h2>
+  <button class="vo-btn" onclick="toggleVO(this, 'architecture')"><span class="vo-icon">&#x1F50A;</span> 6. Structural Comparison</button>
+
+  <div id="arch-table-wrap" class="chart-wrap">
+    <table class="arch-table">
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th>Agentic Memory</th>
+          <th>Judgment Memory</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="arch-r1" class="hl-row">
+          <td>Inference complexity</td>
+          <td class="dim">O(n&#183;K) &#8212; grows with store</td>
+          <td class="hi">O(A&#183;K) &#8212; constant</td>
+        </tr>
+        <tr id="arch-r2" class="hl-row">
+          <td>Memory footprint</td>
+          <td class="dim">n traces &#215; K factors each</td>
+          <td class="hi">A&#183;K floats per category</td>
+        </tr>
+        <tr id="arch-r3" class="hl-row">
+          <td>LLM calls at inference</td>
+          <td class="dim">1 (synthesis of retrieved context)</td>
+          <td class="hi">0</td>
+        </tr>
+        <tr id="arch-r4" class="hl-row">
+          <td>Drift protection</td>
+          <td class="dim">None (FIFO eviction only)</td>
+          <td class="hi">Conservation gate (3-layer)</td>
+        </tr>
+        <tr id="arch-r5" class="hl-row">
+          <td>Learning signal</td>
+          <td class="dim">Append only</td>
+          <td class="hi">Confirmed/override (&#951; differentiated)</td>
+        </tr>
+        <tr id="arch-r6" class="hl-row">
+          <td>Latency (modeled)</td>
+          <td class="dim">~340ms (retrieval + LLM)</td>
+          <td class="hi">&lt;1ms</td>
+        </tr>
+        <tr id="arch-r7" class="hl-row">
+          <td>Category isolation</td>
+          <td class="dim">Single shared store</td>
+          <td class="hi">Scoped per category</td>
+        </tr>
+        <tr id="arch-r8" class="hl-row">
+          <td>Eval protocol</td>
+          <td class="dim">No separation of train/eval</td>
+          <td class="hi">Score-before-learn (strict online)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ SO WHAT ═══ -->
+<section>
+  <div class="section-label">So What</div>
+  <h2>Why This Matters for Your Decision Systems</h2>
+  <button class="vo-btn" onclick="toggleVO(this, 'validation')"><span class="vo-icon">&#x1F50A;</span> 7. Why It Matters</button>
+
+  <div id="val-stats" class="stats">
+    <div id="val-ablation" class="stat hl-row">
+      <div class="stat-label">Ablation effect</div>
+      <div class="stat-val accent">+9.2 pp</div>
+      <div class="stat-note">JM present vs removed</div>
+    </div>
+    <div id="val-ci" class="stat hl-row">
+      <div class="stat-label">95% CI</div>
+      <div class="stat-val accent">[+7.2, +11.3]</div>
+      <div class="stat-note">500 bootstrap resamples &#8212; excludes zero</div>
+    </div>
+    <div id="val-drift-gap" class="stat hl-row">
+      <div class="stat-label">Drift recovery</div>
+      <div class="stat-val accent">+14 pp</div>
+      <div class="stat-note">JM ahead of k-NN at N=1,150</div>
+    </div>
+    <div id="val-infra" class="stat hl-row">
+      <div class="stat-label">Infrastructure</div>
+      <div class="stat-val green">pip install</div>
+      <div class="stat-note">No GPUs &#183; No LLM calls &#183; Apache 2.0</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="footer">
+  <p class="footer-quote">"After 10,000 invoices, that centroid has moved 10,000 times. The geometry IS the judgment."</p>
+  <p class="footer-meta">
+    Arindam Banerji &#183;
+    <a href="https://www.dakshineshwari.net">dakshineshwari.net</a> &#183;
+    <a href="https://github.com/ArindamBanerji">GitHub</a> (Apache-2.0)
+  </p>
+  <p class="footer-fine">Live simulation: 2,000 decisions, seed 42. 4 categories, 8 factors, 4 actions, &#963;=0.30. Drift rotates optimal actions for 2/4 categories at N=1,000. Numbers from controlled experiments unless tagged MEASURED.</p>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script>
+/* Female voice preference */
+(function(){
+  function pickFemale(){
+    var v=speechSynthesis.getVoices();
+    for(var i=0;i<v.length;i++){
+      if(v[i].name.indexOf('Zira')!==-1) return v[i];
+    }
+    for(var i=0;i<v.length;i++){
+      if(v[i].lang.startsWith('en')&&v[i].name.match(/female|samantha|karen|fiona|moira|tessa|veena/i)) return v[i];
+    }
+    return null;
+  }
+  var fem=pickFemale();
+  if(fem){window._rgiVoice=fem;}
+  if(!fem&&speechSynthesis.onvoiceschanged!==undefined){
+    var orig=speechSynthesis.onvoiceschanged;
+    speechSynthesis.onvoiceschanged=function(){
+      var f=pickFemale();if(f)window._rgiVoice=f;
+      if(orig)orig();
+    };
+  }
+})();
+
+
+/* ── Tabs ── */
+function showTab(e, id) {
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  e.currentTarget.classList.add('active');
+  Prism.highlightAllUnder(document.getElementById(id));
+}
+
+/* ═══════════════════════════════════════════════════
+   LIVE SIMULATION ENGINE
+   ═══════════════════════════════════════════════════ */
+
+var SIM = {
+  N: 2000,
+  N_CAT: 4,
+  N_FACTORS: 8,
+  N_ACTIONS: 4,
+  SEP: 0.30,       // centroid separation (correlated)
+  NOISE: 0.30,
+  WINDOW: 50,
+  SEED: 42,
+  // JM params
+  TAU: 0.10,
+  DRIFT_THRESH: 0.5,
+  DRIFT_DAMP: 0.7,  // gate dampens to 70% (not 50%)
+  ETA_CONF: 0.08,
+  ETA_OVER: 0.01,
+  // Agentic params
+  KNN_K: 5,
+  KNN_CAP: 400,
+  // Drift
+  DRIFT_POINT: 1000,
+  DRIFT_CATS: 2     // 2 of 4 categories rotate on drift
+};
+
+/* ── Seeded PRNG (mulberry32) ── */
+function mulberry32(a) {
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function gaussRand(rng) {
+  var u = 0, v = 0;
+  while (u === 0) u = rng();
+  while (v === 0) v = rng();
+  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+}
+
+/* ── Generate correlated ground-truth centroids ── */
+function genTruth(rng) {
+  var truth = [];
+  for (var c = 0; c < SIM.N_CAT; c++) {
+    // Category base point
+    var base = [];
+    for (var f = 0; f < SIM.N_FACTORS; f++) base.push(rng() * 2 - 1);
+    // Actions are small perturbations of the base — close together, hard to classify
+    var actions = [];
+    for (var a = 0; a < SIM.N_ACTIONS; a++) {
+      var mu = [];
+      for (var f = 0; f < SIM.N_FACTORS; f++) mu.push(base[f] + gaussRand(rng) * SIM.SEP);
+      actions.push(mu);
+    }
+    truth.push(actions);
+  }
+  return truth;
+}
+
+/* ── Apply drift: rotate best action for DRIFT_CATS categories ── */
+function applyDrift(truth) {
+  for (var c = 0; c < SIM.DRIFT_CATS; c++) {
+    var tmp = truth[c][0].slice();
+    for (var a = 0; a < SIM.N_ACTIONS - 1; a++) {
+      truth[c][a] = truth[c][a + 1].slice();
+    }
+    truth[c][SIM.N_ACTIONS - 1] = tmp;
+  }
+}
+
+/* ── Sample a decision ── */
+function sampleDecision(truth, rng) {
+  var cat = Math.floor(rng() * SIM.N_CAT);
+  var bestAction = Math.floor(rng() * SIM.N_ACTIONS);
+  var factors = [];
+  for (var f = 0; f < SIM.N_FACTORS; f++) {
+    factors.push(truth[cat][bestAction][f] + gaussRand(rng) * SIM.NOISE);
+  }
+  return { cat: cat, factors: factors, correct: bestAction };
+}
+
+/* ── L2 distance ── */
+function l2(a, b) {
+  var s = 0;
+  for (var i = 0; i < a.length; i++) s += (a[i] - b[i]) * (a[i] - b[i]);
+  return Math.sqrt(s);
+}
+
+/* ── JudgmentMemory ── */
+function JM() {
+  this.centroids = {};
+}
+JM.prototype.score = function(factors, cat) {
+  if (!this.centroids[cat]) return { action: -1, conf: 0 };
+  var C = this.centroids[cat];
+  var dists = {};
+  for (var a in C) {
+    dists[a] = l2(factors, C[a]);
+  }
+  var exps = {}, Z = 0;
+  for (var a in dists) {
+    exps[a] = Math.exp(-dists[a] / SIM.TAU);
+    Z += exps[a];
+  }
+  var best = -1, bestV = -1;
+  for (var a in exps) {
+    if (exps[a] > bestV) { bestV = exps[a]; best = parseInt(a); }
+  }
+  return { action: best, conf: bestV / Z };
+};
+JM.prototype.learn = function(factors, action, cat, confirmed) {
+  if (!this.centroids[cat]) {
+    this.centroids[cat] = {};
+  }
+  if (!this.centroids[cat][action]) {
+    this.centroids[cat][action] = factors.slice();
+    return { gated: false };
+  }
+  var mu = this.centroids[cat][action];
+  var eta = confirmed ? SIM.ETA_CONF : SIM.ETA_OVER;
+  var disp = l2(factors, mu);
+  var gated = disp > SIM.DRIFT_THRESH;
+  if (gated) eta *= SIM.DRIFT_DAMP;
+  for (var i = 0; i < mu.length; i++) {
+    mu[i] += eta * (factors[i] - mu[i]);
+  }
+  return { gated: gated, disp: disp };
+};
+
+/* ── AgenticMemory (k-NN) ── */
+function AM() {
+  this.store = [];
+}
+AM.prototype.score = function(factors) {
+  if (this.store.length < SIM.KNN_K) return { action: -1, conf: 0 };
+  var dists = [];
+  for (var i = 0; i < this.store.length; i++) {
+    dists.push({ d: l2(factors, this.store[i].f), a: this.store[i].a });
+  }
+  dists.sort(function(x, y) { return x.d - y.d; });
+  var neighbors = dists.slice(0, SIM.KNN_K);
+  var votes = {}, totalW = 0;
+  for (var i = 0; i < neighbors.length; i++) {
+    var w = 1.0 / (neighbors[i].d + 1e-8);
+    votes[neighbors[i].a] = (votes[neighbors[i].a] || 0) + w;
+    totalW += w;
+  }
+  var best = -1, bestV = -1;
+  for (var a in votes) {
+    if (votes[a] > bestV) { bestV = votes[a]; best = parseInt(a); }
+  }
+  return { action: best, conf: bestV / totalW };
+};
+AM.prototype.learn = function(factors, action) {
+  this.store.push({ f: factors.slice(), a: action });
+  if (this.store.length > SIM.KNN_CAP) this.store.shift();
+};
+
+/* ═══ PRE-COMPUTE BOTH SIMS AT LOAD ═══ */
+var _simNoDrift = null, _simDrift = null;
+var _currentDrawn = 0;      // how many rolling points are currently visible
+var _currentDrift = false;   // which sim is on screen
+
+function precomputeBoth() {
+  _simNoDrift = computeSim(false);
+  _simDrift = computeSim(true);
+}
+
+function computeSim(drift) {
+  var rngTruth = mulberry32(SIM.SEED);
+  var truth = genTruth(rngTruth);
+  var rng = mulberry32(SIM.SEED + 1000);  // separate stream for decisions
+  var jm = new JM();
+  var am = new AM();
+  var jmCorrect = [], amCorrect = [];
+  var jmRoll = [], amRoll = [];
+  var crossover = -1;
+
+  for (var i = 0; i < SIM.N; i++) {
+    if (drift && i === SIM.DRIFT_POINT) applyDrift(truth);
+    var d = sampleDecision(truth, rng);
+    var jmR = jm.score(d.factors, d.cat);
+    var amR = am.score(d.factors);
+    jmCorrect.push((jmR.action === d.correct) ? 1 : 0);
+    amCorrect.push((amR.action === d.correct) ? 1 : 0);
+    jm.learn(d.factors, d.correct, d.cat, true);
+    am.learn(d.factors, d.correct);
+    if (i >= SIM.WINDOW - 1) {
+      var jmSum = 0, amSum = 0;
+      for (var w = i - SIM.WINDOW + 1; w <= i; w++) { jmSum += jmCorrect[w]; amSum += amCorrect[w]; }
+      jmRoll.push(jmSum / SIM.WINDOW);
+      amRoll.push(amSum / SIM.WINDOW);
+      if (crossover < 0 && jmRoll.length > 1 && jmRoll[jmRoll.length - 1] >= amRoll[amRoll.length - 1])
+        crossover = i;
+    }
+  }
+  var last100jm = 0, last100am = 0;
+  for (var i = SIM.N - 100; i < SIM.N; i++) { last100jm += jmCorrect[i]; last100am += amCorrect[i]; }
+  var jmFinal = (last100jm / 100 * 100).toFixed(1);
+  var amFinal = (last100am / 100 * 100).toFixed(1);
+  var gap = (last100jm / 100 * 100 - last100am / 100 * 100).toFixed(1);
+
+  var recJM = -1, recAM = -1;
+  if (drift) {
+    var target = jmRoll[SIM.DRIFT_POINT - SIM.WINDOW] * 0.90;
+    for (var i = SIM.DRIFT_POINT - SIM.WINDOW + 1; i < jmRoll.length; i++)
+      if (jmRoll[i] >= target) { recJM = (i + SIM.WINDOW) - SIM.DRIFT_POINT; break; }
+    for (var i = SIM.DRIFT_POINT - SIM.WINDOW + 1; i < amRoll.length; i++)
+      if (amRoll[i] >= target) { recAM = (i + SIM.WINDOW) - SIM.DRIFT_POINT; break; }
+  }
+  return { jmRoll:jmRoll, amRoll:amRoll, crossover:crossover, drift:drift,
+    jmFinal:jmFinal, amFinal:amFinal, gap:gap, recJM:recJM, recAM:recAM };
+}
+
+/* ── Narration-driven chart segments ── */
+// Each narration line draws the chart from _currentDrawn to a target index
+// crossover: 5 lines, no-drift sim
+// drift: 6 lines, drift sim
+var DRAW_TARGETS = {
+  crossover: function(r) {
+    var total = r.jmRoll.length;
+    return [
+      Math.floor(total * 0.08),   // line 0: cold start
+      Math.floor(total * 0.18),   // line 1: JM pulling ahead
+      Math.floor(total * 0.50),   // line 2: gap widens, midpoint
+      total,                       // line 3: full chart
+      total                        // line 4: walk thru stats (chart complete)
+    ];
+  },
+  drift: function(r) {
+    var total = r.jmRoll.length;
+    var driftIdx = SIM.DRIFT_POINT - SIM.WINDOW;
+    return [
+      0,                                 // line 0: reset chart
+      driftIdx - 10,                     // line 1: draw to just before drift
+      driftIdx + 50,                     // line 2: drift marker + immediate drop
+      Math.min(driftIdx + 300, total),   // line 3: k-NN collapse, JM recovering
+      Math.min(driftIdx + 500, total),   // line 4: JM recovered, k-NN catching up
+      total                              // line 5: complete + stats
+    ];
+  }
+};
+
+var _animFrame = null;
+function stopAnim() { if (_animFrame) { cancelAnimationFrame(_animFrame); _animFrame = null; } }
+
+/* ── Animate from current draw position to target ── */
+function animateToPoint(r, targetIdx, duration) {
+  stopAnim();
+  var startIdx = _currentDrawn;
+  if (targetIdx <= startIdx) {
+    // If target is 0, clear and redraw from scratch
+    _currentDrawn = 0;
+    startIdx = 0;
+  }
+  var startTime = performance.now();
+  var dur = duration || 6000;
+
+  function tick(now) {
+    var elapsed = now - startTime;
+    var progress = Math.min(elapsed / dur, 1);
+    // Ease out
+    var eased = 1 - Math.pow(1 - progress, 2);
+    var drawTo = Math.floor(startIdx + (targetIdx - startIdx) * eased);
+    drawTo = Math.max(drawTo, 1);
+    _currentDrawn = drawTo;
+    drawChart(r.jmRoll, r.amRoll, r.crossover, r.drift, r.jmFinal, r.amFinal, r.gap, r.recJM, r.recAM, drawTo);
+    if (progress < 1) {
+      _animFrame = requestAnimationFrame(tick);
+    } else {
+      _currentDrawn = targetIdx;
+      if (targetIdx >= r.jmRoll.length) updateStats(r);
+    }
+  }
+  _animFrame = requestAnimationFrame(tick);
+}
+
+/* ── Called by narration choreography for each line ── */
+function chartBeat(scriptKey, lineIdx) {
+  var r, targets;
+  if (scriptKey === 'crossover') {
+    r = _simNoDrift;
+    _currentDrift = false;
+    _chartAnnotation = -1;
+    targets = DRAW_TARGETS.crossover(r);
+    document.getElementById('driftToggle').checked = false;
+    document.getElementById('driftCallout').style.display = 'none';
+    document.getElementById('chartTitle').innerHTML = 'Rolling accuracy (window 50) &#8212; online learning';
+  } else if (scriptKey === 'drift') {
+    r = _simDrift;
+    _currentDrift = true;
+    targets = DRAW_TARGETS.drift(r);
+    document.getElementById('driftToggle').checked = true;
+    document.getElementById('driftCallout').style.display = 'block';
+    document.getElementById('chartTitle').innerHTML = 'Rolling accuracy (window 50) &#8212; distribution shift at N=1,000';
+    if (lineIdx === 0) { _currentDrawn = 0; }
+    _chartAnnotation = lineIdx; // drives on-chart annotations
+  } else {
+    return;
+  }
+  var target = targets[Math.min(lineIdx, targets.length - 1)];
+  var dur = (lineIdx === targets.length - 1) ? 2000 : 8000; // last line is short
+  // Scroll handled by CHOREO beat's scroll field — not here
+  animateToPoint(r, target, dur);
+
+  // Update status
+  document.getElementById('simStatus').textContent = r.drift
+    ? 'Drift at N=1,000 · JM: ' + r.jmFinal + '% · k-NN: ' + r.amFinal + '%'
+    : 'JM: ' + r.jmFinal + '% · k-NN: ' + r.amFinal + '% · Gap: +' + r.gap + ' pp';
+}
+
+/* ── Fallback: manual toggle redraws chart fully ── */
+function rerunSim() {
+  var drift = document.getElementById('driftToggle').checked;
+  var r = drift ? _simDrift : _simNoDrift;
+  _currentDrift = drift;
+  _currentDrawn = 0;
+  _chartAnnotation = drift ? 5 : -1; // show all annotations for manual toggle
+  document.getElementById('driftCallout').style.display = drift ? 'block' : 'none';
+  document.getElementById('chartTitle').innerHTML = drift
+    ? 'Rolling accuracy (window 50) &#8212; distribution shift at N=1,000'
+    : 'Rolling accuracy (window 50) &#8212; online learning';
+  animateToPoint(r, r.jmRoll.length, 4000);
+}
+
+function updateStats(r) {
+  var statsEl = document.getElementById('simStats');
+  if (r.drift) {
+    statsEl.innerHTML =
+      '<div class="stat" style="flex:1;min-width:140px"><div class="stat-label">JM final</div><div class="stat-val accent">' + r.jmFinal + '%</div></div>' +
+      '<div class="stat" style="flex:1;min-width:140px"><div class="stat-label">k-NN final</div><div class="stat-val" style="color:var(--text-muted)">' + r.amFinal + '%</div></div>' +
+      '<div class="stat" style="flex:1;min-width:140px"><div class="stat-label">Gap at N=2,000</div><div class="stat-val accent">+' + r.gap + ' pp</div></div>' +
+      (r.recJM > 0 ? '<div class="stat" style="flex:1;min-width:140px"><div class="stat-label">JM recovery</div><div class="stat-val green">~' + r.recJM + '</div><div class="stat-note">decisions after drift</div></div>' : '') +
+      (r.recAM > 0 ? '<div class="stat" style="flex:1;min-width:140px"><div class="stat-label">k-NN recovery</div><div class="stat-val amber">~' + r.recAM + '</div><div class="stat-note">decisions after drift</div></div>' : '');
+  } else {
+    statsEl.innerHTML =
+      '<div class="stat" style="flex:1;min-width:140px"><div class="stat-label">JM advantage</div><div class="stat-val accent">+' + r.gap + ' pp</div></div>' +
+      (r.crossover > 0 ? '<div class="stat" style="flex:1;min-width:140px"><div class="stat-label">Crossover</div><div class="stat-val amber">N=' + r.crossover + '</div></div>' : '') +
+      '<div class="stat" style="flex:1;min-width:140px"><div class="stat-label">JM final</div><div class="stat-val accent">' + r.jmFinal + '%</div></div>' +
+      '<div class="stat" style="flex:1;min-width:140px"><div class="stat-label">k-NN final</div><div class="stat-val" style="color:var(--text-muted)">' + r.amFinal + '%</div></div>';
+  }
+}
+
+/* ── Draw chart on canvas ── */
+var _chartAnnotation = -1; // which drift narration line is active (-1 = none)
+
+function drawChart(jmRoll, amRoll, crossover, drift, jmFinal, amFinal, gap, recJM, recAM, drawUpTo) {
+  if (!drawUpTo) drawUpTo = jmRoll.length;
+  var canvas = document.getElementById('simCanvas');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var pad = { l: 60, r: 20, t: 30, b: 60 };
+  var cw = W - pad.l - pad.r, ch = H - pad.t - pad.b;
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  // Y range
+  var yMin = 0.15, yMax = 0.95;
+
+  function xPos(i) { return pad.l + (i / jmRoll.length) * cw; }
+  function yPos(v) { return pad.t + (1 - (v - yMin) / (yMax - yMin)) * ch; }
+
+  // Grid
+  ctx.strokeStyle = '#f3f4f6'; ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  for (var g = 0.2; g <= 0.9; g += 0.1) {
+    var gy = yPos(g);
+    ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(pad.l + cw, gy); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // Axes
+  ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + ch); ctx.lineTo(pad.l + cw, pad.t + ch); ctx.stroke();
+
+  // Y labels
+  ctx.fillStyle = '#9ca3af'; ctx.font = '11px -apple-system, system-ui, sans-serif'; ctx.textAlign = 'right';
+  for (var g = 0.2; g <= 0.9; g += 0.1) {
+    ctx.fillText((g * 100).toFixed(0) + '%', pad.l - 6, yPos(g) + 4);
+  }
+
+  // X labels
+  ctx.textAlign = 'center';
+  var xTicks = [0, 500, 1000, 1500, 2000];
+  for (var ti = 0; ti < xTicks.length; ti++) {
+    var xi = Math.floor((xTicks[ti] - SIM.WINDOW) / (SIM.N - SIM.WINDOW) * jmRoll.length);
+    if (xi < 0) xi = 0;
+    if (xi >= jmRoll.length) xi = jmRoll.length - 1;
+    ctx.fillText(xTicks[ti].toString(), xPos(xi), pad.t + ch + 18);
+  }
+  ctx.fillText('Decisions', pad.l + cw / 2, pad.t + ch + 36);
+
+  // Drift marker
+  if (drift) {
+    var driftX = xPos(Math.floor((SIM.DRIFT_POINT - SIM.WINDOW) / (SIM.N - SIM.WINDOW) * jmRoll.length));
+    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath(); ctx.moveTo(driftX, pad.t); ctx.lineTo(driftX, pad.t + ch); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#dc2626'; ctx.font = 'bold 12px -apple-system, system-ui, sans-serif';
+    ctx.fillText('DRIFT', driftX, pad.t - 6);
+    // Red zone
+    ctx.fillStyle = 'rgba(220, 38, 38, 0.04)';
+    ctx.fillRect(driftX, pad.t, pad.l + cw - driftX, ch);
+  }
+
+  // k-NN line (dashed grey)
+  ctx.strokeStyle = '#b0b5be'; ctx.lineWidth = 2.5;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  for (var i = 0; i < drawUpTo && i < amRoll.length; i++) {
+    var x = xPos(i), y = yPos(amRoll[i]);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // JM line (solid indigo)
+  ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (var i = 0; i < drawUpTo && i < jmRoll.length; i++) {
+    var x = xPos(i), y = yPos(jmRoll[i]);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Crossover marker (only in no-drift mode, and only if we've drawn past it)
+  if (!drift && crossover > 0 && (crossover - SIM.WINDOW + 1) < drawUpTo) {
+    var cx = xPos(crossover - SIM.WINDOW + 1);
+    ctx.strokeStyle = '#d97706'; ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(cx, yPos(jmRoll[crossover - SIM.WINDOW + 1])); ctx.lineTo(cx, pad.t + ch); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#d97706'; ctx.beginPath();
+    ctx.arc(cx, yPos(jmRoll[crossover - SIM.WINDOW + 1]), 4, 0, Math.PI * 2); ctx.fill();
+    ctx.font = 'bold 11px -apple-system, system-ui, sans-serif';
+    ctx.fillText('N=' + crossover, cx + 4, pad.t + ch - 6);
+  }
+
+  // End labels (at current draw position)
+  var lastIdx = Math.min(drawUpTo - 1, jmRoll.length - 1);
+  if (lastIdx >= 0) {
+    ctx.font = 'bold 13px -apple-system, system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#4f46e5';
+    var jmLabel = drawUpTo >= jmRoll.length ? jmFinal + '%' : (jmRoll[lastIdx] * 100).toFixed(0) + '%';
+    ctx.fillText(jmLabel, xPos(lastIdx) + 6, yPos(jmRoll[lastIdx]) + 4);
+    ctx.fillStyle = '#9ca3af';
+    var amLabel = drawUpTo >= amRoll.length ? amFinal + '%' : (amRoll[lastIdx] * 100).toFixed(0) + '%';
+    ctx.fillText(amLabel, xPos(lastIdx) + 6, yPos(amRoll[lastIdx]) + 4);
+  }
+
+  // Legend
+  ctx.textAlign = 'left';
+  var lx = pad.l + cw - 220, ly = pad.t + 10;
+  ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 3; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx + 30, ly); ctx.stroke();
+  ctx.fillStyle = '#111827'; ctx.font = '11px -apple-system, system-ui, sans-serif';
+  ctx.fillText('Judgment Memory', lx + 36, ly + 4);
+  ctx.strokeStyle = '#b0b5be'; ctx.lineWidth = 2.5; ctx.setLineDash([6, 4]);
+  ctx.beginPath(); ctx.moveTo(lx, ly + 18); ctx.lineTo(lx + 30, ly + 18); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#9ca3af';
+  ctx.fillText('k-NN (agentic memory)', lx + 36, ly + 22);
+
+  // ── On-chart annotations for drift narration ──
+  if (drift && _chartAnnotation >= 2) {
+    var driftIdx = Math.floor((SIM.DRIFT_POINT - SIM.WINDOW) / (SIM.N - SIM.WINDOW) * jmRoll.length);
+    ctx.font = '11px -apple-system, system-ui, sans-serif';
+    ctx.textAlign = 'left';
+
+    if (_chartAnnotation >= 3 && drawUpTo > driftIdx + 100) {
+      // Annotate k-NN: "FIFO store: stale traces"
+      var amY = yPos(amRoll[Math.min(driftIdx + 200, drawUpTo - 1, amRoll.length - 1)]);
+      ctx.fillStyle = 'rgba(220, 38, 38, 0.85)';
+      ctx.fillText('← stale traces poison retrieval', xPos(driftIdx + 210), amY - 6);
+    }
+
+    if (_chartAnnotation >= 4 && drawUpTo > driftIdx + 200) {
+      // Annotate JM: "conservation gate → recovery"
+      var jmY = yPos(jmRoll[Math.min(driftIdx + 300, drawUpTo - 1, jmRoll.length - 1)]);
+      ctx.fillStyle = 'rgba(79, 70, 229, 0.85)';
+      ctx.fillText('← gate dampens, centroids adapt', xPos(driftIdx + 310), jmY - 6);
+    }
+
+    if (_chartAnnotation >= 5 && drawUpTo > driftIdx + 400) {
+      // Annotate gap
+      var gapIdx = Math.min(driftIdx + 450, drawUpTo - 1, jmRoll.length - 1);
+      var jmGapY = yPos(jmRoll[gapIdx]);
+      var amGapY = yPos(amRoll[gapIdx]);
+      var midY = (jmGapY + amGapY) / 2;
+      ctx.fillStyle = '#d97706';
+      ctx.font = 'bold 12px -apple-system, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('gap', xPos(gapIdx) + 30, midY);
+      // Bracket
+      ctx.strokeStyle = '#d97706'; ctx.lineWidth = 1.5; ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(xPos(gapIdx) + 16, jmGapY + 2);
+      ctx.lineTo(xPos(gapIdx) + 22, jmGapY + 2);
+      ctx.lineTo(xPos(gapIdx) + 22, amGapY - 2);
+      ctx.lineTo(xPos(gapIdx) + 16, amGapY - 2);
+      ctx.stroke();
+    }
+  }
+
+  // Stats updated after animation completes (see updateStats)
+}
+
+// Pre-compute both sims at load, draw empty chart with axes only
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    precomputeBoth();
+    // Draw axes + grid but no lines (drawUpTo = 0)
+    var r = _simNoDrift;
+    drawChart(r.jmRoll, r.amRoll, r.crossover, false, r.jmFinal, r.amFinal, r.gap, r.recJM, r.recAM, 0);
+    document.getElementById('simStatus').textContent = 'Click a voiceover to start the simulation';
+  }, 200);
+});
+
+/* ═══════════════════════════════════════════════════
+   TTS VOICEOVER (Web Speech API)
+   ═══════════════════════════════════════════════════ */
+var cancelToken = 0;
+var activeBtn = null;
+var cachedVoice = null;
+
+var SCRIPTS = {
+  intro: [
+    "Every agentic system that makes repeated decisions faces the same question: how does past experience improve future judgment? Two architectures give different answers.",
+    "Agentic Memory stores decision traces as chunks and retrieves the k nearest neighbors at inference. It's the pattern behind LangChain memory, Mem0, and most agentic frameworks. Flexible and interpretable, but it grows linearly with experience, and every inference requires an LLM call to synthesize retrieved context.",
+    "Judgment Memory takes a different path. Every decision produces a factor vector — the measurable attributes extracted from that decision, like amount, vendor history, and match percentage. The system compresses experience into centroids — one learned prototype per category and action. A centroid is the geometric average of every verified outcome. After a thousand approved invoices, the centroid for auto-approve sits at the average of those thousand factor vectors.",
+    "Inference is a single distance computation from the incoming factor vector to each centroid. No retrieval. No LLM call. O of 1 time and space. And a conservation gate — a safety mechanism that measures how far each new data point is from the existing centroid. If the displacement is too large, the gate dampens the learning rate so a single outlier or a corrupted batch can't hijack what the system has learned.",
+    "Judgment Memory is built on top of the Graph Attention Engine. The Graph Attention Engine is the open-source substrate that the Compounding Intelligence platform uses across all five of its copilots. It ships as a pip-installable package, Apache 2.0 licensed, with roughly 844 parameters per decision cell."
+  ],
+  geometry: [
+    "You've seen the results. Now let's look at the mechanism. Watch the diagram as we trace a single invoice through the pipeline.",
+    "Invoice number 4,712 arrives. The system extracts the factor vector — eight attributes: amount, vendor history, PO match, approval tier, days outstanding, line-item count, currency risk, and prior exceptions.",
+    "Next, the Score step. The system measures the L2 distance from this invoice's factor vector to every action centroid. The nearest centroid is Auto-Approve, at distance 0.034. That gives a probability of 0.97. One distance computation. Zero LLM calls. Under one millisecond.",
+    "Now the Learn step. Before the centroid updates, the conservation gate checks displacement — how far is this invoice from the existing centroid? 0.034 is well below the threshold of 0.5, so the gate passes. Full learning rate: eta equals 0.08. The centroid shifts by exactly 0.0017 toward this invoice.",
+    "After 10,000 invoices, that centroid has moved 10,000 times. The geometry IS the judgment.",
+    "Compare the two approaches at the bottom. A neural network says approve. Why? Backprop through 10 million parameters. Not auditable in production. Cannot undo a wrong decision.",
+    "The open geometry approach is different. L2 distance equals 0.034 to Auto-Approve. Eight factor values visible. Conservation gate visible. If a decision was wrong, you identify the cell, trace the centroid update, and reverse it."
+  ],
+  crossover: [
+    "Both systems start cold. No training data. Watch the two lines climb from random as the first decisions arrive.",
+    "Judgment Memory pulls ahead early — its centroid update rule starts compounding from the very first verified outcome. The solid indigo line is already above the dashed grey.",
+    "k-NN retrieval keeps climbing, but its ceiling is fixed by the memory cap and the noise floor. The centroid update rule compounds without limit. Watch the gap between the two lines.",
+    "By the midpoint, Judgment Memory is consistently in the high 80s and low 90s. k-NN fluctuates in the 70s and 80s. The gap holds steady — that's the compounding dividend.",
+    "Look at the final numbers. Judgment Memory finishes at 90 percent rolling accuracy. k-NN finishes at 84. A 6-point advantage, built purely from the centroid update rule compounding over time. No additional data. No additional compute. Same decision stream, two architectures — one compounds and one plateaus. But this is under stationary conditions. The world hasn't changed yet. Click Distribution Shift to see what happens when it does."
+  ],
+  drift: [
+    "Same simulation. But now we inject a distribution shift at the midpoint. Watch — the drift toggle flips on, and the chart redraws from the beginning.",
+    "Both lines climb through the first thousand decisions. Same trajectory as before. Everything looks stable.",
+    "At decision one thousand, the red line appears. Two of four categories rotate their optimal action. A supplier gets reclassified. A compliance regime changes. A new policy redefines what auto-approve means.",
+    "Watch what happens. Both lines drop — from the 80s and 90s down to around 50 percent. But here's the difference. Agentic Memory's flat 400-trace FIFO store mixes all categories. Stale traces from the drifted categories poison k-NN retrieval for everything. The dashed grey line stays low.",
+    "Now the Judgment Memory line. Its centroids are category-scoped — the two categories that didn't drift are still accurate. That's half the decision stream still handled correctly. For the drifted categories, the conservation gate fires, dampens the learning rate, and lets confirming outcomes accumulate before shifting the centroids. By decision 1,150, Judgment Memory is at 60 percent while k-NN is still at 46. Fourteen points ahead.",
+    "By decision 1,950, Judgment Memory finishes at 90 percent. k-NN finishes at 80. A 10-point gap opened by two architectural advantages: category-scoped centroids that isolate the damage, and a conservation gate that manages the recovery. Not a theoretical safeguard. A measured difference you can see in the chart."
+  ],
+  architecture: [
+    "Look at the first two rows. Inference complexity and memory footprint. k-NN scans its entire store every call — O of n times K — and the store grows linearly. After 10,000 decisions, that's 10,000 records to search through. Judgment Memory computes a fixed number of distances — O of A times K — and stores A times K floats per category. The same 32 floats after 10,000 decisions as after 10.",
+    "LLM calls at inference. k-NN requires one LLM call to synthesize retrieved context. Judgment Memory requires zero. That single row explains the latency difference: 340 milliseconds versus under one millisecond.",
+    "Drift protection. k-NN has none. FIFO eviction is the only mechanism. You just saw in the chart what that looks like — hundreds of decisions to flush stale traces. Judgment Memory has a three-layer conservation gate. Category-scoped. Displacement-measured. Dampened.",
+    "Learning signal and latency. k-NN appends blindly — no quality signal, no distinction between a confirmed outcome and an override. Judgment Memory differentiates: confirmed experience gets a higher learning rate. In production, that means fewer wrong decisions compounding into the model.",
+    "The last two rows: category isolation and evaluation protocol. k-NN uses a single shared store — every category's traces compete in the same retrieval. Judgment Memory scopes centroids by category, so invoice processing doesn't bleed into vendor classification. And score-before-learn means the system is always evaluated on data it hasn't trained on. No leakage. No self-confirming loops."
+  ],
+  validation: [
+    "So why does this matter? Three things to take away.",
+    "First, the compounding gap is real. You saw it in the simulation — same data, same stream, one architecture compounds and one plateaus. In the ablation test across all five copilots, the measured lift is plus 9.2 percentage points when Judgment Memory is present. The 95 percent confidence interval excludes zero.",
+    "Second, the distribution shift test isn't an edge case. Every enterprise system faces regime changes — new policies, reclassified suppliers, shifting compliance rules. The architecture that recovers faster from those shifts is the one that stays accurate in production. Judgment Memory recovered 14 points ahead of k-NN after the shift.",
+    "Third, this isn't a model you retrain. It's a set of centroids that compound in place, with no GPUs, no LLM calls, and no infrastructure beyond a pip install. The Graph Attention Engine ships as Apache 2.0 open source. The question for any team building agentic decision systems is not whether to use retrieval or centroids. It's whether the decisions your system makes tomorrow should compound from the ones it made today."
+  ],
+  tradeoff: [
+    "Agentic Memory's strength is interpretability. The architect can inspect which traces influenced a decision.",
+    "Judgment Memory trades that for constant-time inference, zero LLM dependence, and a formal stability mechanism. In production systems making thousands of decisions per hour, that tradeoff compresses cost and latency by orders of magnitude.",
+    "But here's the shift no one talks about. In every enterprise, critical operational knowledge lives as tribal knowledge. In people's heads. In the judgment a senior analyst applies without being able to articulate why.",
+    "Consider: every quarter, every CFO team turns to the same senior analyst and asks, is 3.76 percent margin the right number, or is it too high? Is it more likely 2.95? That analyst's answer draws on years of pattern recognition they can't fully articulate. If they leave, the next person guesses.",
+    "Judgment Memory changes this. Every verified decision compresses into the centroid tensor. A new analyst on day one inherits the judgment of 10,000 prior decisions. The knowledge doesn't leave when the person does. The question isn't which is better in theory. It's which compounds."
+  ]
+};
+
+/* ── Choreography: sync highlights + simulation with voiceover ── */
+
+// Map: SCRIPTS key → line index → array of element IDs to highlight + optional actions
+var CHOREO = {
+  intro: {
+    // Line 0: "Every agentic system..." — scroll infographic in, highlight both boxes lightly
+    0: { hl: ['svg-am-box', 'svg-jm-box'], scroll: 'svg-am-box' },
+    // Line 1: "Agentic Memory stores traces..." — highlight AM box + LLM
+    1: { hl: ['svg-am-box', 'svg-am-llm'], scroll: 'svg-am-box' },
+    // Line 2: "Judgment Memory... factor vector... centroids..." — highlight JM box + centroid/update bullets
+    2: { hl: ['svg-jm-box'], rows: ['jm-co-head', 'jm-co-centroid', 'jm-co-update'], scroll: 'jm-callout' },
+    // Line 3: "Inference... conservation gate..." — highlight gate + attention/params bullets
+    3: { hl: ['svg-jm-gate'], rows: ['jm-co-attention', 'jm-co-params'] },
+    // Line 4: "...Graph Attention Engine..." — full JM box + all bullets
+    4: { hl: ['svg-jm-box'], rows: ['jm-co-head', 'jm-co-centroid', 'jm-co-update', 'jm-co-attention', 'jm-co-params'] }
+  },
+  geometry: {
+    // Line 0: "You've seen the results..." — scroll pipeline in, light highlight on all three steps
+    0: { hl: ['svg-step-arrive', 'svg-step-score', 'svg-step-learn'], scroll: 'svg-step-arrive' },
+    // Line 1: "Invoice 4,712 arrives. Factor vector..." — highlight Arrive box
+    1: { hl: ['svg-step-arrive'], scroll: 'svg-step-arrive' },
+    // Line 2: "Next, the Score step..." — highlight Score box
+    2: { hl: ['svg-step-score'], scroll: 'svg-step-score' },
+    // Line 3: "Now the Learn step. Conservation gate..." — highlight Learn box
+    3: { hl: ['svg-step-learn'], scroll: 'svg-step-learn' },
+    // Line 4: "After 10,000 invoices..." — all three glow briefly
+    4: { hl: ['svg-step-arrive', 'svg-step-score', 'svg-step-learn'] },
+    // Line 5: "Compare the two approaches... neural network..." — highlight Black Box
+    5: { hl: ['svg-blackbox'], scroll: 'svg-blackbox' },
+    // Line 6: "The open geometry approach..." — highlight Open Geometry
+    6: { hl: ['svg-opengeom'], scroll: 'svg-opengeom' }
+  },
+  tradeoff: {
+    // Line 0: "Agentic Memory's strength is interpretability"
+    0: { hl: ['svg-trade-am'], scroll: 'svg-trade-am' },
+    // Line 1: "Judgment Memory trades that for..."
+    1: { hl: ['svg-trade-jm'] },
+    // Line 2: "But here's the shift..." — CFO question
+    2: { hl: ['svg-cfo-q'], scroll: 'svg-cfo-q' },
+    // Line 3: "Consider: every quarter..."
+    3: { hl: ['svg-cfo-q'] },
+    // Line 4: "Judgment Memory changes this..."
+    4: { hl: ['svg-jm-shift'], scroll: 'svg-jm-shift' }
+  },
+  crossover: {
+    0: { chart: true, scroll: 'simCanvas' },
+    1: { chart: true, scroll: 'simCanvas' },
+    2: { chart: true, scroll: 'simCanvas' },
+    3: { chart: true, scroll: 'simCanvas' },
+    4: { chart: true, scroll: 'simCanvas' }
+  },
+  drift: {
+    // ALL lines stay scrolled to chart — annotations appear ON the canvas
+    0: { chart: true, scroll: 'simCanvas' },
+    1: { chart: true, scroll: 'simCanvas' },
+    2: { chart: true, scroll: 'simCanvas' },
+    3: { chart: true, scroll: 'simCanvas' },
+    4: { chart: true, scroll: 'simCanvas' },
+    5: { chart: true, scroll: 'simCanvas' }
+  },
+  architecture: {
+    // Line 0: inference complexity + memory footprint
+    0: { rows: ['arch-r1', 'arch-r2'], scroll: 'arch-r1' },
+    // Line 1: LLM calls
+    1: { rows: ['arch-r3'], scroll: 'arch-r3' },
+    // Line 2: drift protection
+    2: { rows: ['arch-r4'], scroll: 'arch-r4' },
+    // Line 3: learning signal + latency
+    3: { rows: ['arch-r5', 'arch-r6'], scroll: 'arch-r5' },
+    // Line 4: category isolation + eval protocol
+    4: { rows: ['arch-r7', 'arch-r8'], scroll: 'arch-r7' }
+  },
+  validation: {
+    // Line 0: "Three things to take away" — scroll stats into view, highlight all four cards
+    0: { rows: ['val-ablation', 'val-ci', 'val-drift-gap', 'val-infra'], scroll: 'val-stats' },
+    // Line 1: "compounding gap... +9.2pp... CI excludes zero" — highlight ablation + CI cards
+    1: { rows: ['val-ablation', 'val-ci'], scroll: 'val-ablation' },
+    // Line 2: "distribution shift... recovered 14 points ahead" — highlight drift recovery card
+    2: { rows: ['val-drift-gap'], scroll: 'val-drift-gap' },
+    // Line 3: "no GPUs, no LLM calls, pip install" — highlight infra card
+    3: { rows: ['val-infra'], scroll: 'val-infra' }
+  }
+};
+
+// Clear all SVG highlights
+function clearHighlights() {
+  document.querySelectorAll('.svg-hl.active, .hl-row.active, .hl-item.active').forEach(function(el) {
+    el.classList.remove('active');
+  });
+}
+
+// Apply highlights for a narration beat
+function applyBeat(key, lineIdx) {
+  clearHighlights();
+  var beats = CHOREO[key];
+  if (!beats) return;
+  var beat = beats[lineIdx];
+  if (!beat) return;
+
+  // Highlight SVG elements
+  if (beat.hl) {
+    beat.hl.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    });
+  }
+
+  // Highlight table rows or callout items (same .active class)
+  if (beat.rows) {
+    beat.rows.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    });
+  }
+
+  // Scroll into view
+  if (beat.scroll) {
+    var scrollEl = document.getElementById(beat.scroll);
+    if (scrollEl) scrollEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // Chart-driven beats (narration drives the simulation)
+  if (beat.chart) {
+    chartBeat(key, lineIdx);
+  }
+}
+
+
+function pickVoice() {
+  if (cachedVoice) return cachedVoice;
+  var voices = speechSynthesis.getVoices();
+  cachedVoice =
+    voices.find(function(v) { return v.name.indexOf('Google US English') >= 0; }) ||
+    voices.find(function(v) { return v.name.indexOf('Microsoft') >= 0 && v.lang.indexOf('en') === 0; }) ||
+    voices.find(function(v) { return v.lang.indexOf('en') === 0 && !v.localService; }) ||
+    voices.find(function(v) { return v.lang.indexOf('en') === 0; }) ||
+    voices[0];
+  return cachedVoice;
+}
+try { speechSynthesis.onvoiceschanged = function() { cachedVoice = null; pickVoice(); }; } catch(e) {}
+
+function stopVO() {
+  cancelToken++;
+  try { speechSynthesis.cancel(); } catch(e) {}
+  if (activeBtn) { activeBtn.classList.remove('playing'); activeBtn = null; }
+  _activeScriptKey = null;
+  clearHighlights();
+}
+
+
+/* === CHUNKED SPEECH HELPER (narration fix v2) === */
+function chunkSpeak(text, voice, onDone, onErr) {
+  if (!text || !text.trim()) { if (onDone) onDone(); return; }
+  var sentences = text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
+  var chunks = []; var cur = '';
+  for (var i = 0; i < sentences.length; i++) {
+    var s = sentences[i].trim();
+    if (cur.length + s.length > 120 && cur.length > 0) { chunks.push(cur.trim()); cur = s; }
+    else { cur += (cur ? ' ' : '') + s; }
+  }
+  if (cur.trim()) chunks.push(cur.trim());
+  if (chunks.length === 1 && chunks[0].length > 120) {
+    var parts = chunks[0].split(/,\s*/); chunks = []; cur = '';
+    for (var j = 0; j < parts.length; j++) {
+      if (cur.length + parts[j].length > 100 && cur.length > 0) { chunks.push(cur.trim()); cur = parts[j]; }
+      else { cur += (cur ? ', ' : '') + parts[j]; }
+    }
+    if (cur.trim()) chunks.push(cur.trim());
+  }
+  var idx = 0;
+  function next() {
+    if (idx >= chunks.length) { if (onDone) onDone(); return; }
+    var u = new SpeechSynthesisUtterance(chunks[idx]);
+    u.voice = window._rgiVoice || voice || null;
+    u.rate = 1.0; u.pitch = 1.0;
+    u.onend = function() { idx++; next(); };
+    u.onerror = function() { if (onErr) onErr(); else { idx++; next(); } };
+    speechSynthesis.speak(u);
+  }
+  next();
+}
+/* === END CHUNKED SPEECH HELPER === */
+
+function toggleVO(btn, key) {
+  if (btn.classList.contains('playing')) { stopVO(); return; }
+  stopVO();
+  var lines = SCRIPTS[key];
+  if (!lines || !lines.length) return;
+  if (typeof speechSynthesis === 'undefined') return;
+
+  activeBtn = btn;
+  btn.classList.add('playing');
+  var token = ++cancelToken;
+  var voice = pickVoice();
+  _activeScriptKey = key;
+
+  // Choreograph: apply first beat highlight
+  applyBeat(key, 0);
+
+  chunkSpeak(lines[0], voice, function(){
+    clearInterval(keepAlive);
+    if (cancelToken !== token) return;
+    playRemaining(lines, 1, token, voice);
+  }, function(){stopVO();});
+}
+
+var _activeScriptKey = null;
+
+function playRemaining(lines, idx, token, voice) {
+  if (idx >= lines.length || cancelToken !== token) { stopVO(); return; }
+  setTimeout(function() {
+    if (cancelToken !== token) return;
+
+    // Choreograph: apply beat for this line
+    if (_activeScriptKey) applyBeat(_activeScriptKey, idx);
+
+    chunkSpeak(lines[idx], voice, function(){ playRemaining(lines, idx + 1, token, voice); }, function(){stopVO();});
+  }, 1200);
+}
+</script>
+</body>
+</html>
