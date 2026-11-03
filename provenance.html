@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RGI Experiment Provenance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#FAF8F3;--ink:#1C2126;--soft:#44515C;--muted:#6B7883;--line:#E7E1D2;
+  --card:#FFFFFF;--inset:#F3EFE5;
+  --accent:#1E6FB8;--accent-ink:#1A5C9A;--accent-wash:#1E6FB81a;
+  --green:#0C8367;--green-wash:#0C836714;--green-ink:#0A6B54;
+  --red:#C43C4E;--red-wash:#C43C4E18;
+  --amber:#b7791f;--amber-wash:#b7791f18;
+  --purple:#7C3AED;--purple-wash:#7C3AED18;--purple-ink:#6D28D9;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --head:"Archivo",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:light;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#13171B;--ink:#ECEFF2;--soft:#C3CBD2;--muted:#93A0AB;--line:#2A323A;
+  --card:#1A2026;--inset:#12171C;
+  --accent:#5EA8E6;--accent-ink:#8CC3F0;--accent-wash:#5EA8E622;
+  --green:#36B394;--green-wash:#36B39422;--green-ink:#36B394;
+  --red:#E86B7A;--red-wash:#E86B7A22;
+  --amber:#D79A4E;--amber-wash:#D79A4E22;
+  --purple:#A78BFA;--purple-wash:#A78BFA22;--purple-ink:#A78BFA;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#13171B;--ink:#ECEFF2;--soft:#C3CBD2;--muted:#93A0AB;--line:#2A323A;
+  --card:#1A2026;--inset:#12171C;
+  --accent:#5EA8E6;--accent-ink:#8CC3F0;--accent-wash:#5EA8E622;
+  --green:#36B394;--green-wash:#36B39422;--green-ink:#36B394;
+  --red:#E86B7A;--red-wash:#E86B7A22;
+  --amber:#D79A4E;--amber-wash:#D79A4E22;
+  --purple:#A78BFA;--purple-wash:#A78BFA22;--purple-ink:#A78BFA;
+  color-scheme:dark;
+}
+html{scroll-behavior:smooth}*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;margin:0;padding:40px 18px 60px;max-width:900px;margin-inline:auto}
+
+.nav{position:sticky;top:0;z-index:10;background:var(--paper);border-bottom:1px solid var(--line);padding:8px 0;margin:-40px -18px 24px;padding-inline:18px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.nav a{font-family:var(--mono);font-size:.66rem;letter-spacing:.03em;color:var(--muted);text-decoration:none;padding:4px 10px;border-radius:6px;border:1px solid transparent;transition:all .15s;white-space:nowrap}
+.nav a:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-wash)}
+.nav-brand{font-family:var(--head);font-weight:800;font-size:.8rem;color:var(--ink);text-decoration:none;margin-right:8px}
+
+h1{font-family:var(--head);font-weight:800;font-size:1.9rem;letter-spacing:-.03em;margin:0;line-height:1.1}
+h2{font-family:var(--head);font-weight:800;font-size:1.15rem;letter-spacing:-.01em;margin:36px 0 10px;color:var(--ink);padding-top:20px;border-top:2px solid var(--line);scroll-margin-top:60px}
+h3{font-family:var(--head);font-weight:700;font-size:.92rem;margin:18px 0 8px;color:var(--ink)}
+.subtitle{font-size:.88rem;color:var(--soft);margin:6px 0 0;line-height:1.5;max-width:65ch}
+p{font-size:.84rem;color:var(--soft);line-height:1.6;margin:8px 0}
+a{color:var(--accent-ink);text-decoration:none}
+a:hover{text-decoration:underline}
+ul{font-size:.82rem;color:var(--soft);padding-left:20px;margin:6px 0;line-height:1.7}
+
+.badge{font-family:var(--mono);font-size:.58rem;font-weight:600;letter-spacing:.04em;padding:3px 10px;border-radius:5px;display:inline-block}
+.b-blue{background:var(--accent-wash);color:var(--accent-ink)}
+.b-green{background:var(--green-wash);color:var(--green-ink)}
+.b-purple{background:var(--purple-wash);color:var(--purple-ink)}
+.b-amber{background:var(--amber-wash);color:var(--amber)}
+.b-red{background:var(--red-wash);color:var(--red)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0}
+
+table{width:100%;border-collapse:collapse;font-size:.76rem;margin:10px 0}
+th{background:var(--inset);font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;color:var(--accent-ink);text-align:left;padding:6px 8px;border-bottom:2px solid var(--line)}
+td{padding:6px 8px;border-bottom:1px solid var(--line);color:var(--soft);vertical-align:top}
+td:first-child{font-family:var(--mono);font-weight:600;color:var(--ink);white-space:nowrap}
+.tbl-wrap{overflow-x:auto;margin:10px 0}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+@media(max-width:600px){.g2{grid-template-columns:1fr}}
+
+.footer{text-align:center;margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:.72rem;color:var(--muted)}
+code{font-family:var(--mono);font-size:.82em;background:var(--inset);padding:2px 6px;border-radius:4px}
+pre{background:#1a1e24;border-radius:10px;padding:14px 16px;margin:10px 0;overflow-x:auto;font-family:var(--mono);font-size:.75rem;line-height:1.7;color:#e0e6ed}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <a href="#" class="nav-brand" onclick="event.preventDefault();window.scrollTo({top:0,behavior:'smooth'})">RGI Provenance</a>
+  <a href="#reproduce">Reproduce</a>
+  <a href="#index">Index</a>
+  <a href="#charts">Charts</a>
+  <a href="#harness">Harness</a>
+  <a href="#chain">Chain</a>
+  <a href="#numbers">Numbers</a>
+  <a href="#gaps">Gaps</a>
+</div>
+
+<!-- HEADER -->
+<div style="margin-bottom:28px">
+  <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+    <span class="badge b-blue">79 EXPERIMENTS</span>
+    <span class="badge b-green">167 CHARTS</span>
+    <span class="badge b-purple">17 CHART SCRIPTS</span>
+    <span class="badge b-amber">6 HARNESSES</span>
+  </div>
+  <h1>RGI Experiment Provenance</h1>
+  <p class="subtitle">Every claim &rarr; experiment ID &rarr; script &rarr; data &rarr; chart &rarr; figure. Full reproduction chain.</p>
+  <p style="font-size:.82rem;color:var(--muted);margin-top:10px">Source: experiment_registry_and_chart_inventory_v7.md &middot; Drive scan &middot; Arindam Banerji, PhD</p>
+</div>
+
+<!-- ================================================================ -->
+<!-- HOW TO REPRODUCE -->
+<!-- ================================================================ -->
+<h2 id="reproduce">How to Reproduce</h2>
+
+<ul>
+  <li>Clone the cross-graph-experiments repo (mirrored in Drive)</li>
+  <li>Install: <code>pip install numpy matplotlib scipy pandas pyyaml</code></li>
+  <li>Each experiment script is standalone &mdash; runs from its directory, writes JSON + PNG/PDF to <code>results/</code></li>
+  <li>Chart scripts read JSON results &rarr; produce publication-quality figures</li>
+  <li>Runner scripts batch multiple experiments</li>
+</ul>
+
+<pre><span style="color:#8b949e"># Single experiment</span>
+python experiments/e_jm_1_personnel_change.py
+<span style="color:#8b949e"># &rarr; results/e_jm_1/ (JSON summary + PNG + PDF)</span>
+
+<span style="color:#8b949e"># Batch (E-JM-1 through E-JM-4)</span>
+python run_all_experiments.py
+
+<span style="color:#8b949e"># All harnesses</span>
+python run_all_harnesses.py
+
+<span style="color:#8b949e"># EXP-C1 charts from existing results</span>
+python experiments/expC1_centroid_oracle/expC1_charts.py
+<span style="color:#8b949e"># &rarr; paper_figures/expC1_*.{png,pdf}</span></pre>
+
+<!-- ================================================================ -->
+<!-- EXPERIMENT INDEX -->
+<!-- ================================================================ -->
+<h2 id="index">Experiment Index</h2>
+
+<h3>Group A &mdash; Baseline Accuracy</h3>
+<div class="tbl-wrap">
+<table>
+  <tr><th>ID</th><th>Name</th><th>Script</th><th>Chart</th><th>Status</th></tr>
+  <tr><td>EXP-A1</td><td>Random baseline (25%)</td><td>run_harness.py</td><td>generate_group_a_d_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-A2</td><td>Shared-W Hebbian (49.26%)</td><td>run_harness.py</td><td>generate_group_a_d_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-A3</td><td>Per-category-W Hebbian (51.61%)</td><td>run_harness.py</td><td>generate_group_a_d_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-A4</td><td>Centroid oracle &mdash; no learning</td><td>v_mv_kernel_rerun_v3.ipynb</td><td>expC1_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+</table>
+</div>
+
+<h3>Group B &mdash; Conservation Law Validation</h3>
+<div class="tbl-wrap">
+<table>
+  <tr><th>ID</th><th>Name</th><th>Script</th><th>Chart</th><th>Status</th></tr>
+  <tr><td>EXP-B1</td><td>Adversarial poisoning (20% corrupt)</td><td>run_harness.py</td><td>generate_group_b_c_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-B2</td><td>Regime shift (&sigma; spike 40%)</td><td>run_harness.py</td><td>generate_group_b_c_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-B3</td><td>Sustained degradation detection</td><td>run_harness.py</td><td>generate_group_b_c_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-B4</td><td>Sudden drop detection</td><td>run_harness.py</td><td>generate_group_b_c_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-B5</td><td>Sparse targeted poisoning</td><td>run_harness.py</td><td>generate_group_b_c_charts.py</td><td><span class="badge b-amber">Boundary: 57%</span></td></tr>
+  <tr><td>EXP-B-q</td><td>q ablation (window size)</td><td>run_harness.py</td><td>generate_q_ablation_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+</table>
+</div>
+
+<h3>Group C &mdash; Kernel Comparison</h3>
+<div class="tbl-wrap">
+<table>
+  <tr><th>ID</th><th>Name</th><th>Script</th><th>Chart</th><th>Status</th></tr>
+  <tr><td>EXP-C1</td><td>Centroid oracle: L2 vs dot vs cosine</td><td>v_mv_kernel_rerun_v3.ipynb</td><td>expC1_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-C1b</td><td>Extended: 5 kernels (+ Mahalanobis, learned)</td><td>run_exp_c1b.py</td><td>expC1b charts</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-C1-cat</td><td>Per-category breakdown</td><td>(same as C1)</td><td>expC1_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-C1-cm</td><td>Confusion matrices (5 subplots)</td><td>(same as C1)</td><td>expC1_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-C1-wf</td><td>Waterfall vs EXP-A baselines</td><td>(same as C1)</td><td>expC1_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-C1-mag</td><td>Factor magnitude distribution</td><td>expC1_magnitude/</td><td>(in folder)</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-C1-ece</td><td>ECE calibration</td><td>exp_c1_clean_ece.py</td><td>(inline)</td><td><span class="badge b-blue">Script exists</span></td></tr>
+</table>
+</div>
+
+<h3>Group D &mdash; Recovery Dynamics</h3>
+<div class="tbl-wrap">
+<table>
+  <tr><th>ID</th><th>Name</th><th>Script</th><th>Chart</th><th>Status</th></tr>
+  <tr><td>EXP-D1</td><td>Re-convergence &gamma; &gt; 1</td><td>run_harness.py</td><td>generate_group_a_d_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-D2</td><td>Four structural paths</td><td>run_harness.py</td><td>generate_rv_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-D3</td><td>&gamma; magnitude calibration</td><td>run_harness.py</td><td>generate_rv4_ke45_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+</table>
+</div>
+
+<h3>Groups E, K, BF &mdash; Discovery, K-Learning, Budget</h3>
+<div class="tbl-wrap">
+<table>
+  <tr><th>ID</th><th>Name</th><th>Script</th><th>Chart</th><th>Status</th></tr>
+  <tr><td>EXP-E1</td><td>Cross-domain discovery D(n) &prop; n<sup>2.11</sup></td><td>run_harness.py</td><td>generate_cross_copilot_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-K1</td><td>K-learning accuracy improvement</td><td>run_harness.py</td><td>generate_k_learning_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-K2</td><td>Routing quality gap (moat)</td><td>run_harness.py</td><td>generate_gap1/2_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+  <tr><td>EXP-BF</td><td>Budget frontier analysis</td><td>run_harness.py</td><td>generate_budget_frontier_charts.py</td><td><span class="badge b-green">Reproduced</span></td></tr>
+</table>
+</div>
+
+<h3>Group E-JM &mdash; Judgment Memory (13 experiments)</h3>
+<div class="tbl-wrap">
+<table>
+  <tr><th>ID</th><th>Name</th><th>Script</th><th>Output</th><th>Status</th></tr>
+  <tr><td>E-JM-1</td><td>Personnel change resilience</td><td>e_jm_1_personnel_change.py</td><td>results/e_jm_1/</td><td><span class="badge b-green">Standalone</span></td></tr>
+  <tr><td>E-JM-2</td><td>Signal-confidence inversion</td><td>e_jm_2_inversion_prevalence.py</td><td>results/e_jm_2/</td><td><span class="badge b-green">Standalone</span></td></tr>
+  <tr><td>E-JM-3</td><td>Cross-domain transfer</td><td>e_jm_3_cross_domain_transfer.py</td><td>results/e_jm_3/</td><td><span class="badge b-green">Standalone</span></td></tr>
+  <tr><td>E-JM-4</td><td>Conservation vs unconstrained</td><td>e_jm_4_conservation_vs_unconstrained.py</td><td>results/e_jm_4/</td><td><span class="badge b-green">Standalone</span></td></tr>
+  <tr><td>E-JM-4b</td><td>Recalibration dynamics</td><td>e_jm_4b_recalibration.py</td><td>results/e_jm_4b/</td><td><span class="badge b-green">Standalone</span></td></tr>
+  <tr><td>E-JM-5</td><td>Weight convergence</td><td>e_jm_5_weight_convergence.py</td><td>results/e_jm_5/</td><td><span class="badge b-green">Standalone</span></td></tr>
+  <tr><td>E-JM-6</td><td>Compounding trajectory</td><td>e_jm_6_compounding_trajectory.py</td><td>results/e_jm_6/</td><td><span class="badge b-green">Standalone</span></td></tr>
+  <tr><td>E-JM-6b</td><td>Baseline CI (confidence intervals)</td><td>e_jm_6b_baseline_ci.py</td><td>results/e_jm_6b/</td><td><span class="badge b-green">Standalone</span></td></tr>
+  <tr><td>E-JM-7</td><td>Cross-type transfer</td><td>e_jm_7_cross_type.py</td><td>results/e_jm_7/</td><td><span class="badge b-green">Standalone</span></td></tr>
+  <tr><td>E-JM-8</td><td>Head-to-head vs kNN</td><td>e_jm_8_head_to_head.py</td><td>results/e_jm_8/</td><td><span class="badge b-green">Standalone</span></td></tr>
+  <tr><td>E-JM-9</td><td>Ablation stability</td><td>e_jm_9_ablation_stability.py</td><td>results/e_jm_9/</td><td><span class="badge b-green">Standalone</span></td></tr>
+  <tr><td>E-JM-PS</td><td>Parameter sweep</td><td>e_jm_param_sweep.py</td><td>results/e_jm_ps/</td><td><span class="badge b-green">Standalone</span></td></tr>
+  <tr><td>&mdash;</td><td>Batch runner (E-JM-1&rarr;4)</td><td>run_all_experiments.py</td><td>&mdash;</td><td><span class="badge b-blue">Runner</span></td></tr>
+</table>
+</div>
+
+<!-- ================================================================ -->
+<!-- CHART SCRIPTS -->
+<!-- ================================================================ -->
+<h2 id="charts">Chart Generation Scripts</h2>
+
+<div class="tbl-wrap">
+<table>
+  <tr><th>Script</th><th>Generates</th><th>Input</th><th>Output</th></tr>
+  <tr><td style="font-size:.72rem">generate_all_pub_charts.py</td><td>All publication charts (master)</td><td>All experiment results</td><td>paper_figures/</td></tr>
+  <tr><td style="font-size:.72rem">generate_paper_charts.py</td><td>Core paper figures</td><td>Experiment JSON</td><td>paper_figures/</td></tr>
+  <tr><td style="font-size:.72rem">generate_group_a_d_charts.py</td><td>Baseline + recovery</td><td>Groups A, D</td><td>paper_figures/</td></tr>
+  <tr><td style="font-size:.72rem">generate_group_b_c_charts.py</td><td>Conservation + kernel</td><td>Groups B, C</td><td>paper_figures/</td></tr>
+  <tr><td style="font-size:.72rem">generate_q_ablation_charts.py</td><td>q window ablation</td><td>q sweep</td><td>paper_figures/</td></tr>
+  <tr><td style="font-size:.72rem">generate_gap1_charts.py</td><td>Moat gap analysis (1)</td><td>Cross-firm sim</td><td>paper_figures/</td></tr>
+  <tr><td style="font-size:.72rem">generate_gap2_charts.py</td><td>Moat gap analysis (2)</td><td>Cross-firm sim</td><td>paper_figures/</td></tr>
+  <tr><td style="font-size:.72rem">generate_budget_frontier_charts.py</td><td>Budget frontier</td><td>Budget sweep</td><td>paper_figures/</td></tr>
+  <tr><td style="font-size:.72rem">generate_rv_charts.py</td><td>Recovery / re-convergence</td><td>Recovery sim</td><td>paper_figures/</td></tr>
+  <tr><td style="font-size:.72rem">generate_cross_copilot_charts.py</td><td>Cross-copilot scaling</td><td>Multi-domain</td><td>paper_figures/</td></tr>
+  <tr><td style="font-size:.72rem">generate_k_learning_charts.py</td><td>K-learning accuracy</td><td>K-learning</td><td>paper_figures/</td></tr>
+  <tr><td style="font-size:.72rem">expC1_charts.py</td><td>Kernel comparison (4 charts)</td><td>summary.json</td><td>paper_figures/expC1_*</td></tr>
+  <tr><td style="font-size:.72rem">exp_c1_clean_ece.py</td><td>ECE calibration metrics</td><td>EXP-C1 results</td><td>JSON</td></tr>
+  <tr><td style="font-size:.72rem">render_modified_charts.py</td><td>Modified / updated charts</td><td>Various</td><td>paper_figures/</td></tr>
+  <tr><td style="font-size:.72rem">render_rl_outreach_charts.py</td><td>RL outreach charts</td><td>RL experiment data</td><td>outreach_figures/</td></tr>
+  <tr><td style="font-size:.72rem">generate_nbp_charts.py</td><td>NBP outreach charts</td><td>Various</td><td>nbp_figures/</td></tr>
+</table>
+</div>
+
+<!-- ================================================================ -->
+<!-- HARNESS -->
+<!-- ================================================================ -->
+<h2 id="harness">Harness Infrastructure</h2>
+
+<div class="tbl-wrap">
+<table>
+  <tr><th>File</th><th>Role</th><th>Scope</th></tr>
+  <tr><td>run_all_harnesses.py</td><td>Master experiment runner</td><td>All foundational experiments</td></tr>
+  <tr><td>run_harness.py</td><td>Single-experiment harness</td><td>Configurable via args</td></tr>
+  <tr><td>run_all_experiments.py</td><td>E-JM batch runner</td><td>E-JM-1 through E-JM-4</td></tr>
+  <tr><td>soc_triage_harness.py</td><td>SOC-specific triage harness</td><td>SOC domain experiments</td></tr>
+  <tr><td>kernel_selector.py</td><td>Kernel comparison framework</td><td>L2, diagonal, shrinkage, Mahalanobis, learned</td></tr>
+  <tr><td style="font-size:.72rem">v_mv_kernel_rerun_v3.ipynb</td><td>EXP-C1 Colab notebook</td><td>Kernel comparison (L2 vs dot vs cosine)</td></tr>
+</table>
+</div>
+
+<!-- ================================================================ -->
+<!-- PROVENANCE CHAIN -->
+<!-- ================================================================ -->
+<h2 id="chain">Provenance Chain</h2>
+
+<div class="card" style="padding:20px">
+<svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+  <!-- Step 1: Experiment Script -->
+  <rect x="200" y="10" width="300" height="50" rx="8" fill="var(--accent-wash)" stroke="var(--accent)" stroke-width="1.5"/>
+  <text x="350" y="32" text-anchor="middle" font-family="var(--head)" font-size="11" font-weight="700" fill="var(--accent-ink)">Experiment Script</text>
+  <text x="350" y="48" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--muted)">e.g. e_jm_4_conservation_vs_unconstrained.py</text>
+
+  <!-- Inputs to script -->
+  <rect x="10" y="18" width="150" height="34" rx="6" fill="var(--inset)" stroke="var(--line)" stroke-width="1"/>
+  <text x="85" y="32" text-anchor="middle" font-size="8" fill="var(--soft)">configs/default.yaml</text>
+  <text x="85" y="44" text-anchor="middle" font-size="7" fill="var(--muted)">categories, actions, factors</text>
+  <line x1="160" y1="35" x2="200" y2="35" stroke="var(--line)" stroke-width="1"/>
+
+  <rect x="540" y="18" width="150" height="34" rx="6" fill="var(--inset)" stroke="var(--line)" stroke-width="1"/>
+  <text x="615" y="32" text-anchor="middle" font-size="8" fill="var(--soft)">src/ (engine)</text>
+  <text x="615" y="44" text-anchor="middle" font-size="7" fill="var(--muted)">scorer, gate, centroids</text>
+  <line x1="540" y1="35" x2="500" y2="35" stroke="var(--line)" stroke-width="1"/>
+
+  <!-- Arrow down -->
+  <line x1="350" y1="60" x2="350" y2="95" stroke="var(--accent-ink)" stroke-width="1.5" marker-end="url(#prov-arrow)"/>
+  <defs><marker id="prov-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="var(--accent-ink)" stroke-width="1.5"/></marker></defs>
+
+  <!-- Step 2: JSON Results -->
+  <rect x="200" y="100" width="300" height="60" rx="8" fill="var(--green-wash)" stroke="var(--green)" stroke-width="1.5"/>
+  <text x="350" y="122" text-anchor="middle" font-family="var(--head)" font-size="11" font-weight="700" fill="var(--green-ink)">JSON Results</text>
+  <text x="350" y="138" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--muted)">results/&lt;exp_id&gt;/summary.json</text>
+  <text x="350" y="152" text-anchor="middle" font-size="7.5" fill="var(--soft)">per-experiment stats &middot; per-seed breakdowns &middot; confusion matrices</text>
+
+  <!-- Arrow down -->
+  <line x1="350" y1="160" x2="350" y2="195" stroke="var(--accent-ink)" stroke-width="1.5" marker-end="url(#prov-arrow)"/>
+
+  <!-- Step 3: Chart Script -->
+  <rect x="200" y="200" width="300" height="50" rx="8" fill="var(--purple-wash)" stroke="var(--purple-ink)" stroke-width="1.5"/>
+  <text x="350" y="222" text-anchor="middle" font-family="var(--head)" font-size="11" font-weight="700" fill="var(--purple-ink)">Chart Script</text>
+  <text x="350" y="238" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--muted)">e.g. expC1_charts.py, generate_paper_charts.py</text>
+
+  <!-- Viz input -->
+  <rect x="540" y="208" width="150" height="34" rx="6" fill="var(--inset)" stroke="var(--line)" stroke-width="1"/>
+  <text x="615" y="222" text-anchor="middle" font-size="8" fill="var(--soft)">bridge_common.py</text>
+  <text x="615" y="234" text-anchor="middle" font-size="7" fill="var(--muted)">VIZ_DEFAULTS, setup_axes</text>
+  <line x1="540" y1="225" x2="500" y2="225" stroke="var(--line)" stroke-width="1"/>
+
+  <!-- Arrow down -->
+  <line x1="350" y1="250" x2="350" y2="285" stroke="var(--accent-ink)" stroke-width="1.5" marker-end="url(#prov-arrow)"/>
+
+  <!-- Step 4: Published Figures -->
+  <rect x="200" y="290" width="300" height="50" rx="8" fill="var(--amber-wash)" stroke="var(--amber)" stroke-width="1.5"/>
+  <text x="350" y="312" text-anchor="middle" font-family="var(--head)" font-size="11" font-weight="700" fill="var(--amber)">Published Figures</text>
+  <text x="350" y="328" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--muted)">paper_figures/*.{png,pdf} &mdash; PNG 150 DPI &middot; PDF vector</text>
+
+  <!-- Arrow down to two outputs -->
+  <line x1="300" y1="340" x2="200" y2="365" stroke="var(--accent-ink)" stroke-width="1.2" marker-end="url(#prov-arrow)"/>
+  <line x1="400" y1="340" x2="500" y2="365" stroke="var(--accent-ink)" stroke-width="1.2" marker-end="url(#prov-arrow)"/>
+
+  <!-- HTML page -->
+  <rect x="100" y="355" width="160" height="24" rx="5" fill="var(--card)" stroke="var(--line)" stroke-width="1"/>
+  <text x="180" y="371" text-anchor="middle" font-size="8" fill="var(--soft)">rgi_math_engine.html (data URI)</text>
+
+  <!-- arxiv Paper -->
+  <rect x="440" y="355" width="160" height="24" rx="5" fill="var(--card)" stroke="var(--line)" stroke-width="1"/>
+  <text x="520" y="371" text-anchor="middle" font-size="8" fill="var(--soft)">cga_arxiv (LaTeX \includegraphics)</text>
+</svg>
+</div>
+
+<!-- ================================================================ -->
+<!-- KEY NUMBERS -->
+<!-- ================================================================ -->
+<h2 id="numbers">Key Numbers &mdash; Cross-Reference</h2>
+
+<div class="tbl-wrap">
+<table>
+  <tr><th>Claim</th><th>Value</th><th>Experiment</th><th>Chart</th></tr>
+  <tr><td style="white-space:normal">L2 vs dot product</td><td>+36.99pp (60.9% &rarr; 97.9%)</td><td>EXP-C1, C1b</td><td>expC1_method_comparison, expC1b_method_comparison</td></tr>
+  <tr><td style="white-space:normal">Compounding exponent</td><td>t<sup>1.387</sup>, CI [1.308, 1.477]</td><td>E-JM-6</td><td>e_jm_6a_cumulative_advantage</td></tr>
+  <tr><td style="white-space:normal">Discovery scaling</td><td>n<sup>2.11</sup>, CI [2.09, 2.14], R&sup2;=0.9999</td><td>EXP-E1</td><td>cross_copilot_discovery</td></tr>
+  <tr><td style="white-space:normal">Recovery ratio</td><td>&gamma; &gt; 1 &iff; &epsilon;_firm &gt; 0.125</td><td>EXP-D1</td><td>rv_convergence</td></tr>
+  <tr><td style="white-space:normal">Conservation detection</td><td>100% sustained, 100% drift, 100% sudden</td><td>EXP-B1&ndash;B4</td><td>group_b_conservation</td></tr>
+  <tr><td style="white-space:normal">Poisoning boundary</td><td>57% sparse targeted</td><td>EXP-B5</td><td>group_b_poisoning</td></tr>
+  <tr><td style="white-space:normal">K-learning improvement</td><td>+21.96pp over frozen twin</td><td>EXP-K1</td><td>pub_k_learning_accuracy</td></tr>
+  <tr><td style="white-space:normal">Moat (routing gap)</td><td>19.6&plusmn;5.4pp SOC, 5.7&plusmn;1.1pp DataOps</td><td>EXP-K2</td><td>pub_moat_catchup_v2</td></tr>
+  <tr><td style="white-space:normal">Trust trap (&sigma; inversion)</td><td>device_trust &sigma;=0.28 vs threat_intel &sigma;=0.07</td><td>E-JM-2</td><td>e_jm_2_inversion</td></tr>
+  <tr><td style="white-space:normal">Day-one SA accuracy</td><td>78.2% vs 72.3% (+5.9pp)</td><td>EXP-A</td><td>group_a_baseline</td></tr>
+  <tr><td style="white-space:normal">Parameters</td><td>~844 total (709 centroids + K + DK + constants)</td><td>Architecture</td><td>&mdash;</td></tr>
+  <tr><td style="white-space:normal">Experiment count</td><td>~194 (66 foundational + 13 E-JM + ~115 variants)</td><td>Registry v7</td><td>&mdash;</td></tr>
+</table>
+</div>
+
+<!-- ================================================================ -->
+<!-- KNOWN GAPS -->
+<!-- ================================================================ -->
+<h2 id="gaps">Known Gaps</h2>
+
+<div class="g2">
+  <div class="card" style="border-left:3px solid var(--green)">
+    <div style="font-family:var(--head);font-weight:700;font-size:.82rem;color:var(--green-ink)">Resolved</div>
+    <ul style="font-size:.76rem;padding-left:14px;margin:6px 0 0">
+      <li><strong>No single index manifest</strong> &mdash; this document</li>
+      <li><strong>Cosine not highlighted</strong> &mdash; now shown in EXP-C1b 5-kernel table</li>
+      <li><strong>Mahalanobis + learned-kernel missing</strong> &mdash; EXP-C1b complete (L2 ties Mahalanobis)</li>
+      <li><strong>No experiment &rarr; script path mapping</strong> &mdash; this manifest</li>
+    </ul>
+  </div>
+  <div class="card" style="border-left:3px solid var(--amber)">
+    <div style="font-family:var(--head);font-weight:700;font-size:.82rem;color:var(--amber)">Open</div>
+    <ul style="font-size:.76rem;padding-left:14px;margin:6px 0 0">
+      <li><strong>ECE calibration</strong> &mdash; exp_c1_clean_ece.py exists; results not yet in page</li>
+      <li><strong>E-JM-5&rarr;9 not in batch runner</strong> &mdash; extend run_all_experiments.py</li>
+      <li><strong>Invariant ablation table</strong> &mdash; E-JM-9 design exists; systematic I1&ndash;I6 ablation needed</li>
+      <li><strong>Provenance tags on figures</strong> &mdash; add experiment ID to PNG EXIF metadata</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div>RGI Experiment Provenance &middot; Graph Attention Engine &middot; Apache 2.0</div>
+  <div style="margin-top:4px">Arindam Banerji, PhD &middot; <a href="https://www.dakshineshwari.net">dakshineshwari.net</a></div>
+  <div style="font-family:var(--mono);font-size:.5rem;color:var(--muted);margin-top:8px;text-transform:uppercase;letter-spacing:.04em">v1 &middot; November 2026</div>
+</div>
+
+</body>
+</html>
