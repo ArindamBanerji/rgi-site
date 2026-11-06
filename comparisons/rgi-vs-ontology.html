@@ -927,37 +927,25 @@ status = conservation_status(
 
 
 <!-- ════════════════════════════════════════════════════════════ -->
-<!-- §8.5: FORMAL ONTOLOGY-GRAPH EQUIVALENCE                    -->
+<!-- §9: WHY GROUNDED CONTEXT ISN'T ENOUGH                     -->
 <!-- ════════════════════════════════════════════════════════════ -->
-
-<h2>Ontologies and Semantic Graphs Are Mathematically Equivalent</h2>
+<h2>Why Grounded Context Isn't Enough</h2>
 
 <div style="font-size:0.88rem;color:var(--fg-soft);line-height:1.7">
-• The claim that a semantic graph "is not an ontology" is formally incorrect<br>
-• Bidirectional equivalence proven in linear time (Lembo et al., 2022)<br>
-• W3C defines a standard lossless OWL 2 → RDF graph encoding (2012)
+• Ontologies and semantic graphs are <strong>mathematically equivalent</strong> — proven bidirectionally in linear time (Lembo et al. 2022, Theorems 1-2; W3C OWL 2 Mapping to RDF, 2012)<br>
+• Our UCL graph IS a formal ontology: typed entities, constrained relationships, enforced invariants — in graph notation, not description logic<br>
+• What ontology alone cannot do: learn which sources matter for which decisions, or evolve from verified outcomes
 </div>
 
 <div class="card" style="border-left:3px solid var(--green);margin:20px 0">
-<div style="font-size:0.85rem;font-weight:600;color:var(--fg);margin-bottom:10px">The Formal Relationship</div>
+<div style="font-size:0.85rem;font-weight:600;color:var(--fg);margin-bottom:10px">The Formal Equivalence</div>
 <div style="font-size:0.82rem;color:var(--fg-soft);line-height:1.7;margin-bottom:12px">
-Gruber (1993) defines an ontology as <strong>O = (Σ, Ax)</strong> — a signature Σ = (C, R, I) of classes, roles, and individuals, plus axioms Ax constraining their relationships.<br><br>
-Lembo et al. (2022) prove that the graphical language Graphol — whose constructs map to labeled graph elements — is <strong>equivalent to OWL 2 / SROIQ(D)</strong>:
+Gruber (1993) defines an ontology as <strong>O = (Σ, Ax)</strong> — classes, roles, individuals, plus axioms. Lembo et al. (2022) prove graph notation and OWL 2 / SROIQ(D) are interchangeable:
 </div>
 <pre style="font-size:0.78rem;margin:0 0 12px;border:none;padding:10px">
-Theorem 1 (Graph → OWL 2):
-  ∀ graph ontology G satisfying the structural proviso,
-  Ψ(G) produces an OWL 2 TBox. Linear time.
-
-Theorem 2 (OWL 2 → Graph):
-  ∀ OWL 2 TBox T,
-  Λ⁻¹(T) produces a graph ontology. Linear time.
-
-  Ψ and Λ⁻¹ are mutual inverses.
-  The representations are formally interchangeable.</pre>
-<div style="font-size:0.78rem;color:var(--fg-muted)">
-The W3C OWL 2 Mapping to RDF Graphs (2012) independently defines a standard, lossless encoding of any OWL 2 ontology as a graph — the same equivalence, codified as a web standard.
-</div>
+Theorem 1 (Graph → OWL 2):  Ψ(G) → OWL 2 TBox.  Linear time.
+Theorem 2 (OWL 2 → Graph):  Λ⁻¹(T) → Graph.     Linear time.
+Ψ and Λ⁻¹ are mutual inverses.</pre>
 </div>
 
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border-light);border-radius:var(--radius);overflow:hidden;margin:20px 0">
@@ -968,8 +956,7 @@ Supplier ⊑ ∃supplies.Material
 Alert ⊑ ∃scored_by.Decision
 Campaign ⊑ ≥2 member_of.Alert
 
-# Expert-authored axioms
-# Static — revised manually
+# Expert-authored · static
 # Description logic notation</pre>
   </div>
   <div style="background:var(--bg-card);padding:20px 24px">
@@ -977,50 +964,31 @@ Campaign ⊑ ≥2 member_of.Alert
     <pre style="margin:0;font-size:0.75rem;border:none;padding:6px">
 (Supplier)-[:SUPPLIES]->(Material)
 (Alert)-[:SCORED_BY]->(Decision)
-(Campaign)-[:MEMBER_OF]-(Alert)  min:2
+(Campaign)-[:MEMBER_OF]-(Alert) min:2
 
 # Same formal content, graph notation
-# Schema stable, quantitative layer learns
-# PostgreSQL + AGE — traversable</pre>
+# Schema stable · quantitative layer learns</pre>
   </div>
 </div>
 
-<div class="card" style="border-left:3px solid var(--amber);margin:20px 0">
-<div style="font-size:0.85rem;font-weight:600;color:var(--fg);margin-bottom:10px">What RGI Adds Beyond Classical Ontology</div>
-<div style="font-size:0.82rem;color:var(--fg-soft);line-height:1.7">
-Classical ontologies are static and expert-authored. RGI adds a <strong>learned quantitative layer</strong> on the ontological schema:
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:12px 0">
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:0 0 20px">
   <div style="background:var(--bg-alt);border-radius:8px;padding:12px">
-    <div style="font-size:0.7rem;font-weight:600;color:var(--green);margin-bottom:4px">CENTROIDS μ</div>
-    <div style="font-size:0.75rem;color:var(--fg-soft)">Statistical prototypes compiled from verified outcomes — closer to probabilistic DLs (Lukasiewicz & Straccia, 2008) than classical OWL</div>
+    <div style="font-size:0.7rem;font-weight:600;color:var(--green);margin-bottom:4px">CENTROIDS μ ∈ ℝ^d</div>
+    <div style="font-size:0.75rem;color:var(--fg-soft)">Statistical prototypes from verified outcomes — probabilistic DL territory (Lukasiewicz & Straccia 2008)</div>
   </div>
   <div style="background:var(--bg-alt);border-radius:8px;padding:12px">
-    <div style="font-size:0.7rem;font-weight:600;color:var(--green);margin-bottom:4px">KERNEL WEIGHTS W</div>
-    <div style="font-size:0.75rem;color:var(--fg-soft)">W = diag(1/σ²) — per-deployment precision encoding which ontological dimensions carry signal vs noise</div>
+    <div style="font-size:0.7rem;font-weight:600;color:var(--green);margin-bottom:4px">KERNEL W = diag(1/σ²)</div>
+    <div style="font-size:0.75rem;color:var(--fg-soft)">Per-deployment precision — which dimensions carry signal vs noise, calibrated from data</div>
   </div>
   <div style="background:var(--bg-alt);border-radius:8px;padding:12px">
-    <div style="font-size:0.7rem;font-weight:600;color:var(--green);margin-bottom:4px">WRITE-BACK</div>
-    <div style="font-size:0.75rem;color:var(--fg-soft)">[:TRIGGERED_EVOLUTION] edges update centroids from verified decisions — the ontology schema is stable; the quantitative layer evolves</div>
+    <div style="font-size:0.7rem;font-weight:600;color:var(--green);margin-bottom:4px">WRITE-BACK EVOLUTION</div>
+    <div style="font-size:0.75rem;color:var(--fg-soft)">[:TRIGGERED_EVOLUTION] edges — ontology schema stable, quantitative layer evolves from decisions</div>
   </div>
 </div>
-<div style="font-size:0.82rem;color:var(--fg);font-weight:600;margin-top:8px">
-Ontology-grounded learning graph. Not "data context."
-</div>
-</div>
 
-<p class="source">Gruber 1993 · Lembo et al. 2022, Future Internet 14(3):78 · W3C OWL 2 Mapping to RDF 2012 · Lukasiewicz & Straccia 2008, J. Web Semantics 6(4)</p>
+<p class="source" style="margin-bottom:20px">Gruber 1993 · Lembo et al. 2022, Future Internet 14(3):78 · W3C OWL 2 Mapping to RDF 2012 · Lukasiewicz & Straccia 2008</p>
 
-<!-- ════════════════════════════════════════════════════════════ -->
-<!-- §9: WHY GROUNDED CONTEXT ISN'T ENOUGH                     -->
-<!-- ════════════════════════════════════════════════════════════ -->
-<h2>Why Grounded Context Isn't Enough</h2>
 
-<div style="font-size:0.88rem;color:var(--fg-soft);line-height:1.7">
-• Ontology excels at grounding: validated definitions, reconciled schemas, certified provenance<br>
-• But grounded context doesn't learn which sources matter for which decisions<br>
-• RGI adaptive enrichment: learns <em>which</em> context matters for <em>which</em> decision category
-</div>
 
 <div class="card" style="border-left:3px solid var(--green)">
 <div style="font-size:0.85rem;font-weight:600;color:var(--fg);margin-bottom:10px">DiagonalKernel: Per-Factor Weight Learning</div>
