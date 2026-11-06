@@ -1,0 +1,1154 @@
+<title>RGI vs Ontology</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #FAFAF8; --bg-card: #FFFFFF; --bg-alt: #F3F1EC;
+  --fg: #1C2126; --fg-soft: #44515C; --fg-muted: #6B7883;
+  --accent: #1E6FB8; --green: #0C8367; --red: #C43C4E;
+  --amber: #b7791f; --purple: #7C3AED; --nvidia: #76B900;
+  --border: #E7E1D2; --border-light: #F0EDE6;
+  --radius: 10px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141618; --bg-card: #1C1F22; --bg-alt: #22262A;
+  --fg: #E8E4DC; --fg-soft: #B0A99E; --fg-muted: #7A7570;
+  --accent: #5BA3E0; --green: #34D399; --red: #F87171;
+  --amber: #FBBF24; --purple: #A78BFA; --nvidia: #9ADE00;
+  --border: #333; --border-light: #2A2A2A;
+  color-scheme: dark;
+}}
+:root[data-theme="dark"] {
+  --bg: #141618; --bg-card: #1C1F22; --bg-alt: #22262A;
+  --fg: #E8E4DC; --fg-soft: #B0A99E; --fg-muted: #7A7570;
+  --accent: #5BA3E0; --green: #34D399; --red: #F87171;
+  --amber: #FBBF24; --purple: #A78BFA; --nvidia: #9ADE00;
+  --border: #333; --border-light: #2A2A2A;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6; margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+}
+.wrap { max-width: 960px; margin: 0 auto; padding: 40px 0 60px; }
+h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 4px; color: var(--fg); text-wrap: balance; }
+.subtitle { font-size: 0.95rem; color: var(--fg-muted); margin-bottom: 32px; }
+h2 { font-size: 1.2rem; font-weight: 600; color: var(--fg); margin: 40px 0 16px;
+  padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+h3 { font-size: 1rem; font-weight: 600; color: var(--fg-soft); margin: 24px 0 10px; }
+p, li { color: var(--fg-soft); font-size: 0.9rem; }
+.card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius);
+  padding: 20px 24px; margin-bottom: 16px; }
+.card-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.card-row > * { flex: 1; min-width: 280px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0; }
+th { background: var(--bg-alt); font-weight: 600; text-align: left; padding: 8px 12px;
+  color: var(--fg); border-bottom: 2px solid var(--border); font-size: 0.8rem; }
+td { padding: 8px 12px; border-bottom: 1px solid var(--border-light); color: var(--fg-soft); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+pre { background: var(--bg-alt); border: 1px solid var(--border-light); border-radius: 8px;
+  padding: 16px; overflow-x: auto; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; line-height: 1.5; color: var(--fg-soft); margin: 10px 0; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem;
+  font-weight: 600; letter-spacing: 0.04em; }
+.tag-nv { background: #F0F7E0; color: #4A7A00; }
+.tag-rgi { background: #E6F4EA; color: #137333; }
+.tag-class { background: #F3F1EC; color: #44515C; }
+.check { color: var(--green); font-weight: 600; }
+.cross { color: var(--red); font-weight: 600; }
+.chart-box { margin: 16px 0; background: var(--bg-card); border-radius: var(--radius);
+  border: 1px solid var(--border-light); padding: 20px; overflow-x: auto; }
+.chart-title { font-size: 0.85rem; font-weight: 600; color: var(--fg); margin-bottom: 12px; }
+.source { font-size: 0.75rem; color: var(--fg-muted); font-style: italic; margin-top: 8px; }
+.callout { background: var(--bg-alt); border-left: 3px solid var(--accent); padding: 12px 16px;
+  border-radius: 0 var(--radius) var(--radius) 0; font-size: 0.85rem; color: var(--fg-soft); margin: 16px 0; }
+.math { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--green);
+  background: var(--bg-alt); padding: 2px 6px; border-radius: 3px; }
+.footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);
+  font-size: 0.8rem; color: var(--fg-muted); }
+@media (max-width: 600px) {
+  .card-row { flex-direction: column; }
+  h1 { font-size: 1.4rem; }
+  pre { font-size: 0.72rem; }
+}
+</style>
+
+<div class="wrap">
+
+<h1>RGI: Why Ontology Alone Is Not Enough for Agentic AI</h1>
+<div class="subtitle" style="line-height:1.7">
+• Enterprise AI converging on ontology — Palantir curates, NVIDIA automates, Netflix deploys at scale<br>
+• More will follow<br>
+• Ontology describes what data <em>means</em> — doesn't learn which data <em>matters</em>, which combinations <em>create value</em>, or whether the last decision was <em>right</em><br>
+• RGI (Recursive Graph Improvement) = the computational layer — graph + enrichment math → static context → compounding judgment
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div style="background:linear-gradient(135deg, var(--bg-card) 0%, var(--bg-alt) 100%);border:1px solid var(--border-light);border-radius:var(--radius);padding:28px 28px 24px;margin-bottom:24px">
+<div style="font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);margin-bottom:6px">WHAT IS RGI</div>
+<p style="margin:0 0 16px;font-size:1.15rem;font-weight:700;color:var(--fg);line-height:1.35">RGI: Every Decision Makes the Next One Sharper</p>
+<div style="margin:0 0 16px;font-size:0.88rem;color:var(--fg-soft);line-height:1.7">
+<strong style="color:var(--fg)">RGI</strong> (Recursive Graph Improvement) — compound AI layer above the foundation model:<br>
+• <strong>Decision surface</strong> — scoring + conservation + judgment memory<br>
+• <strong>System surface</strong> — AgentEvolver runtime evolution<br>
+• <strong>Target surface</strong> — process-tech fusion across SAP, Celonis, SIEM, data pipelines<br>
+• ~194 controlled experiments · 167 published charts · 5 copilots · ~10,000 tests
+</div>
+
+<div style="font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-muted);margin-bottom:6px">ENGINE METRICS</div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+  <div style="background:var(--bg-card);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border-light)">
+    <div style="font-size:1.4rem;font-weight:800;color:var(--green)">c=1.387</div>
+    <div style="font-size:0.7rem;color:var(--fg-muted)">compounding exponent</div>
+  </div>
+  <div style="background:var(--bg-card);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border-light)">
+    <div style="font-size:1.4rem;font-weight:800;color:var(--green)">+13.4pp</div>
+    <div style="font-size:0.7rem;color:var(--fg-muted)">vs Uniform (ontology default)</div>
+  </div>
+  <div style="background:var(--bg-card);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border-light)">
+    <div style="font-size:1.4rem;font-weight:800;color:var(--green)">0%</div>
+    <div style="font-size:0.7rem;color:var(--fg-muted)">clean FPR</div>
+  </div>
+  <div style="background:var(--bg-card);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border-light)">
+    <div style="font-size:1.4rem;font-weight:800;color:var(--green)">ρ=0.829</div>
+    <div style="font-size:0.7rem;color:var(--fg-muted)">cross-domain transfer</div>
+  </div>
+</div>
+
+<div style="font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-muted);margin-bottom:6px">COPILOT RESULTS (MODELED)</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+  <div style="background:var(--bg-card);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border-light)">
+    <div style="font-size:1.4rem;font-weight:800;color:var(--green)">+15pp</div>
+    <div style="font-size:0.7rem;color:var(--fg-muted)">S2P touchless AP</div>
+  </div>
+  <div style="background:var(--bg-card);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border-light)">
+    <div style="font-size:1.4rem;font-weight:800;color:var(--green)">−50%</div>
+    <div style="font-size:0.7rem;color:var(--fg-muted)">SOC MTTR</div>
+  </div>
+  <div style="background:var(--bg-card);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border-light)">
+    <div style="font-size:1.4rem;font-weight:800;color:var(--green)">12×</div>
+    <div style="font-size:0.7rem;color:var(--fg-muted)">root cause speed</div>
+  </div>
+</div>
+</div>
+
+<!-- Ontology class convergence graphic -->
+<div class="card" style="padding:12px;margin-bottom:24px">
+  <div style="font-size:0.75rem;font-weight:600;color:var(--fg-muted);margin-bottom:6px">THE ONTOLOGY CLASS — CONVERGENCE + GAP</div>
+  <img src="img_onto_01_2e5687a6.jpg" style="width:100%;border-radius:6px" alt="The Ontology Class Is Growing — Palantir, NVIDIA, Netflix converge on ontology. RGI computes on it.">
+  <div style="font-size:0.72rem;color:var(--fg-muted);margin-top:6px">Palantir curates, NVIDIA automates, Netflix deploys at scale. All converge on ontology. None computes on it.</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- §1: THE ONTOLOGY-AS-PRODUCT CLASS (was §3 — moved up)     -->
+<!--        speed from incident resolution                      -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>The Ontology-as-Product Class</h2>
+
+<div style="font-size:0.88rem;margin-bottom:16px;line-height:1.7;color:var(--fg-soft)">
+• Ontology describes what data <em>means</em><br>
+• RGI computes which data <em>creates value</em> — proves it with measured improvement<br>
+• Not a layer on top of ontology — structurally more powerful substrate<br>
+• You can build ontology inside RGI. You cannot build RGI inside ontology.
+</div>
+
+<!-- 2x2 grid + RGI full-width -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border-light);border-radius:var(--radius);overflow:hidden;margin-bottom:2px">
+ <!-- Palantir -->
+ <div style="background:var(--bg-card);padding:20px">
+ <div style="font-size:0.7rem;font-weight:700;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:8px">PALANTIR AIP</div>
+ <div style="font-size:0.95rem;font-weight:700;color:var(--fg);margin-bottom:8px">Human-Curated Ontology</div>
+ <div style="font-size:0.78rem;color:var(--fg-soft);margin:0 0 6px">• Engineers manually define objects, relationships, actions<br>• Agents read it<br>• Can't discover what isn't authored</div>
+ <div style="font-size:0.78rem;color:var(--fg-soft)">
+ <span style="font-weight:600;color:var(--fg)">Ceiling:</span> what humans wrote<br>
+ <span style="font-weight:600;color:var(--fg)">New data source:</span> weeks of curation<br>
+ <span style="font-weight:600;color:var(--red)">Can't:</span> discover which sources create value
+ </div>
+ </div>
+ <!-- NVIDIA -->
+ <div style="background:var(--bg-card);padding:20px">
+ <div style="font-size:0.7rem;font-weight:700;color:#4A7A00;letter-spacing:0.06em;margin-bottom:8px">NVIDIA AUTO-ONTOLOGY</div>
+ <div style="font-size:0.95rem;font-weight:700;color:var(--fg);margin-bottom:8px">Automated Ontology Building</div>
+ <div style="font-size:0.78rem;color:var(--fg-soft);margin:0 0 6px">• Discovers ontology from metadata<br>• Reconciles definitions, serves over MCP<br>• Treats all sources equally</div>
+ <div style="font-size:0.78rem;color:var(--fg-soft)">
+ <span style="font-weight:600;color:var(--fg)">Ceiling:</span> what metadata reveals<br>
+ <span style="font-weight:600;color:var(--fg)">New data source:</span> ingest + discover<br>
+ <span style="font-weight:600;color:var(--red)">Can't:</span> measure which source improved decisions
+ </div>
+ </div>
+  <div style="background:var(--bg-card);padding:20px">
+ <div style="font-size:0.7rem;font-weight:700;color:#E50914;letter-spacing:0.06em;margin-bottom:8px">NETFLIX OBSERVABILITY ONTOLOGY</div>
+ <div style="font-size:0.95rem;font-weight:700;color:var(--fg);margin-bottom:8px">Deployed Operational Ontology</div>
+ <div style="font-size:0.78rem;color:var(--fg-soft);margin:0 0 6px">• 12 operational namespaces → triples → Knowledge Flywheel<br>• Observer → Enrich → Infer → Adapt<br>• Integration: ~4 hours for a new system (fast)<br>• But: a recent incident still took 4 hours to <em>resolve</em>, 9 teams, 30+ engineers</div>
+ <div style="font-size:0.78rem;color:var(--fg-soft)">
+ <span style="font-weight:600;color:var(--fg)">Ceiling:</span> what the flywheel observes<br>
+ <span style="font-weight:600;color:var(--fg)">New data source:</span> ~4 hours (namespace mapping)<br>
+ <span style="font-weight:600;color:var(--red)">Can't:</span> learn from outcomes or bound degradation
+ </div>
+ </div>
+ <!-- The Pattern -->
+ <div style="background:var(--bg-card);padding:20px">
+ <div style="font-size:0.7rem;font-weight:700;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:8px">THE PATTERN: INDUSTRY CONVERGENCE</div>
+ <div style="font-size:0.95rem;font-weight:700;color:var(--fg);margin-bottom:8px">Everyone Builds the Graph</div>
+ <div style="font-size:0.78rem;color:var(--fg-soft);margin:0 0 6px">• Every major platform converging on ontology/graph for agentic AI<br>• The pattern is clear<br>• The question: what do you <em>compute</em> on top of it?</div>
+ <div style="font-size:0.78rem;color:var(--fg-soft)">
+ <span style="font-weight:600;color:var(--fg)">Palantir:</span> curate → read<br>
+ <span style="font-weight:600;color:var(--fg)">NVIDIA:</span> discover → read<br>
+ <span style="font-weight:600;color:var(--fg)">Netflix:</span> observe → enrich → read<br>
+ <span style="font-weight:600;color:var(--fg-muted);font-style:italic">More will follow.</span>
+ </div>
+ </div>
+</div>
+<!-- RGI: full-width -->
+<div style="background:var(--bg-card);border:2px solid var(--green);border-radius:var(--radius);padding:20px;margin-bottom:20px">
+ <div style="font-size:0.7rem;font-weight:700;color:var(--green);letter-spacing:0.06em;margin-bottom:8px">RGI GRAPH + ENRICHMENT MATH</div>
+ <div style="font-size:0.95rem;font-weight:700;color:var(--fg);margin-bottom:8px">Computational Decision Graph</div>
+ <div style="font-size:0.78rem;color:var(--fg-soft);margin:0 0 6px">• Cross-graph attention + DiagonalKernel + enrichment controller<br>• Discovers, measures, and values data sources automatically<br>• Every platform above builds the graph — RGI computes on it<br>• Proves every computation with measured improvement</div>
+ <div style="display:flex;gap:32px;font-size:0.78rem;color:var(--fg-soft)">
+ <div>
+ <span style="font-weight:600;color:var(--fg)">Ceiling:</span> no ceiling — compounding (c=1.387)<br>
+ <span style="font-weight:600;color:var(--fg)">New data source:</span> plug in → measure → value
+ </div>
+ <div>
+ <span style="font-weight:600;color:var(--green)">Can:</span> prove $value per data combination<br>
+ <span style="font-weight:600;color:var(--green)">Can:</span> learn from outcomes, bound degradation, transfer across domains
+ </div>
+ </div>
+</div>
+
+<!-- Unique content (data valuation, external data) already covered in Five Things + Math sections -->
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- §2: TWO STACKS, ONE GAP (was §1 — moved after class)      -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>Two Stacks, One Gap</h2>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border-light);border-radius:var(--radius);overflow:hidden;margin-bottom:20px">
+    <div style="background:var(--bg-alt);padding:16px 20px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <span class="tag tag-class">THE ONTOLOGY CLASS</span>
+      <span style="font-size:0.72rem;color:var(--fg-muted)">Palantir · NVIDIA · Netflix</span>
+    </div>
+    <p style="font-size:0.88rem;font-weight:600;color:var(--fg-soft);margin:0">The Read Layer</p>
+  </div>
+  <div style="background:#E6F4EA;padding:16px 20px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <span class="tag tag-rgi">RGI</span>
+      <span style="font-size:0.72rem;color:#137333">Apache 2.0 · ~194 experiments</span>
+    </div>
+    <p style="font-size:0.88rem;font-weight:600;color:#0B5E2C;margin:0">The Learn Layer</p>
+  </div>
+
+  <!-- Purpose -->
+  <div style="background:var(--bg-card);padding:14px 20px">
+    <div style="font-size:0.65rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:4px">PURPOSE</div>
+    <p style="font-size:0.85rem;color:var(--fg-soft);margin:0">Build semantic context so agents query data correctly</p>
+  </div>
+  <div style="background:var(--bg-card);padding:14px 20px">
+    <div style="font-size:0.65rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:4px">PURPOSE</div>
+    <p style="font-size:0.85rem;color:var(--fg-soft);margin:0">Compound decision intelligence — every outcome makes the next decision sharper</p>
+  </div>
+
+  <!-- Core loop -->
+  <div style="background:var(--bg-card);padding:14px 20px">
+    <div style="font-size:0.65rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:4px">CORE LOOP</div>
+    <p style="font-size:0.85rem;color:var(--fg-soft);margin:0"><span style="font-weight:600;color:var(--fg-soft)">Discover → Ground → Validate → Expose</span></p>
+  </div>
+  <div style="background:var(--bg-card);padding:14px 20px">
+    <div style="font-size:0.65rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:4px">CORE LOOP</div>
+    <p style="font-size:0.85rem;color:var(--fg-soft);margin:0"><span style="font-weight:600;color:var(--green)">Score → Verify → Learn → Transfer → Evolve</span></p>
+  </div>
+
+  <!-- Intelligence -->
+  <div style="background:var(--bg-card);padding:14px 20px">
+    <div style="font-size:0.65rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:4px">INTELLIGENCE</div>
+    <p style="font-size:0.85rem;color:var(--fg-soft);margin:0">NL-to-SQL, ontology reconciliation, query validation, provenance</p>
+  </div>
+  <div style="background:var(--bg-card);padding:14px 20px">
+    <div style="font-size:0.65rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:4px">INTELLIGENCE</div>
+    <p style="font-size:0.85rem;color:var(--fg-soft);margin:0">Conservation-bounded centroid scoring, cross-graph attention, DiagonalKernel σ</p>
+  </div>
+
+  <!-- Learning -->
+  <div style="background:var(--bg-card);padding:14px 20px">
+    <div style="font-size:0.65rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:4px">LEARNING</div>
+    <p style="font-size:0.85rem;color:var(--fg-soft);margin:0">Certified corrections folded back <span style="font-size:0.75rem;color:var(--fg-muted)">(manual, human-in-the-loop)</span></p>
+  </div>
+  <div style="background:var(--bg-card);padding:14px 20px">
+    <div style="font-size:0.65rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:4px">LEARNING</div>
+    <p style="font-size:0.85rem;color:var(--fg-soft);margin:0">Automatic — every verified outcome updates centroids <span style="font-size:0.75rem;color:var(--green)">(c=1.387 super-linear)</span></p>
+  </div>
+
+  <!-- Safety -->
+  <div style="background:var(--bg-card);padding:14px 20px">
+    <div style="font-size:0.65rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:4px">SAFETY GATE</div>
+    <p style="font-size:0.85rem;color:var(--fg-soft);margin:0">Query validation against certified definitions</p>
+  </div>
+  <div style="background:var(--bg-card);padding:14px 20px">
+    <div style="font-size:0.65rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:4px">SAFETY GATE</div>
+    <p style="font-size:0.85rem;color:var(--fg-soft);margin:0">Conservation law: <code class="math">α·q·V ≥ θ_min</code> <span style="font-size:0.75rem;color:var(--green)">(0% clean FPR)</span></p>
+  </div>
+
+  <!-- Cross-system -->
+  <div style="background:var(--bg-card);padding:14px 20px;border-radius:0 0 0 var(--radius)">
+    <div style="font-size:0.65rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:4px">CROSS-SYSTEM</div>
+    <p style="font-size:0.85rem;color:var(--fg-soft);margin:0">Reconcile conflicting definitions across data sources</p>
+  </div>
+  <div style="background:var(--bg-card);padding:14px 20px;border-radius:0 0 var(--radius) 0">
+    <div style="font-size:0.65rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.06em;margin-bottom:4px">CROSS-SYSTEM</div>
+    <p style="font-size:0.85rem;color:var(--fg-soft);margin:0">Process-tech fusion: SAP + Celonis + SIEM on shared decision graph</p>
+  </div>
+</div>
+
+<div class="chart-box">
+  <div class="chart-title">Where Each Sits — and What Each Unlocks</div>
+  <svg viewBox="0 0 800 440" style="width:100%;max-width:800px;height:auto">
+
+    <!-- LEFT: Ontology class stack -->
+    <text x="192" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="#44515C" font-family="Inter,sans-serif" letter-spacing="0.08em">THE ONTOLOGY CLASS</text>
+
+    <!-- Base layers -->
+    <rect x="12" y="28" width="360" height="30" rx="5" fill="#E7E1D2" stroke="#C4BEB3" stroke-width="1"/>
+    <text x="192" y="48" text-anchor="middle" font-size="9.5" font-weight="500" fill="#44515C" font-family="Inter,sans-serif">Foundation Model (any)</text>
+
+    <rect x="12" y="63" width="360" height="30" rx="5" fill="#F3F1EC" stroke="#C4BEB3" stroke-width="1.5"/>
+    <text x="192" y="83" text-anchor="middle" font-size="9.5" font-weight="600" fill="#44515C" font-family="Inter,sans-serif">Ontology Layer — curate / discover / observe</text>
+
+    <rect x="12" y="98" width="360" height="30" rx="5" fill="#F3F1EC" stroke="#C4BEB3" stroke-width="1.5"/>
+    <text x="192" y="118" text-anchor="middle" font-size="9.5" font-weight="600" fill="#44515C" font-family="Inter,sans-serif">Query + validate + reconcile + serve</text>
+
+    <rect x="12" y="133" width="360" height="30" rx="5" fill="#E8F0FE" stroke="#1967D2" stroke-width="1"/>
+    <text x="192" y="153" text-anchor="middle" font-size="9.5" font-weight="500" fill="#1967D2" font-family="Inter,sans-serif">MCP / API / CLI — serve context to agents</text>
+
+    <!-- Left unlock zone: empty -->
+    <text x="192" y="185" text-anchor="middle" font-size="8" font-weight="600" fill="#6B7883" font-family="Inter,sans-serif" letter-spacing="0.08em">UNLOCKS</text>
+    <rect x="12" y="194" width="360" height="30" rx="5" fill="#FFF" stroke="#C43C4E" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <text x="192" y="213" text-anchor="middle" font-size="9" font-weight="600" fill="#C43C4E" font-family="Inter,sans-serif">Correct answers to data questions</text>
+
+    <rect x="12" y="230" width="360" height="30" rx="5" fill="#FFF" stroke="#E7E1D2" stroke-width="1" stroke-dasharray="5,3"/>
+    <text x="192" y="249" text-anchor="middle" font-size="9" fill="#B0A99E" font-family="Inter,sans-serif">— nothing above this —</text>
+
+    <rect x="12" y="266" width="360" height="30" rx="5" fill="#FFF" stroke="#E7E1D2" stroke-width="1" stroke-dasharray="5,3"/>
+    <text x="192" y="285" text-anchor="middle" font-size="9" fill="#B0A99E" font-family="Inter,sans-serif">— nothing above this —</text>
+
+    <rect x="12" y="302" width="360" height="30" rx="5" fill="#FFF" stroke="#E7E1D2" stroke-width="1" stroke-dasharray="5,3"/>
+    <text x="192" y="321" text-anchor="middle" font-size="9" fill="#B0A99E" font-family="Inter,sans-serif">— nothing above this —</text>
+
+    <!-- RIGHT: RGI stack -->
+    <text x="608" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="#137333" font-family="Inter,sans-serif" letter-spacing="0.08em">RGI (RECURSIVE GRAPH IMPROVEMENT)</text>
+
+    <rect x="428" y="28" width="360" height="30" rx="5" fill="#E7E1D2" stroke="#C4BEB3" stroke-width="1"/>
+    <text x="608" y="48" text-anchor="middle" font-size="9.5" font-weight="500" fill="#44515C" font-family="Inter,sans-serif">Foundation Model (any — GPT, Claude, Gemini)</text>
+
+    <rect x="428" y="63" width="360" height="30" rx="5" fill="#F0F7E0" stroke="#76B900" stroke-width="1"/>
+    <text x="608" y="83" text-anchor="middle" font-size="9.5" font-weight="500" fill="#4A7A00" font-family="Inter,sans-serif">UCL / Ontology — context graph (includes ontology class's job)</text>
+
+    <rect x="428" y="98" width="360" height="30" rx="5" fill="#CEEAD6" stroke="#137333" stroke-width="2"/>
+    <text x="608" y="118" text-anchor="middle" font-size="9.5" font-weight="700" fill="#137333" font-family="Inter,sans-serif">Decision Surface — score · conserve · learn (c=1.387)</text>
+
+    <rect x="428" y="133" width="360" height="30" rx="5" fill="#CEEAD6" stroke="#137333" stroke-width="2"/>
+    <text x="608" y="153" text-anchor="middle" font-size="9.5" font-weight="700" fill="#137333" font-family="Inter,sans-serif">System Surface — AgentEvolver · situation analysis</text>
+
+    <!-- Right unlock zone -->
+    <text x="608" y="185" text-anchor="middle" font-size="8" font-weight="600" fill="#137333" font-family="Inter,sans-serif" letter-spacing="0.08em">UNLOCKS</text>
+
+    <rect x="428" y="194" width="360" height="30" rx="5" fill="#CEEAD6" stroke="#137333" stroke-width="1.5"/>
+    <text x="608" y="208" text-anchor="middle" font-size="8.5" font-weight="600" fill="#137333" font-family="Inter,sans-serif">Correct answers + trust scores + source weights + conservation</text>
+    <text x="785" y="218" text-anchor="end" font-size="7" fill="#6B7883" font-family="Inter,sans-serif">ontology class ⊂ this</text>
+
+    <rect x="428" y="230" width="360" height="30" rx="5" fill="#E8F0FE" stroke="#1967D2" stroke-width="1.5"/>
+    <text x="608" y="244" text-anchor="middle" font-size="8.5" font-weight="600" fill="#1967D2" font-family="Inter,sans-serif">UNLOCK 1: AgentEvolver — runtime strategy evolution</text>
+    <text x="785" y="254" text-anchor="end" font-size="7" fill="#6B7883" font-family="Inter,sans-serif">requires conservation gate</text>
+
+    <rect x="428" y="266" width="360" height="30" rx="5" fill="#F3E8FF" stroke="#7C3AED" stroke-width="1.5"/>
+    <text x="608" y="280" text-anchor="middle" font-size="8.5" font-weight="600" fill="#7C3AED" font-family="Inter,sans-serif">UNLOCK 2: Situation Analyzer — typed intents &lt;150ms</text>
+    <text x="785" y="290" text-anchor="end" font-size="7" fill="#6B7883" font-family="Inter,sans-serif">requires scored centroids</text>
+
+    <rect x="428" y="302" width="360" height="30" rx="5" fill="#FEF3C7" stroke="#92400E" stroke-width="1.5"/>
+    <text x="608" y="316" text-anchor="middle" font-size="8.5" font-weight="600" fill="#92400E" font-family="Inter,sans-serif">UNLOCK 3: Process-Tech Fusion — cross-system computation</text>
+    <text x="785" y="326" text-anchor="end" font-size="7" fill="#6B7883" font-family="Inter,sans-serif">requires cross-graph attention</text>
+
+    <rect x="428" y="342" width="360" height="30" rx="5" fill="#FFF3E0" stroke="#b7791f" stroke-width="1"/>
+    <text x="608" y="362" text-anchor="middle" font-size="9.5" font-weight="500" fill="#92400E" font-family="Inter,sans-serif">Enterprise Systems — SAP · Celonis · SIEM · pipelines</text>
+
+    <line x1="400" y1="25" x2="400" y2="380" stroke="#E7E1D2" stroke-width="1" stroke-dasharray="4,3"/>
+
+    <text x="400" y="410" text-anchor="middle" font-size="9" fill="#6B7883" font-family="Inter,sans-serif">Left: 4 layers, 1 unlock (correct answers). Right: 5 layers, 4 unlocks — each built on the math beneath it.</text>
+    <text x="400" y="425" text-anchor="middle" font-size="9" fill="#6B7883" font-family="Inter,sans-serif">The ontology is the foundation. The unlocks are the product.</text>
+  </svg>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- §3: FIVE THINGS (what fills the gap)                       -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>Five Things a Reading Graph Can Never Produce</h2>
+
+<div class="card" style="padding:12px;margin-bottom:16px">
+  <div style="font-size:0.75rem;font-weight:600;color:var(--fg-muted);margin-bottom:6px">FROM THE RGI RESEARCH PROGRAM — Five Things a Reading Graph Can Never Produce</div>
+  <img src="img_onto_02_696bc706.jpg" style="width:100%;border-radius:6px" alt="Five things a reading graph can never produce — judgment memory, signal-confidence inversion, cross-domain discovery, self-protection, self-expanding criteria">
+  <div style="font-size:0.72rem;color:var(--fg-muted);margin-top:6px">Ontology is a reading graph. All five capabilities require reshape — verified outcomes writing back to scoring geometry. Read and route alone cannot produce any of them.</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border-light);border-radius:var(--radius);overflow:hidden;margin-bottom:20px">
+  <div style="background:var(--bg-card);padding:20px 24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <span style="font-size:1.6rem;font-weight:800;color:var(--green);line-height:1">1</span>
+      <span style="font-size:0.95rem;font-weight:700;color:var(--fg)">Compound judgment over decisions</span>
+    </div>
+    <div style="font-size:0.82rem;margin:0 0 8px;color:var(--fg-soft)">• Ontology class: same context whether 1 decision or 10,000<br>• RGI: centroids shift with every verified outcome<br>• Decision 10,000 draws on geometry of all prior decisions</div>
+    <pre style="margin:0;font-size:0.75rem">
+# +21.96pp over static baseline
+# Compounding exponent c=1.387
+# Super-linear — each decision adds MORE</pre>
+  </div>
+  <div style="background:var(--bg-card);padding:20px 24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <span style="font-size:1.6rem;font-weight:800;color:var(--green);line-height:1">2</span>
+      <span style="font-size:0.95rem;font-weight:700;color:var(--fg)">Prevent silent degradation</span>
+    </div>
+    <div style="font-size:0.82rem;margin:0 0 8px;color:var(--fg-soft)">• Ontology class: validates queries against static definitions<br>• Definitions don't catch silent degradation as data shifts<br>• Conservation law gates every centroid update</div>
+    <pre style="margin:0;font-size:0.75rem">
+# 0% false positive rate (clean)
+# 100% poison detection (all regimes)
+# θ_min = 23.53 / (α × V)</pre>
+  </div>
+  <div style="background:var(--bg-card);padding:20px 24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <span style="font-size:1.6rem;font-weight:800;color:var(--green);line-height:1">3</span>
+      <span style="font-size:0.95rem;font-weight:700;color:var(--fg)">Learn which data sources matter</span>
+    </div>
+    <div style="font-size:0.82rem;margin:0 0 8px;color:var(--fg-soft)">• Ontology class: treats all sources equally<br>• RGI DiagonalKernel: per-factor weights<br>• SAP GR data matters 3.1× more than Celonis timing for three-way-match</div>
+    <pre style="margin:0;font-size:0.75rem">
+# Adaptive enrichment: +6.5–6.8pp
+# Fewer reads, better accuracy
+# σ-diagnostic: 93.6% prevalence</pre>
+  </div>
+  <div style="background:var(--bg-card);padding:20px 24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <span style="font-size:1.6rem;font-weight:800;color:var(--green);line-height:1">4</span>
+      <span style="font-size:0.95rem;font-weight:700;color:var(--fg)">Route signals as typed intents</span>
+    </div>
+    <div style="font-size:0.82rem;margin:0 0 8px;color:var(--fg-soft)">• Ontology class: serves context over MCP<br>• RGI Situation Analyzer: every signal → typed intent on governed bus<br>• &lt;150ms trigger-to-dispatch · deterministic · auditable</div>
+    <pre style="margin:0;font-size:0.75rem">
+# ACCP: Situation-Analyzer + typed-intent bus
+# + Control-Tower router
+# Deterministic routing, not LLM inference
+# 7-year audit trail</pre>
+  </div>
+</div>
+
+<div style="background:var(--bg-card);border:2px solid var(--green);border-radius:var(--radius);padding:20px 24px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+    <span style="font-size:1.6rem;font-weight:800;color:var(--green);line-height:1">5</span>
+    <span style="font-size:0.95rem;font-weight:700;color:var(--fg)">Process-tech fusion: computation across enterprise systems</span>
+  </div>
+  <div style="font-size:0.82rem;margin:0 0 8px;color:var(--fg-soft)">• Ontology class: connects to Databricks, Snowflake, Postgres<br>• RGI: SAP + Celonis + SIEM + data pipelines on shared decision graph — computes across them<br>• 5-act storyboard: WHERE (bottleneck) → WHY (schema change root cause) → WHAT (recommendation + what-if) → LEARN (conservation-bounded) → TRANSFER (promoted to other systems)</div>
+  <pre style="margin:0;font-size:0.75rem">
+# SAP schema change → join fanout 9× → pipeline bottleneck → supplier exception
+# Connected through shared graph nodes. Cross-system computation.
+# "Match Invoice to GR": 42 min → 4 min (what-if)
+# Pattern promoted to billing_api — auto-resolved next occurrence</pre>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- §4: THE MATH (proof)                                       -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>The Math That Makes the Difference</h2>
+
+<div style="font-size:0.88rem;color:var(--fg-soft);line-height:1.7">
+• Ontology reconciles definitions → correct numbers. Necessary<br>
+• Correct numbers don't compound into better decisions<br>
+• The math below turns data context into decision intelligence
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border-light);border-radius:var(--radius);overflow:hidden;margin:20px 0">
+  <div style="background:var(--bg-card);padding:20px 24px">
+    <div style="font-size:0.7rem;font-weight:600;color:var(--green);letter-spacing:0.04em;margin-bottom:8px">CONSERVATION LAW</div>
+    <div style="font-size:0.82rem;margin:0 0 8px;color:var(--fg-soft)">• Centroids update only when evidence is sufficient<br>• No other agent framework has this guarantee against silent degradation</div>
+    <pre style="margin:0;font-size:0.78rem;border:none;padding:10px">
+α·q·V ≥ θ_min
+
+where:
+  α = category coverage ratio
+  q = verification quality
+  V = verified decision volume
+  θ_min = 23.53 / (α × V)
+
+# 0% clean false positive rate
+# 100% poison detection across all regimes
+# Gate prevents bad updates from thin data</pre>
+  </div>
+  <div style="background:var(--bg-card);padding:20px 24px">
+    <div style="font-size:0.7rem;font-weight:600;color:var(--green);letter-spacing:0.04em;margin-bottom:8px">COMPOUNDING EXPONENT</div>
+    <div style="font-size:0.82rem;margin:0 0 8px;color:var(--fg-soft)">• Super-linear — each decision contributes more than the last<br>• Measured across ~194 experiments · bootstrap confidence intervals</div>
+    <pre style="margin:0;font-size:0.78rem;border:none;padding:10px">
+c = 1.387 [1.308, 1.477]
+
+accuracy(t) ~ t^c  where c > 1
+→ super-linear improvement
+
+Discovery surface: n^2.150, γ=2.622
+→ recovery after disruption faster
+   than initial learning</pre>
+  </div>
+  <div style="background:var(--bg-card);padding:20px 24px">
+    <div style="font-size:0.7rem;font-weight:600;color:var(--green);letter-spacing:0.04em;margin-bottom:8px">ENRICHMENT CONTROLLER</div>
+    <div style="font-size:0.82rem;margin:0 0 8px;color:var(--fg-soft)">• Reads fewer context sources while improving accuracy<br>• Ontology class: queries all sources uniformly<br>• No learning about which sources matter for which decisions</div>
+    <pre style="margin:0;font-size:0.78rem;border:none;padding:10px">
+Adaptive vs uniform enrichment:
+  +6.5–6.8pp accuracy improvement
+  fewer context reads required
+
+# The system learns WHICH data sources
+# matter for WHICH decision categories
+# Ontology class treats all sources equally</pre>
+  </div>
+  <div style="background:var(--bg-card);padding:20px 24px">
+    <div style="font-size:0.7rem;font-weight:600;color:var(--green);letter-spacing:0.04em;margin-bottom:8px">CROSS-DOMAIN TRANSFER</div>
+    <div style="font-size:0.82rem;margin:0 0 8px;color:var(--fg-soft)">• Procurement scoring pattern improved security-alert scoring<br>• No manual intervention — cross-graph attention on shared decision graph</div>
+    <pre style="margin:0;font-size:0.78rem;border:none;padding:10px">
+Transfer correlation: ρ = 0.829
+Convergence speedup: 1.56–1.78×
+Negative transfer: 25% → 0%
+
+Cross-entity accuracy: +4.67pp
+  CI: [+3.90, +5.44]
+
+# Domain A learns → Domain B improves
+# Ontology class: no cross-domain learning</pre>
+  </div>
+</div>
+
+<!-- Experiment Charts -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0">
+  <div class="card" style="padding:12px">
+    <div style="font-size:0.75rem;font-weight:600;color:var(--green);margin-bottom:6px">CUMULATIVE ADVANTAGE</div>
+    <img src="img_onto_03_ae178389.jpg" style="width:100%;border-radius:6px" alt="Compounding exponent c=1.387">
+    <div style="font-size:0.72rem;color:var(--fg-muted);margin-top:6px">Super-linear compounding: c=1.387 [1.308, 1.477]. Each decision contributes more than the last.</div>
+  </div>
+  <div class="card" style="padding:12px">
+    <div style="font-size:0.75rem;font-weight:600;color:var(--green);margin-bottom:6px">HEAD-TO-HEAD vs kNN</div>
+    <img src="img_onto_04_d37795e3.jpg" style="width:100%;border-radius:6px" alt="Head-to-head trajectory showing crossover at N=639">
+    <div style="font-size:0.72rem;color:var(--fg-muted);margin-top:6px">Crossover at N=639. Final gap: +6.2pp [+3.7, +8.4]. RGI outperforms nearest-neighbor baseline.</div>
+  </div>
+  <div class="card" style="padding:12px">
+    <div style="font-size:0.75rem;font-weight:600;color:var(--green);margin-bottom:6px">CONSERVATION GATE</div>
+    <img src="img_onto_05_b6327cec.jpg" style="width:100%;border-radius:6px" alt="Conservation status: 0% false positive rate">
+    <div style="font-size:0.72rem;color:var(--fg-muted);margin-top:6px">0% clean false positive rate. 100% poison detection. The gate that prevents silent degradation.</div>
+  </div>
+  <div class="card" style="padding:12px">
+    <div style="font-size:0.75rem;font-weight:600;color:var(--green);margin-bottom:6px">ADAPTIVE vs UNIFORM ENRICHMENT</div>
+    <img src="img_onto_06_6b117fdf.jpg" style="width:100%;border-radius:6px" alt="Adaptive enrichment: +6.5-6.8pp with fewer reads">
+    <div style="font-size:0.72rem;color:var(--fg-muted);margin-top:6px">Adaptive enrichment: +6.5–6.8pp accuracy with fewer context reads. Learns which sources matter.</div>
+  </div>
+</div>
+
+<p class="source">Charts from ~194 controlled experiments · Full registry: 167 published charts · Simulation results · No production customers</p>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- §5: EXPERIMENTS (proof)                                    -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>~194 Experiments, 167 Charts</h2>
+
+<div style="font-size:0.88rem;margin-bottom:16px;color:var(--fg-soft);line-height:1.7">
+• Every claim backed by numbered experiments + bootstrap confidence intervals<br>
+• Ontology class: no published experiment program<br>
+• RGI: ~194 controlled experiments · 167 published charts
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:16px">
+
+  <div style="background:var(--bg-card);border-radius:var(--radius);padding:16px 20px;border:1px solid var(--border-light);border-left:4px solid var(--green)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <span style="font-size:0.7rem;font-weight:700;color:var(--green);letter-spacing:0.04em"></span>
+      <span style="font-size:1.1rem;font-weight:800;color:var(--green)">96.7%</span>
+    </div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--fg)">Personnel Change Detection</div>
+    <p style="font-size:0.78rem;color:var(--fg-soft);margin:4px 0 0">+10.59pp. Judgment memory survives team changes — new analyst inherits all prior learning.</p>
+  </div>
+
+  <div style="background:var(--bg-card);border-radius:var(--radius);padding:16px 20px;border:1px solid var(--border-light);border-left:4px solid var(--green)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <span style="font-size:0.7rem;font-weight:700;color:var(--green);letter-spacing:0.04em"></span>
+      <span style="font-size:1.1rem;font-weight:800;color:var(--green)">93.6%</span>
+    </div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--fg)">σ-Diagnostic</div>
+    <p style="font-size:0.78rem;color:var(--fg-soft);margin:4px 0 0">Heterogeneous per-factor weights in 93.6% of categories. Uniform weighting is wrong almost every time.</p>
+  </div>
+
+  <div style="background:var(--bg-card);border-radius:var(--radius);padding:16px 20px;border:1px solid var(--border-light);border-left:4px solid var(--accent)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <span style="font-size:0.7rem;font-weight:700;color:var(--accent);letter-spacing:0.04em"></span>
+      <span style="font-size:1.1rem;font-weight:800;color:var(--accent)">ρ=0.829</span>
+    </div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--fg)">Cross-Domain Transfer</div>
+    <p style="font-size:0.78rem;color:var(--fg-soft);margin:4px 0 0">1.56–1.78× convergence speedup. Procurement pattern improved security-alert scoring with zero manual intervention.</p>
+  </div>
+
+  <div style="background:var(--bg-card);border-radius:var(--radius);padding:16px 20px;border:1px solid var(--border-light);border-left:4px solid var(--red)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <span style="font-size:0.7rem;font-weight:700;color:var(--red);letter-spacing:0.04em"></span>
+      <span style="font-size:1.1rem;font-weight:800;color:var(--green)">0% FPR</span>
+    </div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--fg)">Conservation Gate</div>
+    <p style="font-size:0.78rem;color:var(--fg-soft);margin:4px 0 0">0% clean false positive rate. 100% poison detection across all regimes. The math that prevents silent degradation.</p>
+  </div>
+
+  <div style="background:var(--bg-card);border-radius:var(--radius);padding:16px 20px;border:1px solid var(--border-light);border-left:4px solid var(--red)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <span style="font-size:0.7rem;font-weight:700;color:var(--red);letter-spacing:0.04em"></span>
+      <span style="font-size:1.1rem;font-weight:800;color:var(--green)">86.8%</span>
+    </div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--fg)">Recovery After Poisoning</div>
+    <p style="font-size:0.78rem;color:var(--fg-soft);margin:4px 0 0">System self-heals after adversarial injection. Conservation gate catches, learning recovers.</p>
+  </div>
+
+  <div style="background:var(--bg-card);border-radius:var(--radius);padding:16px 20px;border:1px solid var(--border-light);border-left:4px solid var(--accent)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <span style="font-size:0.7rem;font-weight:700;color:var(--accent);letter-spacing:0.04em"></span>
+      <span style="font-size:1.1rem;font-weight:800;color:var(--accent)">63.4%</span>
+    </div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--fg)">Cross-Graph Discovery</div>
+    <p style="font-size:0.78rem;color:var(--fg-soft);margin:4px 0 0">Spearman 0.440. Finds patterns across graph domains that humans miss.</p>
+  </div>
+
+  <div style="background:var(--bg-card);border-radius:var(--radius);padding:16px 20px;border:1px solid var(--border-light);border-left:4px solid var(--green);border-width:1px 1px 1px 4px;box-shadow:0 2px 8px rgba(12,131,103,0.1)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <span style="font-size:0.7rem;font-weight:700;color:var(--green);letter-spacing:0.04em"> ★</span>
+      <span style="font-size:1.1rem;font-weight:800;color:var(--green)">c=1.387</span>
+    </div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--fg)">Cumulative Advantage</div>
+    <p style="font-size:0.78rem;color:var(--fg-soft);margin:4px 0 0">CI [1.308, 1.477]. Super-linear compounding — each decision contributes more than the last. The headline result.</p>
+  </div>
+
+  <div style="background:var(--bg-card);border-radius:var(--radius);padding:16px 20px;border:1px solid var(--border-light);border-left:4px solid var(--green);border-width:1px 1px 1px 4px;box-shadow:0 2px 8px rgba(12,131,103,0.1)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <span style="font-size:0.7rem;font-weight:700;color:var(--green);letter-spacing:0.04em"> ★</span>
+      <span style="font-size:1.1rem;font-weight:800;color:var(--green)">γ=2.622</span>
+    </div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--fg)">Discovery Surface</div>
+    <p style="font-size:0.78rem;color:var(--fg-soft);margin:4px 0 0">n^2.150 scaling. Recovery after disruption faster than initial learning. The system gets <em>better</em> at recovering.</p>
+  </div>
+
+  <div style="background:var(--bg-card);border-radius:var(--radius);padding:16px 20px;border:1px solid var(--border-light);border-left:4px solid var(--accent)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <span style="font-size:0.7rem;font-weight:700;color:var(--accent);letter-spacing:0.04em"></span>
+      <span style="font-size:1.1rem;font-weight:800;color:var(--accent)">+4.67pp</span>
+    </div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--fg)">Cross-Entity Accuracy</div>
+    <p style="font-size:0.78rem;color:var(--fg-soft);margin:4px 0 0">CI [+3.90, +5.44]. Transfer works across entity types, not just domains.</p>
+  </div>
+
+  <div style="background:var(--bg-card);border-radius:var(--radius);padding:16px 20px;border:1px solid var(--border-light);border-left:4px solid var(--purple)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <span style="font-size:0.7rem;font-weight:700;color:var(--purple);letter-spacing:0.04em"></span>
+      <span style="font-size:1.1rem;font-weight:800;color:var(--purple)">+6.2pp</span>
+    </div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--fg)">Head-to-Head vs kNN</div>
+    <p style="font-size:0.78rem;color:var(--fg-soft);margin:4px 0 0">CI [+3.7, +8.4]. Crossover at N=639. Outperforms nearest-neighbor baseline at scale.</p>
+  </div>
+
+  <div style="background:var(--bg-card);border-radius:var(--radius);padding:16px 20px;border:1px solid var(--border-light);border-left:4px solid var(--purple)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <span style="font-size:0.7rem;font-weight:700;color:var(--purple);letter-spacing:0.04em"></span>
+      <span style="font-size:1.1rem;font-weight:800;color:var(--purple)">+9.2pp</span>
+    </div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--fg)">Ablation Stability</div>
+    <p style="font-size:0.78rem;color:var(--fg-soft);margin:4px 0 0">CI [+7.2, +11.3]. Excludes zero from N=500. Robust under component removal — no single piece is carrying the result.</p>
+  </div>
+
+</div>
+
+<div style="background:var(--bg-alt);border-radius:var(--radius);padding:14px 20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:0.78rem;color:var(--fg-muted)">
+  <span><strong style="color:var(--fg)">~66</strong> foundational experiments</span>
+  <span><strong style="color:var(--fg)">13</strong> numbered E-JM experiments</span>
+  <span><strong style="color:var(--fg)">167</strong> published charts</span>
+  <span><strong style="color:var(--fg)">All</strong> with bootstrap CIs</span>
+  <span>Simulation results · No production customers</span>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- §6: CAPABILITY SCORECARD (proof)                           -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>Capability Scorecard</h2>
+
+<div style="font-size:0.85rem;margin-bottom:16px;color:var(--fg-soft)">
+• Green background = capability present<br>
+• Shared capabilities = semantic layer<br>
+• RGI-only capabilities (bottom 8 rows) = learning layer the math unlocks
+</div>
+
+<div style="border-radius:var(--radius);overflow:hidden;border:1px solid var(--border-light)">
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;background:var(--bg-alt)">
+  <div style="padding:12px 16px;font-size:0.78rem;font-weight:700;color:var(--fg)">Capability</div>
+  <div style="padding:12px 16px;text-align:center"><span class="tag tag-class">Ontology Class</span></div>
+  <div style="padding:12px 16px;text-align:center"><span class="tag tag-rgi">RGI</span></div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;color:var(--fg-soft)">Build ontology from metadata</div>
+  <div style="padding:10px 16px;text-align:center;background:#F3F1EC40;font-size:0.82rem;color:var(--fg-soft);font-weight:600">✓</div>
+  <div style="padding:10px 16px;text-align:center;background:#E6F4EA40;font-size:0.82rem;color:#137333;font-weight:600">✓ UCL graph</div>
+</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;color:var(--fg-soft)">NL-to-SQL query</div>
+  <div style="padding:10px 16px;text-align:center;background:#F3F1EC40;font-size:0.82rem;color:var(--fg-soft);font-weight:600">✓</div>
+  <div style="padding:10px 16px;text-align:center;font-size:0.78rem;color:var(--fg-muted)">—</div>
+</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;color:var(--fg-soft)">Query validation + provenance</div>
+  <div style="padding:10px 16px;text-align:center;background:#F3F1EC40;font-size:0.82rem;color:var(--fg-soft);font-weight:600">✓</div>
+  <div style="padding:10px 16px;text-align:center;font-size:0.78rem;color:var(--fg-muted)">audit ledger</div>
+</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;color:var(--fg-soft)">MCP connector for agents</div>
+  <div style="padding:10px 16px;text-align:center;background:#F3F1EC40;font-size:0.82rem;color:var(--fg-soft);font-weight:600">✓</div>
+  <div style="padding:10px 16px;text-align:center;background:#E6F4EA40;font-size:0.82rem;color:#137333;font-weight:600">✓ API + routers</div>
+</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;color:var(--fg-soft)">Reconcile conflicting definitions</div>
+  <div style="padding:10px 16px;text-align:center;background:#F3F1EC40;font-size:0.82rem;color:var(--fg-soft);font-weight:600">✓</div>
+  <div style="padding:10px 16px;text-align:center;background:#E6F4EA40;font-size:0.82rem;color:#137333;font-weight:600">✓ graph</div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:3px solid var(--border)">
+  <div style="padding:8px 16px;font-size:0.7rem;font-weight:700;color:var(--fg-muted);letter-spacing:0.06em">THE LEARNING LAYER (RGI only)</div>
+  <div style="padding:8px 16px"></div>
+  <div style="padding:8px 16px"></div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;font-weight:600;color:var(--fg)">Score decisions with domain factors</div>
+  <div style="padding:10px 16px;text-align:center;font-size:0.9rem;color:var(--red)">✗</div>
+  <div style="padding:10px 16px;text-align:center;background:#E6F4EA;font-size:0.82rem;color:#137333;font-weight:600">✓ 5–7 factors</div>
+</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;font-weight:600;color:var(--fg)">Learn from verified outcomes</div>
+  <div style="padding:10px 16px;text-align:center;font-size:0.9rem;color:var(--red)">✗</div>
+  <div style="padding:10px 16px;text-align:center;background:#E6F4EA;font-size:0.82rem;color:#137333;font-weight:600">✓ c=1.387</div>
+</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;font-weight:600;color:var(--fg)">Conservation law (prevent degradation)</div>
+  <div style="padding:10px 16px;text-align:center;font-size:0.9rem;color:var(--red)">✗</div>
+  <div style="padding:10px 16px;text-align:center;background:#E6F4EA;font-size:0.82rem;color:#137333;font-weight:600">✓ α·q·V ≥ θ_min</div>
+</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;font-weight:600;color:var(--fg)">Cross-domain transfer</div>
+  <div style="padding:10px 16px;text-align:center;font-size:0.9rem;color:var(--red)">✗</div>
+  <div style="padding:10px 16px;text-align:center;background:#E6F4EA;font-size:0.82rem;color:#137333;font-weight:600">✓ ρ=0.829</div>
+</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;font-weight:600;color:var(--fg)">Runtime strategy evolution</div>
+  <div style="padding:10px 16px;text-align:center;font-size:0.9rem;color:var(--red)">✗</div>
+  <div style="padding:10px 16px;text-align:center;background:#E6F4EA;font-size:0.82rem;color:#137333;font-weight:600">✓ AgentEvolver</div>
+</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;font-weight:600;color:var(--fg)">Adaptive enrichment</div>
+  <div style="padding:10px 16px;text-align:center;font-size:0.9rem;color:var(--red)">✗</div>
+  <div style="padding:10px 16px;text-align:center;background:#E6F4EA;font-size:0.82rem;color:#137333;font-weight:600">✓ +6.5–6.8pp</div>
+</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;font-weight:600;color:var(--fg)">Situation analysis (typed intents)</div>
+  <div style="padding:10px 16px;text-align:center;font-size:0.9rem;color:var(--red)">✗</div>
+  <div style="padding:10px 16px;text-align:center;background:#E6F4EA;font-size:0.82rem;color:#137333;font-weight:600">✓ ACCP &lt;150ms</div>
+</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--border-light)">
+  <div style="padding:10px 16px;font-size:0.82rem;font-weight:600;color:var(--fg)">Process-tech fusion</div>
+  <div style="padding:10px 16px;text-align:center;font-size:0.9rem;color:var(--red)">✗</div>
+  <div style="padding:10px 16px;text-align:center;background:#E6F4EA;font-size:0.82rem;color:#137333;font-weight:600">✓ 5-act TPF</div>
+</div>
+</div>
+
+<p style="font-size:0.78rem;color:var(--fg-muted);margin-top:10px;text-align:center">5 shared capabilities (the semantic layer) · 8 RGI-only capabilities (the learning layer) · Ontology class: 5 of 13 · RGI: 11 of 13</p>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- §7: THE UNLOCK CASCADE (what it unlocks)                   -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>The Unlock Cascade</h2>
+
+<div class="card" style="padding:12px;margin-bottom:16px">
+  <img src="img_onto_07_33fefcd5.jpg" style="width:100%;border-radius:6px" alt="The Unlock Cascade — Foundation → AgentEvolver → Situation Analyzer → Process-Tech Fusion">
+</div>
+
+<div style="font-size:0.88rem;margin-bottom:20px;color:var(--fg-soft);line-height:1.7">
+• Ontology class's value = its ontology. Full stop<br>
+• RGI's value = what the math <em>unlocks</em> — three systems impossible without conservation-bounded centroid geometry<br>
+• Each unlocks capabilities the previous one couldn't reach
+</div>
+
+<div style="position:relative">
+<div style="background:var(--bg-card);border:2px solid var(--green);border-radius:var(--radius);padding:20px 24px;margin-bottom:4px">
+  <div style="display:flex;align-items:flex-start;gap:16px">
+    <div style="background:#CEEAD6;color:#137333;font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:4px;white-space:nowrap;margin-top:2px">FOUNDATION</div>
+    <div style="min-width:0">
+      <div style="font-size:0.95rem;font-weight:700;color:var(--fg);margin-bottom:4px">GAE + Conservation-Bounded Centroid Scoring</div>
+      <div style="font-size:0.82rem;color:var(--fg-soft);margin:0">• Cross-graph attention (<code>pip install graph-attention-engine</code>)<br>• DiagonalKernel per-factor σ learning<br>• Conservation law (α·q·V ≥ θ_min)<br>• Without this → everything below is either unsafe or stateless</div>
+    </div>
+  </div>
+</div>
+<div style="text-align:center;font-size:1.2rem;color:var(--green);line-height:1">↓</div>
+
+<div style="background:var(--bg-card);border:1px solid var(--border-light);border-left:4px solid var(--accent);border-radius:var(--radius);padding:20px 24px;margin-bottom:4px">
+  <div style="display:flex;align-items:flex-start;gap:16px">
+    <div style="background:#E8F0FE;color:#1967D2;font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:4px;white-space:nowrap;margin-top:2px">UNLOCK 1</div>
+    <div style="min-width:0">
+      <div style="font-size:0.95rem;font-weight:700;color:var(--fg);margin-bottom:4px">AgentEvolver — Runtime Strategy Evolution</div>
+      <p style="font-size:0.82rem;color:var(--fg-soft);margin:0 0 6px"><strong>Requires:</strong> conservation gate to know when a shadow strategy is safe to promote</p>
+      <div style="font-size:0.82rem;color:var(--fg-soft);margin:0"><strong>Unlocks:</strong><br>• Agents improve own routing rules, prompt modules, context composition<br>• No retraining, no redeploying, no human approval<br>• Shadow-test 200 decisions → conservation gate confirms → auto-promote<br>• Agent infrastructure evolves at runtime</div>
+    </div>
+  </div>
+</div>
+<div style="text-align:center;font-size:1.2rem;color:var(--green);line-height:1">↓</div>
+
+<div style="background:var(--bg-card);border:1px solid var(--border-light);border-left:4px solid var(--purple);border-radius:var(--radius);padding:20px 24px;margin-bottom:4px">
+  <div style="display:flex;align-items:flex-start;gap:16px">
+    <div style="background:#F3E8FF;color:#7C3AED;font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:4px;white-space:nowrap;margin-top:2px">UNLOCK 2</div>
+    <div style="min-width:0">
+      <div style="font-size:0.95rem;font-weight:700;color:var(--fg);margin-bottom:4px">Situation Analyzer — Typed Intent Routing (&lt;150ms)</div>
+      <p style="font-size:0.82rem;color:var(--fg-soft);margin:0 0 6px"><strong>Requires:</strong> centroid geometry to score intents, conservation gate to enforce routing safety</p>
+      <div style="font-size:0.82rem;color:var(--fg-soft);margin:0"><strong>Unlocks:</strong><br>• Every signal (KPI breach, alert, user ask) → typed intent on governed bus<br>• Deterministic · auditable · &lt;150ms<br>• Control Tower dispatches the right copilot — ACCP pattern ("Kubernetes for agents")<br>• Without scored centroids → routing on string matching or LLM inference</div>
+    </div>
+  </div>
+</div>
+<div style="text-align:center;font-size:1.2rem;color:var(--green);line-height:1">↓</div>
+
+<div style="background:var(--bg-card);border:1px solid var(--border-light);border-left:4px solid var(--amber);border-radius:var(--radius);padding:20px 24px;margin-bottom:4px">
+  <div style="display:flex;align-items:flex-start;gap:16px">
+    <div style="background:#FEF3C7;color:#92400E;font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:4px;white-space:nowrap;margin-top:2px">UNLOCK 3</div>
+    <div style="min-width:0">
+      <div style="font-size:0.95rem;font-weight:700;color:var(--fg);margin-bottom:4px">Process-Tech Fusion — Computation Across Enterprise Systems</div>
+      <p style="font-size:0.82rem;color:var(--fg-soft);margin:0 0 6px"><strong>Requires:</strong> cross-graph attention on learned profiles, conservation-bounded enrichment to know which sources matter</p>
+      <div style="font-size:0.82rem;color:var(--fg-soft);margin:0"><strong>Unlocks:</strong><br>• SAP schema change → join fanout → pipeline bottleneck → supplier exception<br>• Connected through shared graph nodes<br>• Root causes no single system can see — spans Celonis + SAP + SIEM + operational data<br>• 5-act storyboard: WHERE → WHY → WHAT → LEARN → TRANSFER</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="card" style="padding:12px;margin-top:12px">
+  <div style="font-size:0.75rem;font-weight:600;color:var(--amber);margin-bottom:6px">UNLOCK 3 IN PRACTICE — Three Enterprise Layers, No Causal Connectivity</div>
+  <img src="img_onto_08_210b1f41.jpg" style="width:100%;border-radius:6px" alt="Three enterprise layers — Process Intelligence, ERP, Data Catalogs — with Tech-Process Fusion as the bridge">
+  <div style="font-size:0.72rem;color:var(--fg-muted);margin-top:6px">Celonis shows WHERE. SAP has WHAT. Snowflake holds CONTEXT. No causal connectivity between them — until Tech-Process Fusion bridges all three on one decision graph.</div>
+</div>
+
+<div class="callout" style="margin-top:16px">
+  <strong>The point:</strong><br>
+  • Ontology builds one layer<br>
+  • RGI's math unlocks three systems on top — each impossible without conservation-bounded centroid geometry<br>
+  • Remove the math → AgentEvolver has no safety gate, Situation Analyzer has no scored intents, Process-Tech Fusion has no cross-graph computation<br>
+  • The math isn't decoration. It's structural.
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- §8: IN CODE (in practice)                                  -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>In Code</h2>
+
+<div class="card-row">
+  <div class="card" style="border-top:3px solid var(--fg-muted);padding:16px 20px">
+    <div style="font-size:0.7rem;font-weight:600;color:var(--fg-muted);margin-bottom:8px">ONTOLOGY CLASS — QUERY WITH CONTEXT</div>
+    <pre style="font-size:0.73rem;margin:0">
+# Connect data sources
+POST /api/datasources
+  {"type": "snowflake",
+   "connection_string": "snowflake://..."}
+POST /api/datasources
+  {"type": "databricks",
+   "connection_string": "databricks://..."}
+
+# Ingest metadata → build ontology
+POST /api/datasources/{id}/ingest
+# → discovers tables, columns, relationships
+# → generates ontology nodes, reconciles
+#   conflicting definitions across sources
+
+# Ask a question → NL-to-SQL
+POST /api/chat
+  {"message": "What was Q3 revenue by region?"}
+
+# Pipeline:
+# 1. Rewrite follow-up as standalone
+# 2. Ontology grounds "revenue" → certified def
+# 3. SQL generated against grounded schema
+# 4. Query validated against certified lineage
+# 5. Result: $12.3M (EMEA $4.1M, APAC $3.8M...)
+# 6. Provenance: table, column, lineage attached
+
+# ✓ Correct answer with provenance
+# ✗ No scoring of the decision that used it
+# ✗ No conservation gate on data quality
+# ✗ No learning which sources matter more
+# ✗ Next query treats all sources equally
+# ✗ Decision 1,000 = Decision 1</pre>
+  </div>
+  <div class="card" style="border-top:3px solid var(--green);padding:16px 20px">
+    <div style="font-size:0.7rem;font-weight:600;color:var(--green);margin-bottom:8px">RGI — SCORE, LEARN, COMPOUND (PUBLIC SDK)</div>
+    <pre style="font-size:0.73rem;margin:0">
+from gae import build_profile_scorer, conservation_status
+import numpy as np
+
+# Initialize with domain config
+categories = ["exact_match", "partial", "exception"]
+actions = ["approve", "review", "reject"]
+scorer = build_profile_scorer(
+    categories, actions, centroids, n_factors=7
+)
+
+# Score with 7 domain factors
+vector = np.array([0.03, 0.92, 0.87, 0.95, 0.78, 0.64, 0.91])
+result = scorer.score(vector, category_index=0)
+# → ScoringResult(action_name='approve', confidence=0.847)
+
+# Verify the outcome
+scorer.update(vector, 0, result.action_index,
+              correct=True, confidence=result.confidence)
+# Centroids shift. DiagonalKernel σ updated.
+
+# Conservation gate
+status = conservation_status(
+    verified_count=412, correct_count=340,
+    total_decisions=500, penalty_ratio=5.0,
+    categories_with_data=3, total_categories=3)
+# → GREEN, passed=True, headroom=210.8
+
+# After 1000 decisions: compounding c=1.387
+# SAP GR data (σ=0.12) matters 3.1× more than
+# Celonis timing (σ=0.37)
+# Pattern transferred to SOC scoring (ρ=0.829)</pre>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- §8.5: FORMAL ONTOLOGY-GRAPH EQUIVALENCE                    -->
+<!-- ════════════════════════════════════════════════════════════ -->
+
+<h2>Ontologies and Semantic Graphs Are Mathematically Equivalent</h2>
+
+<div style="font-size:0.88rem;color:var(--fg-soft);line-height:1.7">
+• The claim that a semantic graph "is not an ontology" is formally incorrect<br>
+• Bidirectional equivalence proven in linear time (Lembo et al., 2022)<br>
+• W3C defines a standard lossless OWL 2 → RDF graph encoding (2012)
+</div>
+
+<div class="card" style="border-left:3px solid var(--green);margin:20px 0">
+<div style="font-size:0.85rem;font-weight:600;color:var(--fg);margin-bottom:10px">The Formal Relationship</div>
+<div style="font-size:0.82rem;color:var(--fg-soft);line-height:1.7;margin-bottom:12px">
+Gruber (1993) defines an ontology as <strong>O = (Σ, Ax)</strong> — a signature Σ = (C, R, I) of classes, roles, and individuals, plus axioms Ax constraining their relationships.<br><br>
+Lembo et al. (2022) prove that the graphical language Graphol — whose constructs map to labeled graph elements — is <strong>equivalent to OWL 2 / SROIQ(D)</strong>:
+</div>
+<pre style="font-size:0.78rem;margin:0 0 12px;border:none;padding:10px">
+Theorem 1 (Graph → OWL 2):
+  ∀ graph ontology G satisfying the structural proviso,
+  Ψ(G) produces an OWL 2 TBox. Linear time.
+
+Theorem 2 (OWL 2 → Graph):
+  ∀ OWL 2 TBox T,
+  Λ⁻¹(T) produces a graph ontology. Linear time.
+
+  Ψ and Λ⁻¹ are mutual inverses.
+  The representations are formally interchangeable.</pre>
+<div style="font-size:0.78rem;color:var(--fg-muted)">
+The W3C OWL 2 Mapping to RDF Graphs (2012) independently defines a standard, lossless encoding of any OWL 2 ontology as a graph — the same equivalence, codified as a web standard.
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border-light);border-radius:var(--radius);overflow:hidden;margin:20px 0">
+  <div style="background:var(--bg-card);padding:20px 24px">
+    <div style="font-size:0.7rem;font-weight:600;color:var(--fg-muted);letter-spacing:0.04em;margin-bottom:8px">CLASSICAL ONTOLOGY (OWL)</div>
+    <pre style="margin:0;font-size:0.75rem;border:none;padding:6px">
+Supplier ⊑ ∃supplies.Material
+Alert ⊑ ∃scored_by.Decision
+Campaign ⊑ ≥2 member_of.Alert
+
+# Expert-authored axioms
+# Static — revised manually
+# Description logic notation</pre>
+  </div>
+  <div style="background:var(--bg-card);padding:20px 24px">
+    <div style="font-size:0.7rem;font-weight:600;color:var(--green);letter-spacing:0.04em;margin-bottom:8px">EQUIVALENT GRAPH (UCL)</div>
+    <pre style="margin:0;font-size:0.75rem;border:none;padding:6px">
+(Supplier)-[:SUPPLIES]->(Material)
+(Alert)-[:SCORED_BY]->(Decision)
+(Campaign)-[:MEMBER_OF]-(Alert)  min:2
+
+# Same formal content, graph notation
+# Schema stable, quantitative layer learns
+# PostgreSQL + AGE — traversable</pre>
+  </div>
+</div>
+
+<div class="card" style="border-left:3px solid var(--amber);margin:20px 0">
+<div style="font-size:0.85rem;font-weight:600;color:var(--fg);margin-bottom:10px">What RGI Adds Beyond Classical Ontology</div>
+<div style="font-size:0.82rem;color:var(--fg-soft);line-height:1.7">
+Classical ontologies are static and expert-authored. RGI adds a <strong>learned quantitative layer</strong> on the ontological schema:
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:12px 0">
+  <div style="background:var(--bg-alt);border-radius:8px;padding:12px">
+    <div style="font-size:0.7rem;font-weight:600;color:var(--green);margin-bottom:4px">CENTROIDS μ</div>
+    <div style="font-size:0.75rem;color:var(--fg-soft)">Statistical prototypes compiled from verified outcomes — closer to probabilistic DLs (Lukasiewicz & Straccia, 2008) than classical OWL</div>
+  </div>
+  <div style="background:var(--bg-alt);border-radius:8px;padding:12px">
+    <div style="font-size:0.7rem;font-weight:600;color:var(--green);margin-bottom:4px">KERNEL WEIGHTS W</div>
+    <div style="font-size:0.75rem;color:var(--fg-soft)">W = diag(1/σ²) — per-deployment precision encoding which ontological dimensions carry signal vs noise</div>
+  </div>
+  <div style="background:var(--bg-alt);border-radius:8px;padding:12px">
+    <div style="font-size:0.7rem;font-weight:600;color:var(--green);margin-bottom:4px">WRITE-BACK</div>
+    <div style="font-size:0.75rem;color:var(--fg-soft)">[:TRIGGERED_EVOLUTION] edges update centroids from verified decisions — the ontology schema is stable; the quantitative layer evolves</div>
+  </div>
+</div>
+<div style="font-size:0.82rem;color:var(--fg);font-weight:600;margin-top:8px">
+Ontology-grounded learning graph. Not "data context."
+</div>
+</div>
+
+<p class="source">Gruber 1993 · Lembo et al. 2022, Future Internet 14(3):78 · W3C OWL 2 Mapping to RDF 2012 · Lukasiewicz & Straccia 2008, J. Web Semantics 6(4)</p>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- §9: WHY GROUNDED CONTEXT ISN'T ENOUGH                     -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>Why Grounded Context Isn't Enough</h2>
+
+<div style="font-size:0.88rem;color:var(--fg-soft);line-height:1.7">
+• Ontology excels at grounding: validated definitions, reconciled schemas, certified provenance<br>
+• But grounded context doesn't learn which sources matter for which decisions<br>
+• RGI adaptive enrichment: learns <em>which</em> context matters for <em>which</em> decision category
+</div>
+
+<div class="card" style="border-left:3px solid var(--green)">
+<div style="font-size:0.85rem;font-weight:600;color:var(--fg);margin-bottom:10px">DiagonalKernel: Per-Factor Weight Learning</div>
+<pre style="font-size:0.78rem">
+# Each copilot has a tensor of decision cells
+# SOC: (6,4,6) = 144 cells    Trading: (5,3,6) = 90 cells
+# S2P: (5,5,7) = 175 cells    DataOps: (6,5,6) = 180 cells
+
+# DiagonalKernel learns σ_i per factor dimension
+# High σ → factor matters less (wide kernel, smooth)
+# Low σ → factor matters more (narrow kernel, sharp)
+
+#  σ-diagnostic: 93.6% prevalence of heterogeneous σ
+# → uniform weighting is wrong 93.6% of the time
+# → grounded context alone misses this
+
+# Adaptive enrichment result:
+# +6.5–6.8pp accuracy with FEWER context reads
+# The system learns to ignore irrelevant sources
+</pre>
+</div>
+
+<div class="chart-box">
+  <div class="chart-title">Enrichment Strategy Comparison</div>
+  <svg viewBox="0 0 700 180" style="width:100%;max-width:700px;height:auto">
+    <text x="115" y="40" font-size="11" fill="#44515C" text-anchor="end" font-family="Inter,sans-serif" font-weight="500">Uniform</text>
+    <text x="115" y="52" font-size="8" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">(ontology default)</text>
+    <rect x="120" y="30" width="280" height="24" rx="4" fill="#9CA3AF" opacity="0.3"/>
+    <text x="410" y="47" font-size="10" fill="#6B7883" font-family="Inter,sans-serif" font-weight="500">baseline accuracy</text>
+
+    <text x="115" y="95" font-size="11" fill="#44515C" text-anchor="end" font-family="Inter,sans-serif" font-weight="500">Adaptive</text>
+    <text x="115" y="107" font-size="8" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">(RGI enrichment)</text>
+    <rect x="120" y="85" width="326" height="24" rx="4" fill="#0C8367"/>
+    <text x="456" y="102" font-size="10" fill="#0C8367" font-family="Inter,sans-serif" font-weight="600">+6.5–6.8pp, fewer reads</text>
+
+    <line x1="400" y1="54" x2="400" y2="85" stroke="#C43C4E" stroke-width="1" stroke-dasharray="3,2"/>
+    <line x1="446" y1="54" x2="446" y2="85" stroke="#0C8367" stroke-width="1" stroke-dasharray="3,2"/>
+
+    <text x="350" y="145" text-anchor="middle" font-size="9" fill="#6B7883" font-family="Inter,sans-serif">~194 controlled experiments · Simulation results · No production customers</text>
+  </svg>
+</div>
+
+<!-- Netflix Flywheel vs RGI graphic -->
+<div class="card" style="padding:12px;margin-bottom:24px">
+  <div style="font-size:0.75rem;font-weight:600;color:var(--fg-muted);margin-bottom:6px">NETFLIX KNOWLEDGE FLYWHEEL vs RGI IMPROVEMENT ENGINE</div>
+  <img src="img_onto_09_4acc8c93.jpg" style="width:100%;border-radius:6px" alt="Netflix Knowledge Flywheel (Read) vs RGI Improvement Engine (Compute) — structural gap">
+  <div style="font-size:0.72rem;color:var(--fg-muted);margin-top:6px">Netflix built the most advanced deployed ontology. Here's what it does — and what it structurally cannot. Read vs Compute.</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- §10: RGI CAN ALSO DO WHAT ONTOLOGY DOES                   -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>RGI Can Also Do What Ontology Does</h2>
+
+<div style="font-size:0.88rem;margin-bottom:16px;color:var(--fg-soft);line-height:1.7">
+• Ontology's core job (grounded context + NL questions + provenance) → subset of RGI UCL<br>
+• UCL graph holds the same metadata, definitions, relationships<br>
+• Difference: RGI's context is <em>learned</em>, not just discovered
+</div>
+
+<div class="card" style="border-top:3px solid var(--green)">
+<div style="font-size:0.7rem;font-weight:600;color:var(--green);margin-bottom:4px">RGI — ANSWERING A DATA QUESTION (ontology's job, plus learning)</div>
+<div style="font-size:0.65rem;font-weight:500;color:var(--fg-muted);margin-bottom:8px">CI Platform API — internal, not public SDK. Public SDK covers scoring + conservation + judgment via <code>gae</code>.</div>
+<pre style="font-size:0.76rem;margin:0">
+# The UCL graph already has source metadata
+sources = store.query("""
+    MATCH (s:DataSource)-[:HAS_COLUMN]->(c:Column)
+    WHERE c.name = 'revenue'
+    RETURN s.name, c.certified_definition, c.lineage
+""")
+# → [("snowflake_finance", "Net revenue after returns", "ERP.GL → ETL → finance.revenue")]
+
+# CI Platform API: source trust profile
+profile = scorer.source_profile("snowflake_finance")
+# → SourceProfile(dk_trust=0.89, verified_decisions=3400, iks=72)
+
+# CI Platform API: per-factor importance for this decision category
+sigma = scorer.get_sigma("revenue_forecast", "snowflake_finance")
+# → 0.12 (tight kernel = high importance)
+# vs Celonis timing source: σ=0.37 (wide = low importance)
+
+# When the agent asks "What was Q3 revenue by region?"
+# RGI answers with:
+# 1. The number ($12.3M) — same as ontology
+# 2. Source trust (IKS 72, GREEN, 3400 verified)
+# 3. Which sources were weighted how (σ per source)
+# 4. Confidence from scored centroids (0.89)
+# 5. Conservation status of the answer (gate met)
+</pre>
+</div>
+
+<div style="font-size:0.85rem;margin-top:12px;color:var(--fg-soft);line-height:1.7">
+• Ontology: validates against <em>certified definitions</em> (what a human wrote)<br>
+• RGI: validates against <em>verified outcomes</em> (what actually happened)<br>
+• RGI does both — and learns from the gap between them
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- §11: THE REAL QUESTION (conclusion)                        -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>The Real Question</h2>
+
+<div style="background:var(--bg-card);border:2px solid var(--green);border-radius:var(--radius);padding:24px 28px;margin:16px 0">
+  <p style="font-size:1rem;font-weight:600;color:var(--fg);margin:0 0 12px;line-height:1.4">Ontology answers: "What was Q3 revenue?"<br>RGI answers: "Should we approve this invoice — and was the last approval right?"<br>RGI also answers: "What was Q3 revenue?" — with trust scores, source weights, and conservation status.</p>
+  <div style="font-size:0.88rem;color:var(--fg-soft);margin:0 0 12px;line-height:1.7">
+  • One gives agents correct data<br>
+  • The other gives agents compounding judgment — and can also give them correct data<br>
+  • Ontology layer = necessary infrastructure (like a database schema)<br>
+  • No one ships a database schema as a product — the product is what you compute on top of it
+  </div>
+  <div style="font-size:0.88rem;color:var(--fg-soft);margin:0;line-height:1.7">
+  <strong style="color:var(--fg)">RGI computes on top of it:</strong><br>
+  • Conservation-bounded scoring · cross-graph attention · adaptive enrichment<br>
+  • Situation analysis · process-tech fusion<br>
+  • Three unlocked systems on the context graph that ontology helps build<br>
+  • Ontology = the foundation. RGI = the building — includes the foundation.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="footer">
+  <p><strong>RGI</strong> — Recursive Graph Improvement · <a href="https://rgi.dakshineshwari.net" style="color:var(--accent);text-decoration:none">rgi.dakshineshwari.net</a> · pip install graph-attention-engine (Apache 2.0)</p>
+  <p><strong>Netflix Observability Ontology</strong> — QCon London 2026, "The ontology is the contract between chaos and understanding." 12 operational namespaces, Knowledge Flywheel.</p>
+  <p><strong>Palantir AIP</strong> — <a href="https://www.palantir.com/platforms/aip/" style="color:var(--accent);text-decoration:none">palantir.com/platforms/aip</a></p>
+  <p><strong>NVIDIA auto-ontology</strong> — <a href="https://github.com/NVIDIA/auto-ontology" style="color:var(--accent);text-decoration:none">github.com/NVIDIA/auto-ontology</a> · Apache 2.0</p>
+  <p><strong>Databricks Unity Catalog</strong> — <a href="https://www.databricks.com/product/unity-catalog" style="color:var(--accent);text-decoration:none">databricks.com/product/unity-catalog</a></p>
+  <p style="margin-top:12px">Simulation results · No production customers · Modeled figures labeled · All experiment results from controlled experiments with confidence intervals</p>
+</div>
+
+</div>
