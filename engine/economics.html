@@ -1,0 +1,532 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>RGI Economic Model</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root {
+  --bg: #FAFAF8; --bg-card: #FFFFFF; --bg-alt: #F3F1EC;
+  --fg: #1C2126; --fg-soft: #44515C; --fg-muted: #6B7883;
+  --accent: #1E6FB8; --green: #0C8367; --red: #C43C4E;
+  --amber: #b7791f; --purple: #7C3AED;
+  --border: #E7E1D2; --border-light: #F0EDE6;
+  --radius: 10px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141618; --bg-card: #1C1F22; --bg-alt: #22262A;
+  --fg: #E8E4DC; --fg-soft: #B0A99E; --fg-muted: #7A7570;
+  --accent: #5BA3E0; --green: #34D399; --red: #F87171;
+  --amber: #FBBF24; --purple: #A78BFA;
+  --border: #333; --border-light: #2A2A2A;
+  color-scheme: dark;
+}}
+:root[data-theme="dark"] {
+  --bg: #141618; --bg-card: #1C1F22; --bg-alt: #22262A;
+  --fg: #E8E4DC; --fg-soft: #B0A99E; --fg-muted: #7A7570;
+  --accent: #5BA3E0; --green: #34D399; --red: #F87171;
+  --amber: #FBBF24; --purple: #A78BFA;
+  --border: #333; --border-light: #2A2A2A;
+  color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6; margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+}
+.wrap { max-width: 960px; margin: 0 auto; padding: 40px 0 60px; }
+h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 4px; color: var(--fg); text-wrap: balance; }
+.subtitle { font-size: 0.95rem; color: var(--fg-muted); margin-bottom: 32px; }
+h2 { font-size: 1.25rem; font-weight: 600; color: var(--fg); margin: 40px 0 16px;
+  padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+h3 { font-size: 1rem; font-weight: 600; color: var(--fg-soft); margin: 24px 0 12px; }
+.label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--fg-muted); margin-bottom: 4px; }
+p, li { color: var(--fg-soft); font-size: 0.9rem; }
+.card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius);
+  padding: 20px 24px; margin-bottom: 16px; }
+.card-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.card-row .card { flex: 1; min-width: 200px; }
+.stat { font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
+.stat-label { font-size: 0.75rem; color: var(--fg-muted); margin-top: 2px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0; }
+th { background: var(--bg-alt); font-weight: 600; text-align: left; padding: 8px 12px;
+  color: var(--fg); border-bottom: 2px solid var(--border); font-size: 0.8rem; }
+td { padding: 8px 12px; border-bottom: 1px solid var(--border-light); color: var(--fg-soft); }
+tr:last-child td { border-bottom: none; }
+.highlight { color: var(--green); font-weight: 600; }
+.accent { color: var(--accent); font-weight: 600; }
+.chart-box { margin: 16px 0; background: var(--bg-card); border-radius: var(--radius);
+  border: 1px solid var(--border-light); padding: 20px; overflow-x: auto; }
+.chart-title { font-size: 0.85rem; font-weight: 600; color: var(--fg); margin-bottom: 12px; }
+.scenario-tabs { display: flex; gap: 0; margin: 16px 0; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--border); }
+.scenario-tab { flex: 1; padding: 10px 8px; text-align: center; font-size: 0.8rem; font-weight: 600;
+  cursor: pointer; background: var(--bg-card); color: var(--fg-muted); border: none;
+  border-right: 1px solid var(--border); transition: all 0.2s; }
+.scenario-tab:last-child { border-right: none; }
+.scenario-tab.active { background: var(--accent); color: #fff; }
+.scenario-detail { display: none; }
+.scenario-detail.active { display: block; }
+.source { font-size: 0.75rem; color: var(--fg-muted); font-style: italic; margin-top: 8px; }
+.guardrail { background: var(--bg-alt); border-left: 3px solid var(--amber);
+  padding: 10px 16px; border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 0.8rem; color: var(--fg-muted); margin: 20px 0; }
+.footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);
+  font-size: 0.8rem; color: var(--fg-muted); }
+.mono { font-family: 'JetBrains Mono', monospace; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; font-size: 0.75rem; color: var(--fg-muted); }
+.legend-item { display: flex; align-items: center; gap: 4px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+@media (max-width: 600px) {
+  .card-row { flex-direction: column; }
+  .scenario-tabs { flex-wrap: wrap; }
+  .scenario-tab { flex: 1 1 45%; }
+  h1 { font-size: 1.4rem; }
+  .stat { font-size: 1.3rem; }
+}
+</style>
+
+<div class="wrap">
+
+<h1>RGI Economic Model</h1>
+<p class="subtitle">Five verticals · Sourced market data · Four funding scenarios · November 2026</p>
+
+
+<div class="card" style="margin-bottom:24px">
+<p style="margin:0;font-size:0.9rem;color:var(--fg)">RGI (Recursive Graph Improvement) is a decision intelligence platform with five agentic AI copilots across source-to-pay procurement, security operations, data pipeline intelligence, trading, and restaurant purchasing. The platform improves every decision, the system that makes it, and the enterprise systems it targets — three improvement surfaces compounding on a single decision graph. This page models the market opportunity, unit economics, and revenue trajectories across four funding scenarios. All projections are <strong>illustrative</strong>. Simulation results labeled <strong>(simulated)</strong>. No production customers. Seeking design partners.</p>
+</div>
+
+<!-- ============ SECTION 1: MARKET OPPORTUNITY ============ -->
+<h2>§1 — Market Opportunity</h2>
+<p class="label">Total Addressable Market by Vertical (2026)</p>
+
+<div class="chart-box">
+  <div class="chart-title">TAM by Vertical — $31.4B Total (2026)</div>
+  <svg viewBox="0 0 700 220" style="width:100%;max-width:700px;height:auto">
+    <!-- Grid lines -->
+    <line x1="200" y1="10" x2="200" y2="210" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="320" y1="10" x2="320" y2="210" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="440" y1="10" x2="440" y2="210" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="560" y1="10" x2="560" y2="210" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="680" y1="10" x2="680" y2="210" stroke="#E7E1D2" stroke-width="0.5"/>
+    <!-- Axis labels -->
+    <text x="200" y="225" font-size="10" fill="#6B7883" text-anchor="middle" font-family="Inter,sans-serif">$2B</text>
+    <text x="320" y="225" font-size="10" fill="#6B7883" text-anchor="middle" font-family="Inter,sans-serif">$5B</text>
+    <text x="440" y="225" font-size="10" fill="#6B7883" text-anchor="middle" font-family="Inter,sans-serif">$8B</text>
+    <text x="560" y="225" font-size="10" fill="#6B7883" text-anchor="middle" font-family="Inter,sans-serif">$11B</text>
+    <text x="680" y="225" font-size="10" fill="#6B7883" text-anchor="middle" font-family="Inter,sans-serif">$14B</text>
+    <!-- Bars: scale 0-14B, 480px wide (200-680), so 1B = 34.3px -->
+    <!-- SOC $13.0B (wide enough for label inside) -->
+    <text x="190" y="32" font-size="11" fill="#44515C" text-anchor="end" font-family="Inter,sans-serif" font-weight="500">SOC</text>
+    <rect x="200" y="18" width="446" height="28" rx="4" fill="#C43C4E"/>
+    <text x="638" y="37" font-size="11" fill="#fff" text-anchor="end" font-family="Inter,sans-serif" font-weight="600">$13.0B</text>
+    <!-- S2P $7.0B (wide enough for label inside) -->
+    <text x="190" y="72" font-size="11" fill="#44515C" text-anchor="end" font-family="Inter,sans-serif" font-weight="500">S2P</text>
+    <rect x="200" y="58" width="240" height="28" rx="4" fill="#b7791f"/>
+    <text x="432" y="77" font-size="11" fill="#fff" text-anchor="end" font-family="Inter,sans-serif" font-weight="600">$7.0B</text>
+    <!-- Restaurant $5.3B (label outside right) -->
+    <text x="190" y="112" font-size="11" fill="#44515C" text-anchor="end" font-family="Inter,sans-serif" font-weight="500">Restaurant</text>
+    <rect x="200" y="98" width="182" height="28" rx="4" fill="#0C8367"/>
+    <text x="390" y="117" font-size="11" fill="#0C8367" text-anchor="start" font-family="Inter,sans-serif" font-weight="600">$5.3B</text>
+    <!-- DataOps $3.1B (label outside right) -->
+    <text x="190" y="152" font-size="11" fill="#44515C" text-anchor="end" font-family="Inter,sans-serif" font-weight="500">DataOps</text>
+    <rect x="200" y="138" width="106" height="28" rx="4" fill="#7C3AED"/>
+    <text x="314" y="157" font-size="11" fill="#7C3AED" text-anchor="start" font-family="Inter,sans-serif" font-weight="600">$3.1B</text>
+    <!-- Trading $3.0B (label outside right) -->
+    <text x="190" y="192" font-size="11" fill="#44515C" text-anchor="end" font-family="Inter,sans-serif" font-weight="500">Trading</text>
+    <rect x="200" y="178" width="103" height="28" rx="4" fill="#1E6FB8"/>
+    <text x="311" y="197" font-size="11" fill="#1E6FB8" text-anchor="start" font-family="Inter,sans-serif" font-weight="600">$3.0B</text>
+  </svg>
+</div>
+
+<table>
+  <tr><th>Vertical</th><th>Market Segment</th><th>2026 Size</th><th>CAGR</th><th>Source</th></tr>
+  <tr><td><strong style="color:var(--amber)">S2P / Procurement</strong></td><td>Source-to-pay + AP automation</td><td class="highlight">$7.0B</td><td>10.8–21.6%</td><td>Business Research Co. / SkyQuest</td></tr>
+  <tr><td><strong style="color:var(--red)">SOC / Security Ops</strong></td><td>SIEM + SOAR</td><td class="highlight">$13.0B</td><td>10.9–12.2%</td><td>Mordor Intelligence / FMI</td></tr>
+  <tr><td><strong style="color:var(--purple)">DataOps</strong></td><td>Data observability + pipeline intel</td><td class="highlight">$3.1B</td><td>12.4%</td><td>Fortune Business Insights</td></tr>
+  <tr><td><strong style="color:var(--accent)">Trading</strong></td><td>Execution management systems</td><td class="highlight">$3.0B</td><td>8.2–15.4%</td><td>Business Research Co.</td></tr>
+  <tr><td><strong style="color:var(--green)">Restaurant</strong></td><td>Inventory mgmt & purchasing software</td><td class="highlight">$5.3B</td><td>15.8%</td><td>360iResearch / GlobeNewsWire</td></tr>
+</table>
+
+<div class="card-row">
+  <div class="card">
+    <p class="label">TAM</p>
+    <div class="stat" style="color:var(--accent)">$31.4B</div>
+    <p class="stat-label">Sum of five vertical markets (2026)</p>
+  </div>
+  <div class="card">
+    <p class="label">SAM</p>
+    <div class="stat" style="color:var(--green)">$6.2B</div>
+    <p class="stat-label">~20% — enterprises with complex decision workflows</p>
+  </div>
+  <div class="card">
+    <p class="label">SOM (Year 5)</p>
+    <div class="stat" style="color:var(--amber)">$120M</div>
+    <p class="stat-label">150 enterprise + 80 restaurant operators</p>
+  </div>
+</div>
+
+<p class="source">SAM filter: enterprises >10K employees (~15,000 globally, Forbes Global 2000 + next tier) + multi-unit restaurant operators (>5 locations, ~200K in US). SOM assumes Series A funding path.</p>
+
+<!-- ============ SECTION 2: VALUE PER CUSTOMER ============ -->
+<h2>§2 — Value Created Per Customer</h2>
+
+<div class="chart-box">
+  <div class="chart-title">Value Created vs ACV — All Five Copilots (illustrative, $K/yr)</div>
+  <svg viewBox="0 0 700 280" style="width:100%;max-width:700px;height:auto">
+    <!-- Y axis grid -->
+    <line x1="80" y1="240" x2="680" y2="240" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="80" y1="180" x2="680" y2="180" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="80" y1="120" x2="680" y2="120" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="80" y1="60" x2="680" y2="60" stroke="#E7E1D2" stroke-width="0.5"/>
+    <!-- Y labels (0-4000K, 240px = 4000, 1K = 0.06px) -->
+    <text x="75" y="244" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">$0</text>
+    <text x="75" y="184" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">$1,000K</text>
+    <text x="75" y="124" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">$2,000K</text>
+    <text x="75" y="64" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">$3,000K</text>
+    <!-- Scale: 0 at y=240, 4000 at y=0. Each 1K = 0.06*240/4000... simpler: y = 240 - (val/4000)*240 -->
+    <!-- S2P: value 680, ACV 185 -->
+    <rect x="110" y="199" width="36" height="41" rx="3" fill="#1E6FB8" opacity="0.2" stroke="#1E6FB8" stroke-width="1.5"/>
+    <rect x="150" y="229" width="36" height="11" rx="3" fill="#0C8367"/>
+    <text x="148" y="260" font-size="10" fill="#44515C" text-anchor="middle" font-family="Inter,sans-serif" font-weight="500">S2P</text>
+    <!-- SOC: value 1200, ACV 330 -->
+    <rect x="230" y="168" width="36" height="72" rx="3" fill="#1E6FB8" opacity="0.2" stroke="#1E6FB8" stroke-width="1.5"/>
+    <rect x="270" y="220" width="36" height="20" rx="3" fill="#0C8367"/>
+    <text x="268" y="260" font-size="10" fill="#44515C" text-anchor="middle" font-family="Inter,sans-serif" font-weight="500">SOC</text>
+    <!-- DataOps: value 1620, ACV 450 -->
+    <rect x="350" y="143" width="36" height="97" rx="3" fill="#1E6FB8" opacity="0.2" stroke="#1E6FB8" stroke-width="1.5"/>
+    <rect x="390" y="213" width="36" height="27" rx="3" fill="#0C8367"/>
+    <text x="388" y="260" font-size="10" fill="#44515C" text-anchor="middle" font-family="Inter,sans-serif" font-weight="500">DataOps</text>
+    <!-- Trading: value 3500, ACV 750 -->
+    <rect x="470" y="30" width="36" height="210" rx="3" fill="#1E6FB8" opacity="0.2" stroke="#1E6FB8" stroke-width="1.5"/>
+    <rect x="510" y="195" width="36" height="45" rx="3" fill="#0C8367"/>
+    <text x="508" y="260" font-size="10" fill="#44515C" text-anchor="middle" font-family="Inter,sans-serif" font-weight="500">Trading</text>
+    <!-- Restaurant: value 2600, ACV 650 -->
+    <rect x="590" y="84" width="36" height="156" rx="3" fill="#1E6FB8" opacity="0.2" stroke="#1E6FB8" stroke-width="1.5"/>
+    <rect x="630" y="201" width="36" height="39" rx="3" fill="#0C8367"/>
+    <text x="628" y="260" font-size="10" fill="#44515C" text-anchor="middle" font-family="Inter,sans-serif" font-weight="500">Restaurant</text>
+  </svg>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#1E6FB8;opacity:0.3;border:1.5px solid #1E6FB8"></span> Value Created</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#0C8367"></span> ACV Target</span>
+  </div>
+</div>
+
+<table>
+  <tr><th>Copilot</th><th>Value / Year</th><th>Basis (simulated)</th><th>ACV (25-30%)</th></tr>
+  <tr><td><strong style="color:var(--amber)">S2P</strong></td><td class="highlight">$680K</td><td>+15pp touchless AP × avg enterprise invoice volume</td><td>$170–200K</td></tr>
+  <tr><td><strong style="color:var(--red)">SOC</strong></td><td class="highlight">$1.2M</td><td>−50% MTTR × SOC analyst cost ($95K avg, SANS) × alert volume</td><td>$300–360K</td></tr>
+  <tr><td><strong style="color:var(--purple)">DataOps</strong></td><td class="highlight">$1.62M</td><td>12× faster root cause × analyst cost × incident volume</td><td>$400–500K</td></tr>
+  <tr><td><strong style="color:var(--accent)">Trading</strong></td><td class="highlight">$2–5M</td><td>4× Sharpe on execution quality (simulation vs historical)</td><td>$500K–1M</td></tr>
+  <tr><td><strong style="color:var(--green)">Restaurant</strong></td><td class="highlight">$1.2–4M</td><td>2-4pp food cost reduction × 20 locations × $3-5M rev/location</td><td>$300K–1M</td></tr>
+</table>
+
+<p class="source">Restaurant value shown for a 20-location multi-unit operator. Per-location: $60–200K value, $15–50K ACV. All value figures are illustrative, derived from simulation results.</p>
+
+<!-- ============ SECTION 3: UNIT ECONOMICS ============ -->
+<h2>§3 — Unit Economics</h2>
+
+<div class="card-row">
+  <div class="card"><p class="label">Blended ACV</p><div class="stat" style="color:var(--accent)">$500K</div><p class="stat-label">Weighted average across copilots, Year 1 land</p></div>
+  <div class="card"><p class="label">Net Revenue Retention</p><div class="stat" style="color:var(--green)">150%</div><p class="stat-label">Target — cross-copilot expansion (land S2P → add DataOps)</p></div>
+  <div class="card"><p class="label">Gross Margin</p><div class="stat" style="color:var(--accent)">85%</div><p class="stat-label">Target — software + graph compute</p></div>
+  <div class="card"><p class="label">Target LTV/CAC</p><div class="stat" style="color:var(--green)">5×+</div><p class="stat-label">At $500K ACV, $75K blended CAC</p></div>
+</div>
+
+<h3>Expansion Model</h3>
+<table>
+  <tr><th>Quarter</th><th>Motion</th><th>ACV Impact</th></tr>
+  <tr><td>Q0</td><td>Land: single copilot (S2P or Restaurant)</td><td>$200–500K</td></tr>
+  <tr><td>Q3–Q4</td><td>Expand: second copilot (DataOps or SOC)</td><td>+$300–500K</td></tr>
+  <tr><td>Q6–Q8</td><td>Platform: third copilot + cross-domain transfer</td><td>+$300–500K</td></tr>
+  <tr><td>Q8+</td><td>Full platform: judgment memory across domains</td><td>$1M+ total ACV</td></tr>
+</table>
+
+<p class="source">Expansion thesis: once the context graph has verified outcomes in one domain, cross-domain transfer (procurement → security, demonstrated in simulation) makes the second copilot faster to value. NRR >150% is the structural target.</p>
+
+<!-- ============ SECTION 4: FUNDING SCENARIOS ============ -->
+<h2>§4 — Funding Scenarios</h2>
+
+<div class="scenario-tabs">
+  <button class="scenario-tab active" onclick="showScenario(0)">Bootstrap<br><span class="mono" style="font-size:0.75rem">$0</span></button>
+  <button class="scenario-tab" onclick="showScenario(1)">Seed<br><span class="mono" style="font-size:0.75rem">$2–3M</span></button>
+  <button class="scenario-tab" onclick="showScenario(2)">Series A<br><span class="mono" style="font-size:0.75rem">$8–12M</span></button>
+  <button class="scenario-tab" onclick="showScenario(3)">Growth<br><span class="mono" style="font-size:0.75rem">$20–30M</span></button>
+</div>
+
+<div class="scenario-detail active" id="scenario-0">
+  <div class="card">
+    <h3 style="margin-top:0">Bootstrap — $0 Raised</h3>
+    <div class="card-row" style="margin-bottom:16px">
+      <div class="card" style="background:var(--bg-alt)"><p class="label">Team</p><div class="stat" style="font-size:1.2rem">1</div><p class="stat-label">Founder + AI tooling</p></div>
+      <div class="card" style="background:var(--bg-alt)"><p class="label">Burn</p><div class="stat" style="font-size:1.2rem">$0</div><p class="stat-label">Sweat equity</p></div>
+      <div class="card" style="background:var(--bg-alt)"><p class="label">Y2 ARR</p><div class="stat" style="font-size:1.2rem">$200K</div><p class="stat-label">2–3 design partners</p></div>
+    </div>
+    <table>
+      <tr><th>Timeline</th><th>Milestone</th><th>Customers</th><th>ARR</th></tr>
+      <tr><td>M0–6</td><td>First design partner (S2P or Restaurant)</td><td>1</td><td>$0 (free pilot)</td></tr>
+      <tr><td>M6–12</td><td>Convert pilot to paid, add 1–2 more</td><td>2–3</td><td>$100K</td></tr>
+      <tr><td>M12–24</td><td>Prove PMF, build case studies</td><td>3–5</td><td>$200–400K</td></tr>
+    </table>
+    <p style="font-size:0.85rem;color:var(--fg-muted)"><strong>Unlock:</strong> Product-market fit signal. Proof points for seed raise. Slow but capital-efficient.</p>
+    <p style="font-size:0.85rem;color:var(--fg-muted)"><strong>Risk:</strong> Founder bandwidth — product + sales + support on one person. Can't pursue enterprise deals that need team credibility.</p>
+  </div>
+</div>
+
+<div class="scenario-detail" id="scenario-1">
+  <div class="card">
+    <h3 style="margin-top:0">Seed — $2–3M Raised</h3>
+    <div class="card-row" style="margin-bottom:16px">
+      <div class="card" style="background:var(--bg-alt)"><p class="label">Team</p><div class="stat" style="font-size:1.2rem">5</div><p class="stat-label">2 eng, 1 sales, 1 CS, founder</p></div>
+      <div class="card" style="background:var(--bg-alt)"><p class="label">Burn</p><div class="stat" style="font-size:1.2rem">$120K/mo</div><p class="stat-label">18–24 month runway</p></div>
+      <div class="card" style="background:var(--bg-alt)"><p class="label">Y3 ARR</p><div class="stat" style="font-size:1.2rem">$3–5M</div><p class="stat-label">10–15 customers</p></div>
+    </div>
+    <table>
+      <tr><th>Timeline</th><th>Milestone</th><th>Customers</th><th>ARR</th></tr>
+      <tr><td>M0–6</td><td>Close 3 design partners (S2P wedge + Restaurant)</td><td>3</td><td>$300K</td></tr>
+      <tr><td>M6–12</td><td>Convert to paid, start DataOps pilot</td><td>6–8</td><td>$1.5M</td></tr>
+      <tr><td>M12–18</td><td>Expansion deals + new logos, Sysco channel talks</td><td>10–12</td><td>$3M</td></tr>
+      <tr><td>M18–24</td><td>Series A position: 15 customers, 2 verticals, NRR data</td><td>15</td><td>$5M</td></tr>
+    </table>
+    <p style="font-size:0.85rem;color:var(--fg-muted)"><strong>Unlock:</strong> S2P + Restaurant wedge with real revenue. Sysco channel exploration. Series A readiness.</p>
+    <p style="font-size:0.85rem;color:var(--fg-muted)"><strong>Risk:</strong> Single-vertical dependency if Restaurant or S2P doesn't convert. Need expansion to show NRR for Series A story.</p>
+  </div>
+</div>
+
+<div class="scenario-detail" id="scenario-2">
+  <div class="card">
+    <h3 style="margin-top:0">Series A — $8–12M Raised</h3>
+    <div class="card-row" style="margin-bottom:16px">
+      <div class="card" style="background:var(--bg-alt)"><p class="label">Team</p><div class="stat" style="font-size:1.2rem">20</div><p class="stat-label">8 eng, 5 sales, 3 CS, 2 mkt, 2 G&A</p></div>
+      <div class="card" style="background:var(--bg-alt)"><p class="label">Burn</p><div class="stat" style="font-size:1.2rem">$350K/mo</div><p class="stat-label">24–30 month runway</p></div>
+      <div class="card" style="background:var(--bg-alt)"><p class="label">Y3 ARR</p><div class="stat" style="font-size:1.2rem">$15–25M</div><p class="stat-label">50+ customers</p></div>
+    </div>
+    <table>
+      <tr><th>Timeline</th><th>Milestone</th><th>Customers</th><th>ARR</th></tr>
+      <tr><td>M0–6</td><td>Scale S2P + Restaurant, launch DataOps GA</td><td>20</td><td>$5M</td></tr>
+      <tr><td>M6–12</td><td>SOC launch, first enterprise platform deals</td><td>30</td><td>$10M</td></tr>
+      <tr><td>M12–18</td><td>Cross-domain expansion, NRR >150%</td><td>40</td><td>$18M</td></tr>
+      <tr><td>M18–24</td><td>Series B position: 50+ customers, 4 verticals</td><td>50+</td><td>$25M</td></tr>
+    </table>
+    <p style="font-size:0.85rem;color:var(--fg-muted)"><strong>Unlock:</strong> Multi-vertical GTM. Enterprise sales motion. Platform positioning (not point solution). Sysco channel live.</p>
+    <p style="font-size:0.85rem;color:var(--fg-muted)"><strong>Risk:</strong> Execution across 4 verticals simultaneously. Enterprise sales cycles (6–12 months). Need strong VP Sales hire.</p>
+  </div>
+</div>
+
+<div class="scenario-detail" id="scenario-3">
+  <div class="card">
+    <h3 style="margin-top:0">Growth — $20–30M Raised</h3>
+    <div class="card-row" style="margin-bottom:16px">
+      <div class="card" style="background:var(--bg-alt)"><p class="label">Team</p><div class="stat" style="font-size:1.2rem">50</div><p class="stat-label">20 eng, 12 sales, 8 CS, 5 mkt, 5 G&A</p></div>
+      <div class="card" style="background:var(--bg-alt)"><p class="label">Burn</p><div class="stat" style="font-size:1.2rem">$800K/mo</div><p class="stat-label">24–36 month runway</p></div>
+      <div class="card" style="background:var(--bg-alt)"><p class="label">Y3 ARR</p><div class="stat" style="font-size:1.2rem">$50M+</div><p class="stat-label">150+ customers</p></div>
+    </div>
+    <table>
+      <tr><th>Timeline</th><th>Milestone</th><th>Customers</th><th>ARR</th></tr>
+      <tr><td>M0–6</td><td>Full GTM all 5 verticals, Sysco channel live</td><td>40</td><td>$12M</td></tr>
+      <tr><td>M6–12</td><td>International expansion, partner ecosystem</td><td>70</td><td>$25M</td></tr>
+      <tr><td>M12–18</td><td>Platform standard, industry analyst recognition</td><td>110</td><td>$40M</td></tr>
+      <tr><td>M18–24</td><td>Category leader, IPO/growth path</td><td>150+</td><td>$50M+</td></tr>
+    </table>
+    <p style="font-size:0.85rem;color:var(--fg-muted)"><strong>Unlock:</strong> Category definition. "Decision intelligence platform" as a market. International. Sysco + SAP/Celonis partnerships.</p>
+    <p style="font-size:0.85rem;color:var(--fg-muted)"><strong>Risk:</strong> Burn rate demands consistent execution. Competition from well-funded incumbents. Org scaling challenges.</p>
+  </div>
+</div>
+
+<!-- ============ SECTION 5: REVENUE PROJECTIONS ============ -->
+<h2>§5 — Revenue Projections by Scenario</h2>
+
+<div class="chart-box">
+  <div class="chart-title">ARR Projection by Funding Scenario ($M, illustrative)</div>
+  <svg viewBox="0 0 700 300" style="width:100%;max-width:700px;height:auto">
+    <!-- Grid -->
+    <line x1="80" y1="260" x2="660" y2="260" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="80" y1="195" x2="660" y2="195" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="80" y1="130" x2="660" y2="130" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="80" y1="65" x2="660" y2="65" stroke="#E7E1D2" stroke-width="0.5"/>
+    <!-- Y labels: 0-160M, 260-0 -->
+    <text x="75" y="264" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">$0</text>
+    <text x="75" y="199" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">$50M</text>
+    <text x="75" y="134" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">$100M</text>
+    <text x="75" y="69" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">$150M</text>
+    <!-- X labels -->
+    <text x="130" y="278" font-size="11" fill="#6B7883" text-anchor="middle" font-family="Inter,sans-serif">Y1</text>
+    <text x="260" y="278" font-size="11" fill="#6B7883" text-anchor="middle" font-family="Inter,sans-serif">Y2</text>
+    <text x="390" y="278" font-size="11" fill="#6B7883" text-anchor="middle" font-family="Inter,sans-serif">Y3</text>
+    <text x="520" y="278" font-size="11" fill="#6B7883" text-anchor="middle" font-family="Inter,sans-serif">Y4</text>
+    <text x="650" y="278" font-size="11" fill="#6B7883" text-anchor="middle" font-family="Inter,sans-serif">Y5</text>
+    <!-- Scale: y = 260 - (val/160)*195 -->
+    <!-- Bootstrap: 0, 0.2, 0.4, 0.8, 1.5 (barely visible at this scale) -->
+    <polyline points="130,260 260,260 390,259 520,259 650,258" fill="none" stroke="#6B7883" stroke-width="1.5" stroke-dasharray="5,4"/>
+    <text x="660" y="256" font-size="9" fill="#6B7883" font-family="Inter,sans-serif">$1.5M</text>
+    <!-- Seed: 0.3, 1.5, 5, 10, 18 -->
+    <polyline points="130,260 260,258 390,254 520,247 650,238" fill="none" stroke="#b7791f" stroke-width="2"/>
+    <circle cx="650" cy="238" r="3" fill="#b7791f"/>
+    <text x="660" y="235" font-size="9" fill="#b7791f" font-family="Inter,sans-serif">$18M</text>
+    <!-- Series A: 2, 10, 25, 45, 75 -->
+    <polyline points="130,258 260,248 390,230 520,205 650,169" fill="none" stroke="#1E6FB8" stroke-width="2.5"/>
+    <circle cx="650" cy="169" r="3" fill="#1E6FB8"/>
+    <text x="660" y="166" font-size="9" fill="#1E6FB8" font-family="Inter,sans-serif">$75M</text>
+    <!-- Growth: 5, 25, 50, 90, 150 -->
+    <polyline points="130,254 260,230 390,199 520,150 650,77" fill="none" stroke="#0C8367" stroke-width="3"/>
+    <circle cx="650" cy="77" r="3.5" fill="#0C8367"/>
+    <text x="660" y="74" font-size="9" fill="#0C8367" font-family="Inter,sans-serif" font-weight="600">$150M</text>
+  </svg>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#6B7883"></span> Bootstrap ($0)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#b7791f"></span> Seed ($2–3M)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#1E6FB8"></span> Series A ($8–12M)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#0C8367"></span> Growth ($20–30M)</span>
+  </div>
+</div>
+
+<table>
+  <tr><th>Scenario</th><th>Y1 ARR</th><th>Y2 ARR</th><th>Y3 ARR</th><th>Y4 ARR</th><th>Y5 ARR</th></tr>
+  <tr><td>Bootstrap ($0)</td><td>$0</td><td>$200K</td><td>$400K</td><td>$800K</td><td>$1.5M</td></tr>
+  <tr><td>Seed ($2–3M)</td><td>$300K</td><td>$1.5M</td><td>$5M</td><td>$10M</td><td>$18M</td></tr>
+  <tr><td>Series A ($8–12M)</td><td>$2M</td><td>$10M</td><td>$25M</td><td>$45M</td><td>$75M</td></tr>
+  <tr><td>Growth ($20–30M)</td><td>$5M</td><td>$25M</td><td>$50M</td><td>$90M</td><td>$150M</td></tr>
+</table>
+
+<p class="source">All projections illustrative. Assumes 150% NRR from Year 2 onward (cross-copilot expansion). Restaurant operator ACV blended at $100K (20-location avg); enterprise ACV at $500K.</p>
+
+<!-- ============ SECTION 6: HEADCOUNT BUILD ============ -->
+<h2>§6 — Headcount by Scenario</h2>
+
+<div class="chart-box">
+  <div class="chart-title">Headcount by Scenario (Year 2)</div>
+  <svg viewBox="0 0 700 240" style="width:100%;max-width:700px;height:auto">
+    <!-- Y grid -->
+    <line x1="120" y1="200" x2="660" y2="200" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="120" y1="160" x2="660" y2="160" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="120" y1="120" x2="660" y2="120" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="120" y1="80" x2="660" y2="80" stroke="#E7E1D2" stroke-width="0.5"/>
+    <line x1="120" y1="40" x2="660" y2="40" stroke="#E7E1D2" stroke-width="0.5"/>
+    <!-- Y labels: 0-50, 200-0 -->
+    <text x="115" y="204" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">0</text>
+    <text x="115" y="164" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">10</text>
+    <text x="115" y="124" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">20</text>
+    <text x="115" y="84" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">30</text>
+    <text x="115" y="44" font-size="10" fill="#6B7883" text-anchor="end" font-family="Inter,sans-serif">40</text>
+    <!-- Scale: 1 person = 4px. y = 200 - val*4 -->
+    <!-- Bootstrap: 1 eng, 0 sales, 0 CS, 0 GA = 1 total -->
+    <rect x="170" y="196" width="60" height="4" rx="2" fill="#1E6FB8"/>
+    <text x="200" y="218" font-size="10" fill="#44515C" text-anchor="middle" font-family="Inter,sans-serif">Bootstrap</text>
+    <text x="200" y="192" font-size="10" fill="#1E6FB8" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600">1</text>
+    <!-- Seed: 2 eng, 1 sales, 1 CS, 1 GA = 5 total -->
+    <rect x="300" y="192" width="60" height="8" rx="2" fill="#1E6FB8"/>
+    <rect x="300" y="188" width="60" height="4" rx="2" fill="#0C8367"/>
+    <rect x="300" y="184" width="60" height="4" rx="2" fill="#b7791f"/>
+    <rect x="300" y="180" width="60" height="4" rx="2" fill="#7C3AED"/>
+    <text x="330" y="218" font-size="10" fill="#44515C" text-anchor="middle" font-family="Inter,sans-serif">Seed</text>
+    <text x="330" y="176" font-size="10" fill="#1E6FB8" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600">5</text>
+    <!-- Series A: 8 eng, 5 sales, 3 CS, 4 GA = 20 total -->
+    <rect x="430" y="168" width="60" height="32" rx="2" fill="#1E6FB8"/>
+    <rect x="430" y="148" width="60" height="20" rx="2" fill="#0C8367"/>
+    <rect x="430" y="136" width="60" height="12" rx="2" fill="#b7791f"/>
+    <rect x="430" y="120" width="60" height="16" rx="2" fill="#7C3AED"/>
+    <text x="460" y="218" font-size="10" fill="#44515C" text-anchor="middle" font-family="Inter,sans-serif">Series A</text>
+    <text x="460" y="116" font-size="10" fill="#1E6FB8" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600">20</text>
+    <!-- Growth: 20 eng, 12 sales, 8 CS, 10 GA = 50 total -->
+    <rect x="560" y="120" width="60" height="80" rx="2" fill="#1E6FB8"/>
+    <rect x="560" y="72" width="60" height="48" rx="2" fill="#0C8367"/>
+    <rect x="560" y="40" width="60" height="32" rx="2" fill="#b7791f"/>
+    <rect x="560" y="0" width="60" height="40" rx="2" fill="#7C3AED"/>
+    <text x="590" y="218" font-size="10" fill="#44515C" text-anchor="middle" font-family="Inter,sans-serif">Growth</text>
+    <text x="590" y="-4" font-size="10" fill="#1E6FB8" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600">50</text>
+  </svg>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#1E6FB8"></span> Engineering</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#0C8367"></span> Sales</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#b7791f"></span> Customer Success (CS)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#7C3AED"></span> Marketing + G&A (General & Admin)</span>
+  </div>
+</div>
+
+<h3>Headcount Assumptions</h3>
+<table>
+  <tr><th>Role</th><th>Avg Fully Loaded Cost</th><th>Rationale</th></tr>
+  <tr><td>Engineer</td><td>$200K/yr</td><td>Senior full-stack / ML. AI tooling (Codex, Claude) multiplies output 3–5×.</td></tr>
+  <tr><td>Sales (AE)</td><td>$250K/yr</td><td>Enterprise AE with OTE. $500K ACV = 2 AEs cover quota at $2M each.</td></tr>
+  <tr><td>Customer Success</td><td>$150K/yr</td><td>Technical CSM. 1 CSM per 8–10 accounts; drives expansion (NRR).</td></tr>
+  <tr><td>Marketing + G&A</td><td>$160K/yr</td><td>Product marketing, demand gen, finance, ops. Lean until Series A.</td></tr>
+</table>
+
+<h3>Key Insights</h3>
+<table>
+  <tr><th>Insight</th><th>Detail</th></tr>
+  <tr><td><strong>AI tooling = headcount leverage</strong></td><td>Codex + Claude Code handle ~60% of implementation. 8 engineers at Series A do the work of 20–25 without AI tooling. This is the moat on the cost side.</td></tr>
+  <tr><td><strong>Engineering-heavy until Series A</strong></td><td>40% eng at every stage. Product is the GTM engine — demos sell, not slide decks. Sales hires scale only after product-market fit is proven.</td></tr>
+  <tr><td><strong>CS drives NRR (Net Revenue Retention)</strong></td><td>Cross-copilot expansion is the revenue multiplier. CS surfaces the second-copilot opportunity. Without CS, expansion stalls at single-copilot ACV.</td></tr>
+  <tr><td><strong>Burn discipline</strong></td><td>Seed: $120K/mo for 5 people = 18–24 month runway. Series A: $350K/mo for 20 = 24–30 months. Always >18 months runway before next raise.</td></tr>
+</table>
+
+<!-- ============ SECTION 7: WHY NOW ============ -->
+<h2>§7 — Structural Tailwinds</h2>
+
+<div class="card-row">
+  <div class="card"><p class="label">$684B Enterprise AI Spend</p><p style="font-size:0.85rem">5% see real value (RAND/KPMG/McKinsey/BCG/S&P). The infrastructure gap is a buying signal, not a blocker.</p></div>
+  <div class="card"><p class="label">Model Commoditization</p><p style="font-size:0.85rem">Foundation models are a commodity. Decision infrastructure is the durable layer. Buyers shifting from "which model" to "which system."</p></div>
+  <div class="card"><p class="label">Agent Fatigue</p><p style="font-size:0.85rem">Agents that don't learn are being abandoned. 42% of companies abandoned most AI initiatives (S&P 2025). RGI is the learning layer.</p></div>
+</div>
+
+<h2>Glossary</h2>
+<div class="card" style="font-size:0.8rem;color:var(--fg-soft)">
+<table style="margin:0">
+<tr><th style="width:30%">Market Sizing</th><th style="width:70%"></th></tr>
+<tr><td><strong>TAM</strong></td><td>Total Addressable Market — full revenue opportunity if 100% market share</td></tr>
+<tr><td><strong>SAM</strong></td><td>Serviceable Addressable Market — segment reachable with current product and go-to-market</td></tr>
+<tr><td><strong>SOM</strong></td><td>Serviceable Obtainable Market — realistic capture in the planning window</td></tr>
+</table>
+<table style="margin:8px 0 0">
+<tr><th style="width:30%">Revenue & Unit Economics</th><th style="width:70%"></th></tr>
+<tr><td><strong>ARR</strong></td><td>Annual Recurring Revenue</td></tr>
+<tr><td><strong>ACV</strong></td><td>Annual Contract Value — what one customer pays per year</td></tr>
+<tr><td><strong>NRR</strong></td><td>Net Revenue Retention — revenue from existing customers incl. expansion and churn (>100% = growing)</td></tr>
+<tr><td><strong>LTV</strong></td><td>Lifetime Value — total revenue from a customer over the relationship</td></tr>
+<tr><td><strong>CAC</strong></td><td>Customer Acquisition Cost — fully loaded cost to land one customer</td></tr>
+<tr><td><strong>OTE</strong></td><td>On-Target Earnings — base salary + commission at quota</td></tr>
+</table>
+<table style="margin:8px 0 0">
+<tr><th style="width:30%">Go-to-Market</th><th style="width:70%"></th></tr>
+<tr><td><strong>GTM</strong></td><td>Go-to-Market — sales, marketing, and distribution strategy</td></tr>
+<tr><td><strong>PMF</strong></td><td>Product-Market Fit — evidence that customers need and will pay for the product</td></tr>
+<tr><td><strong>CS</strong></td><td>Customer Success — post-sale team that drives adoption and expansion</td></tr>
+<tr><td><strong>G&A</strong></td><td>General & Administrative — finance, legal, HR, operations</td></tr>
+</table>
+<table style="margin:8px 0 0">
+<tr><th style="width:30%">RGI Verticals & Domains</th><th style="width:70%"></th></tr>
+<tr><td><strong>S2P</strong></td><td>Source-to-Pay — end-to-end procurement, from sourcing through invoice payment</td></tr>
+<tr><td><strong>AP</strong></td><td>Accounts Payable — invoice processing and payment execution</td></tr>
+<tr><td><strong>SOC</strong></td><td>Security Operations Center — team that monitors and responds to security alerts</td></tr>
+<tr><td><strong>SIEM</strong></td><td>Security Information & Event Management — log aggregation and alert correlation</td></tr>
+<tr><td><strong>SOAR</strong></td><td>Security Orchestration, Automation & Response — automated incident playbooks</td></tr>
+<tr><td><strong>MTTR</strong></td><td>Mean Time to Resolve — average time from alert to resolution</td></tr>
+<tr><td><strong>DataOps</strong></td><td>Data pipeline operations — monitoring, quality, root-cause investigation</td></tr>
+</table>
+</div>
+
+<div class="footer">
+  <p><strong>RGI Economic Model v2</strong> · November 3, 2026 · All projections illustrative · No production customers</p>
+  <p>rgi.dakshineshwari.net · Arindam Banerji</p>
+  <p style="margin-top:12px;font-size:0.7rem">
+    Sources: Business Research Co. (AP Automation), SkyQuest/GII (S2P), Mordor Intelligence (SIEM),
+    Future Market Insights (SOAR), Fortune Business Insights (Data Observability),
+    360iResearch/GlobeNewsWire (Restaurant Inventory), Business Research Co. (Algorithmic Trading),
+    SANS SOC Survey 2024 (N=422), Forbes Global 2000.
+  </p>
+</div>
+
+</div>
+
+<script>
+function showScenario(idx) {
+  document.querySelectorAll('.scenario-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  document.querySelectorAll('.scenario-detail').forEach((d,i) => d.classList.toggle('active', i===idx));
+}
+</script>
+
+</body></html>
