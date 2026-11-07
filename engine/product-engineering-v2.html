@@ -1,0 +1,478 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>AI Product Engineering &amp; Economics</title>
+<meta name="description" content="AI Product Engineering & Economics — build defensible AI products with a small team. Your customer shouldn't be your first experiment. Modeled before/after costs.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F7F5F1; --surface:#FFFFFF; --surface2:#FBFAF8; --ink:#1F2937; --muted:#6B7280;
+  --line:#E7E3DC; --line2:#F0EDE7;
+  --accent:#B2740F; --accent-soft:#FBF1DF; --accent-line:#EAD6AE;
+  --good:#059669; --bad:#B91C1C;
+  --radius:16px; --shadow:0 8px 28px rgba(31,41,55,.06); --maxw:1180px;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --serif:"Fraunces",Georgia,serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17160F; --surface:#211F16; --surface2:#1C1A12; --ink:#F0ECE2; --muted:#B0A896;
+  --line:#352F22; --line2:#2A2619; --accent:#E0A542; --accent-soft:#2A2213; --accent-line:#4A3C20; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#17160F; --surface:#211F16; --surface2:#1C1A12; --ink:#F0ECE2; --muted:#B0A896;
+  --line:#352F22; --line2:#2A2619; --accent:#E0A542; --accent-soft:#2A2213; --accent-line:#4A3C20; color-scheme:dark;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;margin:0}
+.wrap{max-width:var(--maxw);margin:0 auto;padding-block:30px;padding-inline:20px}
+h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;text-wrap:balance;margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);font-weight:500}
+section{margin-top:44px}
+.sechead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.sechead h2{font-size:clamp(20px,2.6vw,26px)}
+.sechead .k{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.lead{color:var(--muted);font-size:15px;max-width:74ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.grid2{display:grid;gap:18px;grid-template-columns:1fr}
+@media(min-width:820px){.grid2{grid-template-columns:1fr 1fr}}
+.chip{display:inline-block;background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--accent);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;font-family:var(--mono)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.deliverbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:18px}
+.deliverbar .dlabel{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;margin-right:2px}
+.chip.d{background:var(--surface);border-color:var(--line);color:var(--ink);font-weight:500}
+.tag{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.b{font-weight:700}
+ul{margin:8px 0 0;padding-left:18px}
+li{margin:6px 0}
+/* hero */
+.hero{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:clamp(24px,4vw,38px)}
+.hero h1{font-size:clamp(34px,6vw,58px);margin:8px 0 4px;line-height:1.02}
+.hero .std{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.hero .tagline{font-family:var(--serif);font-weight:500;font-style:italic;font-size:clamp(17px,2.6vw,23px);color:var(--ink);margin:12px 0 14px}
+.hero .promise{font-size:clamp(14px,2vw,16px);color:var(--ink);max-width:66ch}
+.hero .sub{color:var(--muted);font-size:14px;margin-top:8px;max-width:72ch}
+.hero .herocta{margin-top:16px;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--ink);max-width:72ch}
+/* buyer pains */
+.pains{display:grid;gap:12px;grid-template-columns:1fr;margin:14px 0 2px}
+@media(min-width:720px){.pains{grid-template-columns:1fr 1fr}}
+.pain{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--ink)}
+.pain b{color:var(--accent)}
+/* process moves */
+.moves{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:720px){.moves{grid-template-columns:1fr 1fr}}
+@media(min-width:1000px){.moves{grid-template-columns:1fr 1fr 1fr}}
+.move{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px 18px 16px;overflow:hidden}
+.move .num{font-family:var(--serif);font-weight:700;font-size:46px;line-height:.9;color:var(--accent);letter-spacing:-.02em}
+.move .step{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:2px}
+.move h3{font-size:16.5px;margin:10px 0 6px}
+.move p{margin:0}
+.move.chain{background:linear-gradient(180deg,var(--accent-soft),var(--surface));border-color:var(--accent-line)}
+.move.chain .num{font-size:40px}
+/* figures */
+.figure{margin-top:16px;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);background:#0E1726}
+.figure img{display:block;width:100%;height:auto}
+.figcap{font-size:12px;color:var(--muted);margin-top:8px}
+/* big number */
+.bignum{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.bignum .x{font-family:var(--mono);font-size:clamp(36px,8vw,64px);font-weight:600;color:var(--accent);line-height:1}
+.math{font-family:var(--mono);font-size:13px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow-x:auto}
+/* what to look for / outcomes */
+.outs{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:720px){.outs{grid-template-columns:1fr 1fr}}
+.out{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px;border-left:3px solid var(--accent)}
+.out .lf{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.out h3{font-size:16px;margin:4px 0 6px}
+.out p{margin:0;font-size:13.5px;color:var(--muted)}
+.out .ans{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:13.5px;color:var(--ink)}
+.out .ans b{font-family:var(--mono);font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);white-space:nowrap}
+/* what you walk away with — shippable product */
+.gets{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:720px){.gets{grid-template-columns:1fr 1fr}}
+.get{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px}
+.get h3{font-size:15.5px;margin:0 0 5px}
+.get p{margin:0;font-size:13.5px;color:var(--muted)}
+/* engine building-blocks grid (capstone) */
+.engine{display:grid;gap:8px;grid-template-columns:1fr;margin-top:12px}
+@media(min-width:620px){.engine{grid-template-columns:1fr 1fr}}
+.eb{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px}
+.eb b{color:var(--accent);font-family:var(--mono);font-size:12.5px;display:block;margin-bottom:2px}
+.eb span{color:var(--muted)}
+/* the shift — vibe coding contrast */
+.shift{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:720px){.shift{grid-template-columns:1fr 1fr}}
+.sp{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--surface);box-shadow:var(--shadow)}
+.sp .h{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:8px}
+.sp.bad .h{color:var(--muted)}
+.sp.good{border-color:var(--accent-line);background:var(--accent-soft)}
+.sp.good .h{color:var(--accent)}
+.sp p{margin:0;font-size:14px;color:var(--ink)}
+/* large-codebase proof tiles */
+.codebase{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-top:14px}
+@media(min-width:720px){.codebase{grid-template-columns:repeat(4,1fr)}}
+.cb{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;box-shadow:var(--shadow)}
+.cb b{display:block;font-family:var(--mono);font-size:26px;color:var(--accent);font-weight:600;line-height:1}
+.cb span{font-size:12.5px;color:var(--muted);display:block;margin-top:6px}
+/* changed product economics grid */
+.econ{display:grid;gap:14px;grid-template-columns:1fr;margin-top:16px}
+@media(min-width:720px){.econ{grid-template-columns:1fr 1fr}}
+@media(min-width:1040px){.econ{grid-template-columns:1fr 1fr 1fr}}
+.ec{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px}
+.ec h3{font-size:15px;margin:0 0 8px}
+.ec p{margin:0;font-size:13.5px}
+.ec .chg{color:var(--muted)}
+.ec .ans{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);color:var(--ink)}
+.ec .lbl{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block;margin-bottom:3px}
+.ec .ans .lbl{color:var(--accent)}
+/* modeled cost table */
+.costwrap{overflow-x:auto;margin-top:14px}
+.costmodel{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px}
+.costmodel th,.costmodel td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.costmodel thead th{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:500}
+.costmodel td.dim{font-weight:600;color:var(--ink)}
+.costmodel td.before{color:var(--muted)}
+.costmodel td.after{color:var(--ink);font-weight:600}
+.costmodel td.delta{font-family:var(--mono);color:var(--good);font-weight:600;white-space:nowrap}
+.modeled-badge{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:999px;padding:3px 10px}
+/* credibility */
+.cred{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-top:16px;font-size:14px;color:var(--ink)}
+.cred .tag{margin-bottom:6px;display:block}
+/* press quotes */
+.quotes{display:grid;gap:14px;grid-template-columns:1fr;margin-top:16px}
+@media(min-width:820px){.quotes{grid-template-columns:1fr 1fr 1fr}}
+.quote{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent-line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+.quote p{margin:0;font-size:13.5px;font-style:italic;color:var(--ink);line-height:1.5}
+.quote .who{margin-top:10px;font-family:var(--mono);font-size:10.5px;color:var(--muted);line-height:1.4}
+.cta{background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:var(--radius);padding:18px}
+.foot{margin-top:46px;border-top:1px solid var(--line);padding-top:16px;font-size:12.5px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow">Services · A product-design process for AI</div>
+    <h1>AI Product Engineering &amp; Economics</h1>
+    <div class="std">Build it fast · Prove it · Make it pay</div>
+    <p class="tagline">Your customer shouldn't be your first experiment.</p>
+    <div class="promise">The one place a product-builder gets a <span class="b">working demo, the product design, a roadmap, and a claim set that survives a board</span> — in weeks, with a 2–3 person team. A model vendor leaves you a capability; a design shop leaves screens; a consultancy leaves a deck. Here it's one product, with the proof attached.</div>
+    <div class="sub">For founders and product leads betting real money on an AI product — an agent, a copilot, a generative or a decision feature. We design the mechanism, prove it on synthetic data before a customer sees it, and build it on a shared engine you keep. <span class="b">Not</span> a model-quality bake-off, and not a throwaway one-off script.</div>
+    <div class="chips">
+      <span class="chip">most of vibe coding's speed — without the debt</span>
+      <span class="chip">a shared engine you keep</span>
+      <span class="chip">coding agents on a large codebase</span>
+      <span class="chip">every claim → an experiment</span>
+    </div>
+    <div class="herocta"><span class="b">Start with a free 30-minute consult.</span> Tell me what you're building and where the risk is — you'll leave with the experiment that would prove your core mechanism, and an honest read on whether this is worth your time. <span class="b">banerji.arindam@gmail.com</span></div>
+  </div>
+
+  <!-- YOU WALK AWAY WITH — top chip strip -->
+  <div class="deliverbar">
+    <span class="dlabel">You walk away with</span>
+    <span class="chip d">a working demo</span>
+    <span class="chip d">front-end &amp; product design</span>
+    <span class="chip d">a product roadmap</span>
+    <span class="chip d">the theoretical basis</span>
+    <span class="chip d">validated competitive claims</span>
+    <span class="chip d">a claims registry</span>
+    <span class="chip d">the engine, kept in-house</span>
+  </div>
+
+  <!-- THE SHIFT (vibe coding contrast) -->
+  <section>
+    <div class="sechead"><h2>The shift</h2><span class="k">vibe coding, without the nightmare</span></div>
+    <div class="shift">
+      <div class="sp bad">
+        <div class="h">Vibe coding</div>
+        <p>Fast and seductive — a working demo in a weekend. Then the <span class="b">maintenance nightmare</span>: code no one can reason about, claims you can't defend, a mechanism you can't trust — and the customer as your first real test.</p>
+      </div>
+      <div class="sp good">
+        <div class="h">With us</div>
+        <p><span class="b">Most of that speed</span> — a working product in days, on a shared engine. <span class="b">Without the nightmare</span>: a tested mechanism, a defensible claim set, and an engine you build the next product on. Built fast, built to keep.</p>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:12px">That's the shift — <span class="b">most of the advantages of vibe coding, without the maintenance nightmare.</span></p>
+  </section>
+
+  <!-- WHY THE SHIFT IS POSSIBLE (large codebase) -->
+  <section>
+    <div class="sechead"><h2>Why the shift is possible</h2><span class="k">coding agents that hold a large codebase</span></div>
+    <p class="lead">Vibe coding falls apart as the codebase grows — the agent loses the thread, and the nightmare sets in. Keeping coding agents productive on a large, evolving codebase is the hard, mostly-unsolved problem underneath that. Here's ours, as proof it can be done:</p>
+    <div class="codebase">
+      <div class="cb"><b>6</b><span>repositories</span></div>
+      <div class="cb"><b>5</b><span>copilots on one shared engine</span></div>
+      <div class="cb"><b>~2,500</b><span>files in the copilot SDK alone</span></div>
+      <div class="cb"><b>1,244</b><span>tests in the open-source GAE substrate</span></div>
+    </div>
+    <p class="lead" style="margin-top:12px">Built and maintained this way from the start. That combination — a shared engine plus coding agents that hold the whole codebase — is exactly what lets us move at vibe-coding speed without the vibe-coding debt.</p>
+  </section>
+
+  <!-- THE ECONOMICS OF BUILDING AI PRODUCTS HAVE CHANGED -->
+  <section>
+    <div class="sechead"><h2>The economics of building AI products have changed</h2><span class="k">and how we answer each part</span></div>
+    <p class="lead">The money in software just moved. The largest firms — AWS, Microsoft, and Oracle among them — are pouring capital into data centers and cutting development headcount by the thousands. Compute is the new capex, so every cost of building <span class="b">and running</span> a product is under pressure. Here's what changed — and how this approach answers each.</p>
+    <div class="econ">
+      <div class="ec"><h3>Developer cost</h3><p class="chg"><span class="lbl">Changed</span>A 20-person AI team is a luxury few can still justify.</p><p class="ans"><span class="lbl">Our answer</span>The engine plus coding agents that hold a large codebase let a <span class="b">small team</span> do what used to need a large one.</p></div>
+      <div class="ec"><h3>Maintenance cost</h3><p class="chg"><span class="lbl">Changed</span>AI-generated code becomes a maintenance nightmare; upkeep dominates the lifetime bill.</p><p class="ans"><span class="lbl">Our answer</span>Built on a tested mechanism, a shared engine, and a claims registry — maintainable by design, not a growing liability.</p></div>
+      <div class="ec"><h3>Update velocity &amp; risk</h3><p class="chg"><span class="lbl">Changed</span>Every change can silently degrade an AI product; safe updates are slow and scary.</p><p class="ans"><span class="lbl">Our answer</span>A fail-closed gate and mechanism tests mean updates can't silently regress; the system learns online, no retraining.</p></div>
+      <div class="ec"><h3>Time to ship</h3><p class="chg"><span class="lbl">Changed</span>Months to a first product, months per feature after.</p><p class="ans"><span class="lbl">Our answer</span>Days, not months, for a new product on the engine — the hard parts are already built and reused.</p></div>
+      <div class="ec"><h3>Risk of shipping unproven AI</h3><p class="chg"><span class="lbl">Changed</span>One bad AI call reaches a customer, a regulator, or your brand.</p><p class="ans"><span class="lbl">Our answer</span>Synthetic validation and a claims registry make it defensible before it ships — the customer isn't the experiment.</p></div>
+      <div class="ec"><h3>Team &amp; coordination</h3><p class="chg"><span class="lbl">Changed</span>Big teams carry big coordination overhead, and the knowledge walks out the door.</p><p class="ans"><span class="lbl">Our answer</span>One PM, a few reasoning systems, four protocols — and the operating system stays with your team.</p></div>
+    </div>
+  </section>
+
+  <!-- THE COST, MODELED (before / after) -->
+  <section>
+    <div class="sechead"><h2>The cost, modeled</h2><span class="k">before / after</span></div>
+    <p class="lead"><span class="b">The promise in one line: most of the speed of vibe coding, without the maintenance debt — at a fraction of a big team's cost.</span> Here's the honest three-way comparison.</p>
+    <div class="figure" style="background:var(--surface);max-width:780px;margin-left:auto;margin-right:auto"><img src="img_pe_01_8931029e.jpg" alt="The cost of one AI product, year 1 — three-way comparison" loading="lazy"></div>
+    <p class="figcap" style="margin-top:10px">Vibe coding wins the first demo and loses everything after it; a big team wins defensibility at several times the cost.</p>
+  </section>
+
+  <!-- WHAT MAKES US DIFFERENT (vs the field) -->
+  <section>
+    <div class="sechead"><h2>What makes us different</h2><span class="k">vs the field</span></div>
+    <p class="lead">The market is full of AI product agencies, fixed-price "AI sprint" shops, and pilot-to-production consultancies — most will de-risk a build and hand you an eval harness. Four things here are hard to find anywhere else.</p>
+    <div class="costwrap">
+      <table class="costmodel">
+        <thead><tr><th>&nbsp;</th><th>Most AI product shops</th><th>AI Product Engineering &amp; Economics</th></tr></thead>
+        <tbody>
+          <tr><td class="dim">What you leave with</td><td class="before">a bespoke, one-off build</td><td class="after">a product <span class="b">and the engine that builds the next one</span> — yours to keep</td></tr>
+          <tr><td class="dim">The second product</td><td class="before">start from scratch again</td><td class="after">days, on the same engine — your product line compounds</td></tr>
+          <tr><td class="dim">How far the proof goes</td><td class="before">an eval harness + "known failure conditions"</td><td class="after">math-first spec, oracle-separated synthetic validation, original results</td></tr>
+          <tr><td class="dim">The math for your mechanism</td><td class="before">tune a model — no one derives it</td><td class="after">we <span class="b">build the math for your product</span> — a derived spec, then proven</td></tr>
+          <tr><td class="dim">What it's built around</td><td class="before">de-risking the pilot, governance</td><td class="after">the economics — a small team, a fraction of the cost</td></tr>
+          <tr><td class="dim">What it costs</td><td class="before">"book a call, we'll propose"</td><td class="after">posted: $1,500 review · $12,500 one-week sprint</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="figcap" style="margin-top:10px">Category patterns as publicly described by AI product agencies and fixed-price AI-sprint firms; no competitor metrics asserted.</p>
+  </section>
+
+  <!-- THE ENGINE YOU KEEP -->
+  <section>
+    <div class="sechead"><h2>The engine you keep</h2><span class="k">the moat no competitor hands you</span></div>
+    <div class="card" style="background:var(--accent-soft);border-color:var(--accent-line)">
+      <h3 style="font-size:18px">A model and engine for consistent product growth</h3>
+      <p class="lead" style="color:var(--ink);margin-top:6px">This isn't a promise — it's how we build. Five copilots — SOC, S2P, Trading, Purchasing, DataOps — run on <span class="b">one shared engine</span>. A new copilot now takes <span class="b">days, not months</span>, because the hard parts are already built and reused:</p>
+      <div class="engine">
+        <div class="eb"><b>GAE</b><span>the open-source graph-attention substrate — score · gate · update</span></div>
+        <div class="eb"><b>The context graph</b><span>enrichment and situation analysis for each decision</span></div>
+        <div class="eb"><b>AgentEvolver</b><span>runtime evolution on live deployments</span></div>
+        <div class="eb"><b>Shared platform repos</b><span>the reusable copilot scaffolding</span></div>
+        <div class="eb"><b>The compounding loops</b><span>enrich → decide → act → verify → evolve</span></div>
+        <div class="eb"><b>The claims registry</b><span>what's proven, conditional, forbidden — carried forward</span></div>
+      </div>
+      <p class="lead" style="color:var(--ink);margin-top:12px">You get the <span class="b">same engine</span>, not a one-off build. Assemble the blocks, add your domain, and your next product is days — not a restart. Your product line compounds instead of starting from zero each time. <span class="b">This is the leverage</span>: one person built five products on this engine — a small team can ship defensible AI products without a big-team budget. That's Compounding Intelligence, turned on your own roadmap.</p>
+      <p class="lead" style="color:var(--ink);margin-top:10px"><span class="b">And no lock-in.</span> The engine is GAE — Apache-2.0, pip-installable, no license fee and no hosted service: it's yours to keep and fork. The method, registry, and protocols stand on their own even if you never touch GAE again.</p>
+    </div>
+  </section>
+
+  <!-- MATH FOR YOUR PRODUCT (slim callout) -->
+  <div style="margin-top:28px;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:14px;padding:15px 18px;font-size:14.5px;color:var(--ink);max-width:82ch">
+    <span class="b">We build the math for your product.</span> Not advice. Not a tuned model. A derived spec for one core mechanism. Almost no one else does this — the $1,500 review, the $12,500 sprint.
+  </div>
+
+  <!-- WHY TEAMS BRING US IN (buyer pains) -->
+  <section>
+    <div class="sechead"><h2>Why teams bring us in</h2><span class="k">the bet you're making</span></div>
+    <p class="lead">You're putting real money and your reputation on an AI product. The usual way to build it — code, demo, ship — turns your customer into the first real experiment. That's the bet we take off the table.</p>
+    <div class="pains">
+      <div class="pain">It <b>demos beautifully</b> — and no one can tell you whether it survives production.</div>
+      <div class="pain">Your <b>claims outrun what engineering can defend</b> — risky in front of customers, auditors, investors.</div>
+      <div class="pain">You're <b>tuning and re-tuning</b> with no real gains, and can't see why.</div>
+      <div class="pain">You don't want to be the <b>95% that never ships</b> — learning the hard way, live.</div>
+    </div>
+    <div class="figure"><img src="img_pe_02_e7bbe9eb.jpg" alt="Three Approaches to Building Enterprise AI" loading="lazy"></div>
+    <div class="figcap">Intuition-first and research-first both push the risk onto the customer. The method moves it upstream, into ~194 experiments run before anyone buys.</div>
+  </section>
+
+  <!-- THE METHOD: 5 MOVES -->
+  <section>
+    <div class="sechead"><h2>The process, in five moves</h2><span class="k">concurrent, not sequential</span></div>
+    <div class="moves">
+      <div class="move"><div class="num">01</div><div class="step">Step one</div><h3>Formulate the math first</h3><p class="lead">Equations precede code and serve as the spec — derived, not imported. The equation catches what the test suite misses.</p></div>
+      <div class="move"><div class="num">02</div><div class="step">Step two</div><h3>Test the mechanism, not the config</h3><p class="lead">Factorial design on architecture decisions. Mechanism gates, not outcome gates — so you learn <span class="b">why</span>, not just whether.</p></div>
+      <div class="move"><div class="num">03</div><div class="step">Step three</div><h3>Know what's true — and forbidden</h3><p class="lead">A claims registry: every claim tiered and traceable. Synthetic validation at scale. Multi-model peer review catches the next forbidden claim.</p></div>
+      <div class="move"><div class="num">04</div><div class="step">Step four</div><h3>Products from buyer problems</h3><p class="lead">Not capability-forward. Avoid the capability trap and the judge trap; define from the scenario the buyer actually has.</p></div>
+      <div class="move"><div class="num">05</div><div class="step">Step five</div><h3>The operating system</h3><p class="lead">One PM, several reasoning systems, four protocols. The method is the product's own pattern — and the commercial moat.</p></div>
+      <div class="move chain"><div class="num">↻</div><div class="step">The through-line</div><h3>Accountability, end to end</h3><p class="lead">The five moves connect into one traceable chain: every product claim walks back to the experiment that earned it.</p></div>
+    </div>
+    <p class="lead" style="margin-top:20px">None of it requires our specific product — it requires the discipline. Five things any AI product team can put to work tomorrow:</p>
+    <div class="figure"><img src="img_pe_03_3d64fb74.jpg" alt="Five things any AI product team can implement tomorrow" loading="lazy"></div>
+  </section>
+
+  <!-- TESTED BEFORE IT TOUCHES YOU (synthetic validation) -->
+  <section>
+    <div class="sechead"><h2>Tested before it touches you</h2><span class="k">synthetic validation, done right</span></div>
+    <p class="lead">The obvious question for any pre-revenue method — <span class="b">am I your first experiment?</span> No. Every mechanism is stress-tested on a synthetic harness before it ever sees your real data or a customer. That's how ~194 experiments (59 primary, 1,890 factorial cells) run before customer #1 — and why you're the beneficiary, not the test.</p>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card">
+        <div class="tag">The trap most teams miss</div>
+        <p style="margin:6px 0 0;font-size:14px">Synthetic data done naively <span class="b">lies</span>. Let an LLM generate your test data and it smuggles in its own competence — you end up measuring the model's opinion, not your mechanism. We learned this the hard way; three frontier models confirmed it's a structural identifiability problem, not a prompt-engineering one.</p>
+      </div>
+      <div class="card">
+        <div class="tag" style="color:var(--accent)">How we do it</div>
+        <p style="margin:6px 0 0;font-size:14px"><span class="b">Oracle separation</span>: the model only proposes; a math oracle judges every answer against ground truth. The test measures <span class="b">your mechanism</span>, not the model. And when synthetic can't settle a claim, we prove it analytically and stage the real measurement to the pilot — no claim ships on a number the method can't defend.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIGNATURE PROOF: 3,689x -->
+  <section>
+    <div class="sechead"><h2>Why mechanism beats intuition</h2><span class="k">the 3,689× result</span></div>
+    <div class="card">
+      <div class="bignum"><span class="x">+36.89pp</span><span class="lead" style="margin:0"><span class="b">vs +0.01pp.</span> Three frontier models (GPT-5, Claude Opus, Grok), given the full setup, all prescribed the literature-standard fix — tune the gating weights — and it bought +0.01pp. Questioning the <span class="b">mechanism</span> instead (distance geometry over dot-product) produced <span class="b">+36.89pp</span>, before any learning: the same decision, done right.</span></div>
+      <div class="math" style="margin-top:14px">consensus of 3 frontier models → tune the configuration → +0.01pp<br>question the mechanism (the math itself) → +36.89pp → <span style="color:var(--good)">3,689× the improvement</span></div>
+      <p class="lead" style="margin-top:10px">The lesson the process encodes: the biggest wins hide in the <span class="b">mechanism</span>, where consensus intuition — human or model — doesn't look. You only find them if the math is the spec and the experiment tests the mechanism.</p>
+    </div>
+    <p class="lead" style="margin-top:18px">And it isn't a one-off flourish — the method runs on real math and a lot of experiments, and the derivations are public.</p>
+    <div class="codebase" style="margin-top:12px">
+      <div class="cb"><b>6</b><span>original mathematical results</span></div>
+      <div class="cb"><b>~194</b><span>experiments · 59 primary + 1,890 factorial cells</span></div>
+      <div class="cb"><b>4</b><span>frontier models cross-check each claim</span></div>
+      <div class="cb"><b>3</b><span>independent proof paths confirm the core theorem</span></div>
+    </div>
+    <div class="math" style="margin-top:12px">conservation gate&nbsp; α·q·V ≥ θ_min &nbsp;(fail-closed)&nbsp; · &nbsp;attention&nbsp; P(a | f, c) = softmax(−‖f − μ‖² ⁄ τ)&nbsp; · &nbsp;full synopsis in the open-source GAE repo</div>
+  </section>
+
+  <!-- CLAIMS DISCIPLINE -->
+  <section>
+    <div class="sechead"><h2>What the discipline produces</h2><span class="k">proven · conditional · forbidden</span></div>
+    <p class="lead">Every claim is tiered and traceable: breakthroughs validated across domains, claims that hold only under a stated condition, and the features that get <span class="b">killed</span> before a customer sees them. Documenting what fails is what makes the positive claims reliable — and the forbidden registry is itself a moat.</p>
+    <div class="figure"><img src="img_pe_04_84978e7f.jpg" alt="What the claims discipline produces" loading="lazy"></div>
+  </section>
+
+  <!-- CHAIN OF ACCOUNTABILITY -->
+  <section>
+    <div class="sechead"><h2>Every claim traces to an experiment</h2><span class="k">the chain of accountability</span></div>
+    <p class="lead">No customer-facing claim stands alone. Each traces an unbroken chain down to its validation experiments, its gate condition, its equation, and its deployment formula.</p>
+    <div class="figure"><img src="img_pe_05_70c72e8e.jpg" alt="The chain of accountability" loading="lazy"></div>
+  </section>
+
+  <!-- OPERATING SYSTEM -->
+  <section>
+    <div class="sechead"><h2>The operating system</h2><span class="k">one PM · several reasoning systems · four protocols</span></div>
+    <p class="lead">The rigor holds because the workflow enforces it: a single human PM owns governance, judgment, and sequence; specialized reasoning systems do the work under four protocols. The constraint is governance, not compute — and that's what we leave behind with your team.</p>
+    <div class="figure"><img src="img_pe_06_3eaa160a.jpg" alt="Seven AI sessions, one human PM, four protocols" loading="lazy"></div>
+  </section>
+
+  <!-- WHAT TO LOOK FOR / WHAT YOU GET -->
+  <section>
+    <div class="sechead"><h2>What to look for — and what you get</h2><span class="k">how to judge a service like this</span></div>
+    <p class="lead">If you're buying a process to de-risk an AI product, here's what a careful buyer should demand of anyone — us included. We built the service to clear every bar.</p>
+    <div class="outs" style="margin-top:16px">
+      <div class="out">
+        <div class="lf">Look for</div>
+        <h3>Proof the method shipped something real</h3>
+        <p>Has it produced a working system — or just a deck of best practices?</p>
+        <div class="ans"><b>Here</b><span>It built the five-copilot Compounding Intelligence platform solo, on the open-source GAE substrate (<span class="b">pip install graph-attention-engine</span>, 1,244 tests passing). Every number on this page — 3,689×, +36.89pp, the killed features — is measured on that apparatus.</span></div>
+      </div>
+      <div class="out">
+        <div class="lf">Look for</div>
+        <h3>That it works on <i>your</i> product</h3>
+        <p>Does the method transfer to your domain — or only theirs?</p>
+        <div class="ans"><b>Here</b><span>The process is domain-agnostic. We start by running it on one of your own mechanisms, so you see it on your problem before you commit.</span></div>
+      </div>
+      <div class="out">
+        <div class="lf">Look for</div>
+        <h3>Claims that survive scrutiny</h3>
+        <p>Will the capabilities hold up to a skeptical buyer, auditor, or board?</p>
+        <div class="ans"><b>Here</b><span>You leave with a claims registry where every capability traces to an experiment and a gate condition — defensible, not demo magic.</span></div>
+      </div>
+      <div class="out">
+        <div class="lf">Look for</div>
+        <h3>That you keep the capability</h3>
+        <p>Do you own the method afterward — or depend on the provider forever?</p>
+        <div class="ans"><b>Here</b><span>We leave the operating system, protocols, and registry with your team — repeatable for the next product, not a retainer.</span></div>
+      </div>
+      <div class="out">
+        <div class="lf">Look for</div>
+        <h3>A low-risk way to find out</h3>
+        <p>Can you test the value before a big commitment?</p>
+        <div class="ans"><b>Here</b><span>Start with a free 30-min consult, then a $1,500 mechanism review, then a 1-week sprint. Expand only as each step earns the next.</span></div>
+      </div>
+      <div class="out">
+        <div class="lf">Look for</div>
+        <h3>Evidence you can inspect — not take on faith</h3>
+        <p>Can you check the claims yourself, or only trust the pitch?</p>
+        <div class="ans"><b>Here</b><span>The substrate is open source and the experiments are public — the results reproduce on our own apparatus. The product is the evidence; our own examples carry every claim.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT YOU WALK AWAY WITH (a shippable product) -->
+  <section>
+    <div class="sechead"><h2>What you walk away with</h2><span class="k">a product you can ship — not a report</span></div>
+    <p class="lead">Most help gets you one piece — a model, a demo, a deck, a UX mock. To actually ship, you need all of it, and it has to hold together under scrutiny. You walk away with the whole package, each piece backed by an experiment.</p>
+    <div class="gets" style="margin-top:16px">
+      <div class="get"><h3>A working demo</h3><p>Your core mechanism running on your own scenario — ready to put in front of customers, your board, or investors. Not a slide; a thing that runs.</p></div>
+      <div class="get"><h3>Front-end &amp; product design</h3><p>The interface, screens, and flow — how your buyer actually experiences the product, designed alongside the mechanism, not bolted on after.</p></div>
+      <div class="get"><h3>A product roadmap</h3><p>Sequenced from the first mechanism to a shipped product and the releases after — tied to buyer problems and to what the experiments have already cleared.</p></div>
+      <div class="get"><h3>The theoretical basis</h3><p>The derived math that is your product's spec and its defensibility — <i>why</i> it works, not just that it does. The part competitors can't reverse-engineer from a demo.</p></div>
+      <div class="get"><h3>Experimentally-validated competitive claims</h3><p>Your differentiation versus the alternatives — each one backed by a reproducible experiment, not a marketing line. It survives a skeptical buyer, auditor, or investor.</p></div>
+      <div class="get"><h3>A buyer-problem product definition</h3><p>The product scoped from the scenario your buyer actually has — not from the capability you happened to build.</p></div>
+      <div class="get"><h3>A claims registry</h3><p>Proven, conditional, and forbidden — the discipline that makes every positive claim credible, and the forbidden list that is itself a moat.</p></div>
+      <div class="get"><h3>The operating system — kept in-house</h3><p>The protocols and the method, so your team keeps shipping this way after we're gone. The capability doesn't leave with us.</p></div>
+    </div>
+    <p class="lead" style="margin-top:14px">This is the help a product-builder usually can't get in one place: a model vendor leaves you a capability, a design shop leaves you screens, a consultancy leaves you a deck. Here it arrives as one product — with the proof attached.</p>
+  </section>
+
+  <!-- WHO / CTA -->
+  <section>
+    <div class="sechead"><h2>Who it's for, and how to start</h2><span class="k">the on-ramp</span></div>
+    <div class="grid2">
+      <div class="card">
+        <div class="tag">Who</div>
+        <ul>
+          <li>Teams building an AI product where a wrong call reaches a customer or a dollar.</li>
+          <li>Founders who need a defensible claim set before they raise or sell.</li>
+          <li>Delivery partners who want a repeatable way to ship AI that lands.</li>
+        </ul>
+      </div>
+      <div class="cta">
+        <div class="tag" style="color:var(--accent)">Start small — each step earns the next</div>
+        <p style="margin:8px 0 0;font-size:14px"><span class="b">Free 30-min consult</span> — what you're building and where the risk is. You leave with the experiment that would prove your core mechanism.</p>
+        <p style="margin:8px 0 0;font-size:14px"><span class="b">Mechanism review · $1,500 · within a week</span> — a focused written review of one mechanism: the experiment to run, what it would prove, and whether a sprint is worth it. A fraction of a full engagement — priced to be an easy yes.</p>
+        <p style="margin:8px 0 0;font-size:14px"><span class="b">Mechanism sprint · 1 week · $12,500 fixed</span> — the mechanism formulated as math, the first experiment on a synthetic harness, and your first claims-registry entries.</p>
+        <p style="margin:8px 0 0;font-size:14px"><span class="b">Working demo · 2 weeks</span> — a running demo on your scenario, the experiment suite, and a defensible claim set you can show a customer or board.</p>
+        <p style="margin:8px 0 0;font-size:14px"><span class="b">Product pilot · 6–8 weeks · scoped after the sprint</span> — the full mechanism through the chain: demo, front-end, roadmap, claims registry — plus the engine set up for your next product.</p>
+        <p style="margin:11px 0 0;font-size:13px;color:var(--muted)">Fixed-scope, fixed-fee, billed at $250/hr (10-hour days); later steps run only if the one before earns it. The entry is low because the engine does the heavy lifting, not because the work is — a comparable PoC elsewhere runs $15–40K over 3–6 weeks.</p>
+        <p style="margin:10px 0 0;font-size:14px"><span class="b">dakshineshwari.net</span> · Arindam Banerji, PhD · banerji.arindam@gmail.com</p>
+      </div>
+    </div>
+    <div class="cred" style="margin-top:16px">
+      <span class="tag">How delivery works</span>
+      Delivered by Arindam directly, working alongside your engineers — a small number of engagements at a time, with the reasoning systems doing the volume. No account-manager layer: the person who built the platform is in the room. Your team keeps the operating system, so you are never dependent on us to run it.
+    </div>
+    <div class="cred">
+      <span class="tag">Why trust it — the evidence is the product</span>
+      The best evidence isn't a résumé; it's what the process built. The five-copilot Compounding Intelligence platform, its open-source GAE substrate, and every measured result on this page all came out of this exact method — built by one person on the engine, which is itself the clearest proof of the leverage you'd get. Delivered by Arindam Banerji, PhD, who has spent over two decades shipping product after product — 8+ market-leading, several that created categories: SOA and e-Speak at HP Labs (e-Speak now in the Smithsonian Technology Collection), one of the first Analytics-as-a-Service products in supply chain, and the Accenture Insights Platform (an earliest full-stack AI/ML platform) — plus Sun Microsystems compilers, Infosys–Microsoft supply-chain offerings, and multiple startups. So &ldquo;one person built five copilots&rdquo; isn't a leap — it's the pattern.
+    </div>
+  </section>
+
+  <!-- WHAT OTHERS SAID (press, prior-career products) -->
+  <section>
+    <div class="sechead"><h2>What others said</h2><span class="k">about products he led — on the record</span></div>
+    <p class="lead">The CI platform is new, but the track record isn't. A few notes on products Arindam led to market earlier — at HP, CSC / Microsoft, and Infosys.</p>
+    <div class="quotes">
+      <div class="quote">
+        <p>&ldquo;HP's e-Speak is the universal compiler and translator … the Rosetta stone of the brave new everything-networked world. I repeat … e-Speak is universal. It is pure HP.&rdquo;</p>
+        <div class="who">Carly Fiorina · CEO, HP · 1999 — on e-Speak, which Arindam co-created</div>
+      </div>
+      <div class="quote">
+        <p>&ldquo;CSC's IML solution harnesses the power of the cloud with Microsoft Azure and advanced analytics … companies can take data that had previously been overlooked and give it real business value.&rdquo;</p>
+        <div class="who">Joseph Sirosh · CVP, Microsoft · 2017 — on the CSC–Microsoft industrial-ML offering Arindam led</div>
+      </div>
+      <div class="quote">
+        <p>&ldquo;Infosys and Microsoft, poised to capture the supply-visibility and collaboration opportunity.&rdquo;</p>
+        <div class="who">AMR Research — on the Infosys–Microsoft supply-chain offering Arindam led to market</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    AI Product Engineering &amp; Economics is one of two <b>Services</b> under RGI (Recursive Graph Improvement) — alongside Last-Mile AI Engineering — with the RGI / Compounding Intelligence platform as the credibility engine underneath. It's the process that built that platform: a five-copilot system whose results are controlled experiments on synthetic streams, no production customers yet. External figures (MIT, S&amp;P Global) are cited industry estimates; the 3,689× / +36.89pp results are measured on CI's own apparatus.
+    <br><br>Arindam Banerji, PhD · Compounding Intelligence · Dakshineshwari LLC · dakshineshwari.net
+  </div>
+
+</div>
+
+</body></html>
