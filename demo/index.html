@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="RGI Interactive Demo — Enterprise AI that improves every decision. Five domains, one learning engine. Try the live demo.">
+<title>RGI Interactive Demo</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #fafaf9;
+  --bg-alt: #f5f3f0;
+  --fg: #1c1917;
+  --fg-sub: #57534e;
+  --fg-muted: #a8a29e;
+  --accent: #1e40af;
+  --accent-light: #dbeafe;
+  --gold: #b45309;
+  --gold-light: #fef3c7;
+  --teal: #0f766e;
+  --teal-light: #ccfbf1;
+  --red: #b91c1c;
+  --red-light: #fee2e2;
+  --green: #15803d;
+  --green-light: #dcfce7;
+  --purple: #7e22ce;
+  --purple-light: #f3e8ff;
+  --amber: #d97706;
+  --border: #e7e5e4;
+  --card-bg: #ffffff;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --card-shadow-lg: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c0a09;
+    --bg-alt: #1c1917;
+    --fg: #fafaf9;
+    --fg-sub: #a8a29e;
+    --fg-muted: #78716c;
+    --accent: #60a5fa;
+    --accent-light: #1e3a5f;
+    --gold: #fbbf24;
+    --gold-light: #422006;
+    --teal: #2dd4bf;
+    --teal-light: #042f2e;
+    --red: #f87171;
+    --red-light: #450a0a;
+    --green: #4ade80;
+    --green-light: #052e16;
+    --purple: #c084fc;
+    --purple-light: #3b0764;
+    --amber: #fbbf24;
+    --border: #292524;
+    --card-bg: #1c1917;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --card-shadow-lg: 0 4px 16px rgba(0,0,0,0.4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c0a09;
+  --bg-alt: #1c1917;
+  --fg: #fafaf9;
+  --fg-sub: #a8a29e;
+  --fg-muted: #78716c;
+  --accent: #60a5fa;
+  --accent-light: #1e3a5f;
+  --gold: #fbbf24;
+  --gold-light: #422006;
+  --teal: #2dd4bf;
+  --teal-light: #042f2e;
+  --red: #f87171;
+  --red-light: #450a0a;
+  --green: #4ade80;
+  --green-light: #052e16;
+  --purple: #c084fc;
+  --purple-light: #3b0764;
+  --amber: #fbbf24;
+  --border: #292524;
+  --card-bg: #1c1917;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --card-shadow-lg: 0 4px 16px rgba(0,0,0,0.4);
+  color-scheme: dark;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+}
+
+.container { max-width: 960px; margin: 0 auto; }
+
+/* ── Section spacing ── */
+section { padding: 72px 0; }
+section + section { border-top: 1px solid var(--border); }
+
+/* ── Typography ── */
+h1 { font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight: 900; letter-spacing: -0.03em; line-height: 1.1; color: var(--fg); }
+h2 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; color: var(--fg); margin-bottom: 12px; }
+h3 { font-size: 1.1rem; font-weight: 700; color: var(--fg); margin-bottom: 8px; }
+.subtitle { font-size: clamp(1rem, 2vw, 1.25rem); color: var(--fg-sub); line-height: 1.5; max-width: 640px; }
+.section-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+  text-decoration: none; transition: all 0.2s;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { filter: brightness(1.15); }
+.btn-secondary { background: var(--card-bg); color: var(--fg); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--fg-muted); }
+
+/* ── Cards ── */
+.card {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px; box-shadow: var(--card-shadow);
+}
+
+/* ── Image placeholder ── */
+.img-slot {
+  background: var(--bg-alt); border: 2px dashed var(--border); border-radius: 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 32px 24px; text-align: center; color: var(--fg-muted); min-height: 200px;
+}
+.img-slot .slot-label { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
+.img-slot .slot-desc { font-size: 0.75rem; max-width: 400px; }
+.img-slot img { max-width: 100%; border-radius: 8px; }
+
+/* ── Domain grid ── */
+.domain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.domain-card { border-left: 4px solid var(--border); padding-left: 16px; }
+.domain-card.dataops { border-color: var(--purple); }
+.domain-card.s2p { border-color: var(--amber); }
+.domain-card.trading { border-color: var(--red); }
+.domain-card.restaurant { border-color: var(--green); }
+.domain-card.labelqa { border-color: var(--accent); }
+.domain-tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+.domain-metric { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+
+/* ── Evidence tabs ── */
+.evidence-tabs { display: flex; gap: 4px; margin-bottom: 24px; flex-wrap: wrap; }
+.evidence-tab {
+  padding: 10px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+  background: var(--bg-alt); color: var(--fg-sub); border: 1px solid var(--border);
+  cursor: pointer; transition: all 0.2s;
+}
+.evidence-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.evidence-panel { display: none; }
+.evidence-panel.active { display: block; }
+
+/* ── Stat row ── */
+.stat-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.stat-item { flex: 1; min-width: 140px; text-align: center; }
+.stat-value { font-size: 1.8rem; font-weight: 800; color: var(--accent); letter-spacing: -0.02em; }
+.stat-label { font-size: 0.75rem; color: var(--fg-sub); }
+
+/* ── Inline SVG diagrams ── */
+.diagram-container { max-width: 100%; overflow-x: auto; }
+.diagram-container svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+
+/* ── Footer ── */
+.footer { padding: 48px 0; text-align: center; color: var(--fg-muted); font-size: 0.85rem; }
+.footer a { color: var(--accent); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  section { padding: 48px 0; }
+  .stat-row { flex-direction: column; }
+  .hero-ctas { flex-direction: column; }
+}
+</style>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 1: HERO                                        -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section style="padding-top: 48px;">
+<div class="container">
+  <div class="section-label">Recursive Graph Improvement</div>
+  <h1>RGI</h1>
+  <p class="subtitle" style="margin-top: 12px;">
+    RSI improves the model. RGI improves every decision, the system that makes it, and the enterprise systems it targets.
+  </p>
+  <p style="color: var(--fg-sub); font-size: 0.95rem; margin-top: 16px; margin-bottom: 32px; max-width: 640px;">
+    $684 billion in enterprise AI spending. Five percent see real value. The reason: every platform improves the model — fine-tuning, RLHF, RAG, prompt engineering — none improve the decision infrastructure. RGI is that missing layer.
+  </p>
+
+  <div class="hero-ctas" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px;">
+    <a href="https://huggingface.co/spaces/abanerji/rgi-demo-v2" target="_blank" class="btn btn-primary">
+      Try the Live Demo →
+    </a>
+    <a href="#how-it-works" class="btn btn-secondary">How It Works</a>
+    <a href="https://rgi.dakshineshwari.net" target="_blank" class="btn btn-secondary">Product Site →</a>
+  </div>
+
+  <!-- HERO: S2P Why RGI — Score 85, $314K, +18pp -->
+  <div style="border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--card-shadow-lg);">
+    <img src="img/hero-dataops-whyrgi.png" alt="DataOps Alert Triage — $1.6M projected annual value, 4pp ahead of frozen baseline" style="width: 100%; display: block;">
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 2: THE PROBLEM                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section>
+<div class="container">
+  <div class="section-label">Why Now</div>
+  <h2>$684 billion invested. Five percent see real value.</h2>
+  <p style="color: var(--fg-sub); max-width: 640px; margin-bottom: 28px;">
+    The problem isn't the model. It's that the system doesn't learn from its own decisions.
+  </p>
+
+  <!-- Why Now stats table -->
+  <div class="card" style="margin-bottom: 28px; overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 480px;">
+      <thead>
+        <tr>
+          <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); color: var(--fg-sub); font-weight: 600;">Source</th>
+          <th style="padding: 10px 12px; text-align: center; border-bottom: 2px solid var(--border); color: var(--accent); font-weight: 700;">Finding</th>
+          <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); color: var(--fg-sub); font-weight: 600;">Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border);">RAND Corporation</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: center; font-weight: 700; color: var(--accent);">80%</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--fg-sub);">of AI projects fail to deliver intended business value (2024)</td></tr>
+        <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border);">KPMG</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: center; font-weight: 700; color: var(--accent);">95%</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--fg-sub);">of AI use cases fail to deliver measurable value (2025)</td></tr>
+        <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border);">McKinsey</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: center; font-weight: 700; color: var(--accent);">6%</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--fg-sub);">of organizations see real business value from AI (2025)</td></tr>
+        <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border);">BCG</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: center; font-weight: 700; color: var(--accent);">5%</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--fg-sub);">of companies achieve substantial AI value (2025)</td></tr>
+        <tr><td style="padding: 8px 12px;">S&amp;P Global</td>
+            <td style="padding: 8px 12px; text-align: center; font-weight: 700; color: var(--red);">42%</td>
+            <td style="padding: 8px 12px; color: var(--fg-sub);">of companies abandoned most AI initiatives — up from 17% in 2024 (2025)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Three surfaces intro -->
+  <h3 style="margin-bottom: 16px;">Three improvement surfaces compound simultaneously</h3>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 36px;">
+    <div class="card" style="border-top: 3px solid var(--accent);">
+      <h3 style="color: var(--accent); font-size: 0.95rem;">Decision Surface</h3>
+      <p style="color: var(--fg-sub); font-size: 0.9rem;">
+        Context engineering on verified outcomes. Conservation-bounded scoring learns which factors matter.
+        Judgment memory transfers across domains. Every decision makes the next one sharper.
+      </p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--teal);">
+      <h3 style="color: var(--teal); font-size: 0.95rem;">System Surface</h3>
+      <p style="color: var(--fg-sub); font-size: 0.9rem;">
+        AgentEvolver shadow-tests strategies and promotes winners at runtime — no redeployment.
+        Situation analysis adapts to regime shifts, schema drift, threat landscape changes.
+      </p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--gold);">
+      <h3 style="color: var(--gold); font-size: 0.95rem;">Target Surface</h3>
+      <p style="color: var(--fg-sub); font-size: 0.9rem;">
+        Process-tech fusion rewires how ERP data (SAP, Oracle) and process mining data (Celonis)
+        flow through the decision graph. The enterprise systems RGI connects to get measurably better.
+      </p>
+    </div>
+  </div>
+
+  <!-- NBP: Static vs Compounding two curves -->
+  <div style="border-radius: 12px; overflow: hidden;">
+    <img src="img/nbp-static-vs-compounding.jpg" alt="Static AI vs RGI Compounding — two curves diverging" style="width: 100%; display: block;">
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 3: HOW IT WORKS                                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="how-it-works">
+<div class="container">
+  <div class="section-label">The Mechanism</div>
+  <h2>Score → Verify → Learn → Compound</h2>
+  <p style="color: var(--fg-sub); max-width: 640px; margin-bottom: 36px;">
+    Every decision teaches. Every verification strengthens. The system earns its autonomy — it doesn't assume it.
+  </p>
+
+  <!-- NBP: RGI Loop — four stages diamond -->
+  <div style="border-radius: 12px; overflow: hidden; max-width: 700px; margin: 0 auto 36px;">
+    <img src="img/nbp-rgi-loop.jpg" alt="The RGI Loop — Score, Verify, Learn, Compound with Conservation Gate" style="width: 100%; display: block;">
+  </div>
+
+  <!-- Loop explanation cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+    <div class="card" style="border-top: 3px solid var(--accent);">
+      <h3 style="font-size: 0.9rem;">Score</h3>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">
+        Domain-specific factors (4–7 per domain). ProfileScorer computes action probabilities via L2 distance to learned centroids. No black box — every factor's contribution visible.
+      </p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--gold);">
+      <h3 style="font-size: 0.9rem;">Verify</h3>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">
+        Human confirms or overrides the recommendation. Confirms update centroids gently (η=0.05). Overrides update more cautiously (η=0.01) with asymmetric penalty. The system learns from both.
+      </p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--teal);">
+      <h3 style="font-size: 0.9rem;">Learn</h3>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">
+        Centroids drift toward verified outcomes: μ_c ← μ_c + η·y·(v − μ_c). Every category builds its own judgment geometry. Decisions that don't pass the conservation gate don't compound.
+      </p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--accent); opacity: 0.85;">
+      <h3 style="font-size: 0.9rem;">Compound</h3>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">
+        Accuracy rises. The system earns autonomy — categories that prove reliable get auto-routing. Cross-domain patterns transfer. The gap widens with every cycle.
+      </p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 4: FIVE DOMAINS                                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section>
+<div class="container">
+  <div class="section-label">One Engine, Five Domains</div>
+  <h2>Same geometry. Different decisions. Every domain compounds.</h2>
+  <p style="color: var(--fg-sub); max-width: 640px; margin-bottom: 32px;">
+    One learning engine serves all five copilots. A pattern learned in DataOps transfers to S2P.
+    The fifth copilot adds more cross-domain discovery pairs than the first four combined.
+  </p>
+
+  <div class="domain-grid" style="margin-bottom: 32px;">
+    <div class="card domain-card dataops">
+      <div class="domain-tag" style="color: var(--purple);">DataOps Alert Triage</div>
+      <div class="domain-metric" style="color: var(--purple);">$1.6M</div>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">Projected annual value at 200 alerts/day, $800/alert (modeled at 4pp gap)</p>
+    </div>
+
+    <div class="card domain-card s2p">
+      <div class="domain-tag" style="color: var(--amber);">S2P Invoice Matching</div>
+      <div class="domain-metric" style="color: var(--amber);">$585K</div>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">Projected annual value at 150 invoices/day, $120/invoice (modeled at 12pp gap)</p>
+    </div>
+
+    <div class="card domain-card trading">
+      <div class="domain-tag" style="color: var(--red);">Trading Decisions</div>
+      <div class="domain-metric" style="color: var(--red);">+2pp</div>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">Compounding edge over frozen baseline — open source, no platform cost</p>
+    </div>
+
+    <div class="card domain-card restaurant">
+      <div class="domain-tag" style="color: var(--green);">Restaurant Purchasing</div>
+      <div class="domain-metric" style="color: var(--green);">84%</div>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">Category accuracy through learned ordering patterns across protein, produce, dairy, dry goods</p>
+    </div>
+
+    <div class="card domain-card labelqa">
+      <div class="domain-tag" style="color: var(--accent);">Label QA — Medical NER</div>
+      <div class="domain-metric" style="color: var(--accent);">91%</div>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">Label accuracy with auto-routing to the correct annotator tier</p>
+    </div>
+  </div>
+
+  <!-- C11: One Architecture, Five Domains -->
+  <div style="border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--card-shadow);">
+    <img src="img/nbp-five-domains.jpg" alt="One Architecture. Five Domains. Different Judgment in Each." style="width: 100%; display: block;">
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 5: THE EVIDENCE                                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section>
+<div class="container">
+  <div class="section-label">Simulation Results</div>
+  <h2>Benchmarked in controlled simulation.</h2>
+  <p style="color: var(--fg-sub); max-width: 640px; margin-bottom: 24px;">
+    Four copilots measured against industry benchmarks. Controlled experiments · synthetic + production-structure data · no production customers.
+  </p>
+
+  <!-- Benchmark results table -->
+  <div class="card" style="margin-bottom: 32px; overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 520px;">
+      <thead>
+        <tr>
+          <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); color: var(--fg-sub);">Copilot</th>
+          <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); color: var(--fg-sub);">Result (simulated)</th>
+          <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); color: var(--fg-sub);">Benchmark</th>
+          <th style="padding: 10px 12px; text-align: center; border-bottom: 2px solid var(--border); color: var(--accent); font-weight: 700;">Delta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border); font-weight: 600;">S2P Procurement</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border);">54–59% touchless</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--fg-sub);">42% best published benchmark*</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: center; font-weight: 700; color: var(--accent);">+15pp</td></tr>
+        <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border); font-weight: 600;">SOC Security Ops</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border);">30.85 min/alert saved</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--fg-sub);">SANS SOC Survey ’24, N=422</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: center; font-weight: 700; color: var(--accent);">MTTR −50%</td></tr>
+        <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border); font-weight: 600;">DataOps Pipeline Intel</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border);">15 min investigation</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--fg-sub);">3 hrs manual (fix transferred to 6 pipelines)</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: center; font-weight: 700; color: var(--accent);">12× faster</td></tr>
+        <tr><td style="padding: 8px 12px; font-weight: 600;">Trading Decision Quality</td>
+            <td style="padding: 8px 12px;">Sharpe 1.6</td>
+            <td style="padding: 8px 12px; color: var(--fg-sub);">Live Sharpe 0.4 (execution quality)</td>
+            <td style="padding: 8px 12px; text-align: center; font-weight: 700; color: var(--accent);">4×</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size: 0.75rem; color: var(--fg-muted); margin-top: 8px;">*Benchmark source: Zycus Merlin AI, Gartner MQ Leader 2026. Not a head-to-head comparison — measured against published industry rate.</p>
+  </div>
+
+  <h3 style="margin-bottom: 16px;">See it in the demo</h3>
+
+  <div class="evidence-tabs">
+    <button class="evidence-tab active" onclick="showPanel('roi')">What's the ROI?</button>
+    <button class="evidence-tab" onclick="showPanel('capabilities')">What can I do now?</button>
+    <button class="evidence-tab" onclick="showPanel('competitive')">How is RGI better?</button>
+  </div>
+
+  <!-- Panel 1: ROI -->
+  <div id="panel-roi" class="evidence-panel active">
+    <div class="stat-row" style="margin-bottom: 24px;">
+      <div class="stat-item card">
+        <div class="stat-value">+4pp</div>
+        <div class="stat-label">Accuracy Gain (78% → 82%)</div>
+      </div>
+      <div class="stat-item card">
+        <div class="stat-value" style="color: var(--green);">2/3</div>
+        <div class="stat-label">Categories Earned Autonomy</div>
+      </div>
+      <div class="stat-item card">
+        <div class="stat-value" style="color: var(--gold);">4pp</div>
+        <div class="stat-label">Compounding Gap vs Frozen</div>
+      </div>
+      <div class="stat-item card">
+        <div class="stat-value" style="color: var(--teal);">$1.6M</div>
+        <div class="stat-label">Projected Annual Value (modeled)</div>
+      </div>
+    </div>
+
+    <!-- DataOps Why RGI: Score 74, $340K -->
+    <div style="border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--card-shadow);">
+      <img src="img/dataops-insight.png" alt="DataOps Alert Triage — Insight tab with severity heatmap, trust grid, and $1.6M projected value" style="width: 100%; display: block;">
+    </div>
+    <p style="font-size: 0.75rem; color: var(--fg-muted); margin-top: 8px;">Values shown are modeled from demo session data (simulated). Run the demo to generate your own.</p>
+  </div>
+
+  <!-- Panel 2: Capabilities -->
+  <div id="panel-capabilities" class="evidence-panel">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 24px;">
+      <div>
+        <h3 style="margin-bottom: 16px;">Capabilities unlock with use</h3>
+        <p style="font-size: 0.9rem; color: var(--fg-sub); margin-bottom: 16px;">
+          The system isn't static — it earns new capabilities as it proves accuracy.
+          Each milestone unlocks the next level of autonomy.
+        </p>
+        <!-- S2P Why RGI bottom: stepper + before/after -->
+        <div style="border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--card-shadow);">
+          <img src="img/s2p-whyrgi.png" alt="S2P Invoice Matching — $585K projected value, 12pp ahead of frozen baseline" style="width: 100%; display: block;">
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 16px;">Before and after</h3>
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th style="padding: 12px 16px; text-align: left; background: var(--bg-alt); border-bottom: 2px solid var(--border); width: 50%;">Without RGI</th>
+                <th style="padding: 12px 16px; text-align: left; background: var(--accent-light); border-bottom: 2px solid var(--border); width: 50%; color: var(--accent);">With RGI</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--fg-sub);">Every analyst starts from scratch</td>
+                  <td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">Judgment accumulates in centroids</td></tr>
+              <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--fg-sub);">Rules written once, never updated</td>
+                  <td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">Categories that prove reliable earn auto-routing</td></tr>
+              <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--fg-sub);">No memory of past decisions</td>
+                  <td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">Conservation law protects what's been learned</td></tr>
+              <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--fg-sub);">Same accuracy at decision 1,000</td>
+                  <td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">Measurably better — and you can see the curve</td></tr>
+              <tr><td style="padding: 10px 16px; color: var(--fg-sub);">Knowledge leaves with each departure</td>
+                  <td style="padding: 10px 16px;">Institutional judgment compounds permanently</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel 3: Competitive -->
+  <div id="panel-competitive" class="evidence-panel">
+    <p style="font-size: 0.9rem; color: var(--fg-sub); margin-bottom: 20px;">
+      Domain-specific competitive positioning. Harvey balls (● ◕ ◑ ◔ ○) show capability depth.
+      "You Saw This" markers link claims to what you can verify in the live demo.
+    </p>
+
+    <!-- DataOps compounding: trust grid + learning vs frozen vs static -->
+    <div style="border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--card-shadow); margin-bottom: 24px;">
+      <img src="img/dataops-compounding.png" alt="DataOps compounding — two lines, Learning vs Frozen, regime shift" style="width: 100%; display: block;">
+    </div>
+
+    <div class="card" style="background: var(--accent-light); border-color: var(--accent);">
+      <h3 style="color: var(--accent); font-size: 0.95rem;">The moat</h3>
+      <p style="color: var(--fg-sub); font-size: 0.9rem;">
+        Six compounding capabilities — scoring, verification, learning, conservation, evolution, cross-domain transfer —
+        that improve with every decision. Competitors would need to replicate the substrate, not just the features.
+        The longer RGI runs, the wider the gap.
+      </p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 6: FOR ARCHITECTS                              -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section>
+<div class="container">
+  <div class="section-label">For Architects</div>
+  <h2>Under the hood</h2>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-bottom: 32px;">
+    <div class="card">
+      <h3 style="color: var(--accent);">Graph Attention Engine</h3>
+      <p style="font-size: 0.85rem; color: var(--fg-sub); margin-bottom: 8px;">
+        Open source: <code class="mono" style="font-size: 0.8rem; background: var(--bg-alt); padding: 2px 6px; border-radius: 4px;">pip install graph-attention-engine</code>
+      </p>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">
+        ~844 parameters. Apache 2.0. 1,280 tests.
+        ProfileScorer computes L2 distance to learned centroids — softmax over category prototypes.
+        No neural network. No GPU. Runs on a laptop.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="color: var(--teal);">Conservation Law</h3>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">
+        θ_min = 23.53 / (α × V). The system cannot grant autonomy until it has enough verified decisions
+        to bound error at the 95th percentile. Domain-specific penalty ratios (20:1 for SOC, 5:1 for S2P)
+        make the threshold contextual. Not a hyperparameter — a mathematical gate.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="color: var(--gold);">Centroid Update Rule</h3>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">
+        <code class="mono" style="font-size: 0.8rem; background: var(--bg-alt); padding: 2px 6px; border-radius: 4px;">μ_c ← μ_c + η · y · (v − μ_c)</code>
+        <br><br>
+        Same equation in every copilot. Different centroids, different geometries.
+        Confirms: η = 0.05. Overrides: η = 0.01. The asymmetry is the safety mechanism.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="color: var(--purple);">Tensor Dimensions</h3>
+      <p style="font-size: 0.85rem; color: var(--fg-sub);">
+        Each domain defines its own judgment space:<br>
+        <span class="mono" style="font-size: 0.8rem;">SOC (6×4×6)=144 · S2P (5×5×7)=175<br>
+        Trading (5×3×6)=90 · Purchasing (5×4×6)=120<br>
+        DataOps (6×5×6)=180</span><br><br>
+        709 centroids across five demo domains. 10 cross-domain discovery pairs.
+      </p>
+    </div>
+  </div>
+
+
+
+  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+    <a href="https://rgi.dakshineshwari.net" target="_blank" class="btn btn-secondary" style="font-size: 0.85rem;">
+      Product Documentation →
+    </a>
+    <a href="https://pypi.org/project/graph-attention-engine/" target="_blank" class="btn btn-secondary" style="font-size: 0.85rem;">
+      PyPI: graph-attention-engine →
+    </a>
+    <a href="https://www.dakshineshwari.net" target="_blank" class="btn btn-secondary" style="font-size: 0.85rem;">
+      Research & Publications →
+    </a>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 7: CTA + FOOTER                                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section style="text-align: center; padding-bottom: 32px;">
+<div class="container">
+  <h2 style="margin-bottom: 8px;">See it compound.</h2>
+  <p style="color: var(--fg-sub); margin-bottom: 28px; max-width: 480px; margin-left: auto; margin-right: auto;">
+    No login. No signup. Runs in your browser. Pick a domain, score some decisions, and watch the curves diverge.
+    <br><span style="font-size: 0.8rem; color: var(--fg-muted);">First load may take ~30 seconds if the Space is cold.</span>
+  </p>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 24px;">
+    <a href="https://huggingface.co/spaces/abanerji/rgi-demo-v2" target="_blank" class="btn btn-primary" style="font-size: 1.05rem; padding: 16px 36px;">
+      Try the Live Demo →
+    </a>
+    <a href="https://rgi.dakshineshwari.net" target="_blank" class="btn btn-secondary" style="font-size: 1.05rem; padding: 16px 36px;">
+      Product Documentation →
+    </a>
+  </div>
+  <p style="color: var(--fg-sub); font-size: 0.9rem; max-width: 640px; margin: 0 auto;">Built by <strong>Arindam Banerji</strong> — creator of the Accenture Insights Platform, co-creator of HP e-Speak, 9 US patents, 20+ years enterprise AI. Pre-revenue, working with a small number of design partners.</p>
+  <p style="color: var(--fg-sub); font-size: 0.9rem; margin-top: 8px;"><a href="https://www.dakshineshwari.net" target="_blank" style="color: var(--accent);">dakshineshwari.net</a></p>
+</div>
+</section>
+
+<footer class="footer">
+<div class="container">
+  <p style="margin-bottom: 8px;">
+    <strong style="color: var(--fg);">RGI</strong> · Recursive Graph Improvement
+  </p>
+  <p>
+    Arindam Banerji · <a href="https://www.dakshineshwari.net">dakshineshwari.net</a> · <a href="https://rgi.dakshineshwari.net">rgi.dakshineshwari.net</a>
+  </p>
+  <p style="margin-top: 12px; font-size: 0.75rem;">
+    Simulation results. Controlled experiments · synthetic + production-structure data · no production customers.
+    Seeded with 200 simulated decisions per domain. Quick Demo runs 400. ~194 experiments total.
+  </p>
+</div>
+</footer>
+
+<script>
+function showPanel(id) {
+  document.querySelectorAll('.evidence-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.evidence-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body></html>
